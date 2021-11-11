@@ -34,7 +34,7 @@ concept arithmetic = std::is_arithmetic_v<T>;
 ```c++
 #include <Euclid/Eucild.h>
 
-using namespace sorry;
+using namespace euclid;
 
 int main()
 {
