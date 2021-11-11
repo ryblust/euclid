@@ -2,7 +2,7 @@
 > Sorry's Graphics Mathematics Library
 
 ## Overview
-**Eucild** is a Graphcis Mathematics Libray for the mathematices computation in Computer Graphics
+**Eucild** is a Graphcis Mathematics Libray for the mathematices computation in Computer Graphics requires C++20 supported compiler
 
 **Features** 
 - Strictly differ `Vector`, `Matrix`, `Point` and `Scalar` in the compiler-time
@@ -17,6 +17,18 @@
 ```c++
 template<typename T>
 concept arithmetic = std::is_arithmetic_v<T>;
+```
+- Type convertion in `Vector` 
+```c++
+	// implicitly
+	vec3f a{ 1.1f,2.2f,3.3f };
+	vec2i b = a;
+	b.print(); // [1,2]
+	
+	// explicitly
+	vec3f a{ 1,1f,2,2f,3.3f };
+	vec2i b = a.cast<int, 2>();
+	b.print(); // [1,2]
 ```
 ## Example
 ```c++
