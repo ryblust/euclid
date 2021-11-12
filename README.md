@@ -12,23 +12,25 @@
 - SIMD speed up(To-do)
 
 ## Introdution
-- Compile-time type constraints by using C++20 concept
+- Compile-time type constraints
 
 ```c++
 template<typename T>
 concept arithmetic = std::is_arithmetic_v<T>;
 ```
-- Type convertion in `Vector` 
+
+- Automatically arithmetic type promotion
+
 ```c++
-	// implicitly
-	vec3f a{ 1.1f,2.2f,3.3f };
-	vec2i b = a;
-	b.print(); // [1,2]
-	
-	// explicitly
-	vec3f a{ 1,1f,2,2f,3.3f };
-	vec2i b = a.cast<int, 2>();
-	b.print(); // [1,2]
+scalarf a = 1.1f;
+vec2i vec{ 1,2 };
+auto res = a * vec; // get vec2f
+```
+- Type convertion
+```c++
+vec3f a{ 1,1f,2,2f,3.3f };
+vec2i b = a.cast<int, 2>();
+b.print(); // [1,2]
 ```
 ## Example
 ```c++
