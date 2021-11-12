@@ -6,10 +6,12 @@
 
 **Features** 
 - Strictly differ `Vector`, `Matrix`, `Point` and `Scalar` in the compiler-time
+- Euclidean Affine & Euclidean Vector
+- SIMD speed up(To-do)
 - OOP
 - Head-only
 - Single inheritance
-- SIMD speed up(To-do)
+- Common function in Computer Graphics(affine, convolution, euler, triangle)
 
 ## Introdution
 - Compile-time type constraints
