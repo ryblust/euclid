@@ -45,3 +45,10 @@ int main()
     a.cross(b).print();
     a.dot(b).print();
 }
+```
+## To Do
+1. ```euclid::point```
+2. ```euclid::Matrix```
+3. ```std::conjunction_v``` in ```Vector``` type deduction guide
+4. compare 3 instructions vs 4 instructions in assembly
+5. SIMD speed up
