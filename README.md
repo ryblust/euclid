@@ -2,7 +2,7 @@
 > Sorry's Graphics Mathematics Library
 
 ## Overview
-**Eucild** is a Graphcis Mathematics Libray for the mathematices computation in Computer Graphics requires C++20 supported compiler
+**Euclid** is a Graphics Mathematics Libray for the mathematics computation in Computer Graphics requires C++20 supported compiler
 
 **Features** 
 - Strictly differ `Vector`, `Matrix`, `Point` and `Scalar` in the compiler-time
@@ -11,9 +11,9 @@
 - OOP
 - Head-only
 - Single inheritance
-- Common function in Computer Graphics(affine, convolution, euler, triangle)
+- Common function in Computer Graphics(affine, convolution, Euler, triangle)
 
-## Introdution
+## Introduction
 - Compile-time type constraints
 
 ```c++
@@ -54,3 +54,4 @@ int main()
 3. ```std::conjunction_v``` in ```Vector``` type deduction guide
 4. compare 3 instructions vs 4 instructions in assembly
 5. SIMD speed up
+6. ...
