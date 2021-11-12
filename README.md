@@ -2,7 +2,7 @@
 > Sorry's Graphics Mathematics Library
 
 ## Overview
-**Euclid** is a Graphics Mathematics Libray for the mathematics computation in Computer Graphics requires C++20 supported compiler
+**Euclid** is a Graphics Mathematics Libray for the mathematics computation in Computer Graphics required C++20 supported compiler
 
 **Features** 
 - Strictly differ `Vector`, `Matrix`, `Point` and `Scalar` in the compiler-time
