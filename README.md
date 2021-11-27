@@ -2,7 +2,7 @@
 > weeknd's Graphics Mathematics Library
 
 ## Overview
-**Euclid** 是一个基于 C++20 的图形数学库，提供了完整的编译期计算支持
+**Euclid** 是一个基于 C++20 的图形数学库，提供了完整的编译期计算支持和严格的类型约束
 
 **Features**
 - 编译期的类型约束
@@ -49,7 +49,7 @@ auto res = mat2i * v1; // get ve2f
 
 ```
 
-- constexpr Math function
+- ```constexpr```数学函数
 ```c++
 constexpr float res1 = math::cos(45);
 constexpr float res2 = math::sqrt(2);
@@ -60,7 +60,22 @@ constexpr float res2 = math::sqrt(2);
 vec3f a{ 1,1f,2,2f,3.3f };
 vec3i b = a.cast<int>(); // [1, 2, 3]
 ```
-- Transformation
+
+- ```operator+=, -=, *=```的```concpets```约束
+```c++
+template<typename Des, typename Src>
+concept acceptable_loss = float_point_type<Des> || same_type<Des, Src>;
+
+vec2i v1{ 1, 2 };
+vec2f v2{ 1.1f, 2.2f };
+vec2f v3{ 1.1, 2.2 };
+scalarf a = 1.2f;
+v1 *= a; // compiler-tiem error: int *= float too much precision loss 
+v1 += v2; // same reason
+v2 += v3; // no error: the precision loss is accpetable
+```
+
+- Transformation in Homogeneous Coordinates
 ```c++
 template<arithmetic auto x, arithmetic auto y, arithmetic auto z>
 static inline constexpr mat4<arithmetic_value_promotion_t<x, y, z>> Translate{
