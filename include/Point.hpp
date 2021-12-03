@@ -16,10 +16,11 @@ public:
 
     template<arithmetic T>
     constexpr Point<T, Size> cast() const noexcept {
-        return  { static_cast<T>(point[0]),
-                  static_cast<T>(point[1]),
-                  static_cast<T>(point[2]),
-                  static_cast<T>(point[3])
+        return { 
+            static_cast<T>(point[0]),
+            static_cast<T>(point[1]),
+            static_cast<T>(point[2]),
+            static_cast<T>(point[3])
         };
     }
 
@@ -42,17 +43,17 @@ public:
     }
 
     constexpr this_type operator-() const noexcept {
-        this_type retPoint = *this;
-        return retPoint.negative();
+        return { -point[0], -point[1], -point[2], -point[3] };
     }
 
     template<arithmetic T>
-    constexpr auto operator-(const Point<T, Size>& otherPoint) const noexcept {
-        using type = typename arithmetic_promotion<Type, T>::type;
-        return Vector<type, Size> { point[0] - otherPoint[0],
-                                    point[1] - otherPoint[1],
-                                    point[2] - otherPoint[2],
-                                    point[3] - otherPoint[3] };
+    constexpr Vector<arithmetic_promotion_t<Type, T>, Size> operator-(const Point<T, Size>& otherPoint) const noexcept {
+        return { 
+            point[0] - otherPoint[0],
+            point[1] - otherPoint[1],
+            point[2] - otherPoint[2],
+            point[3] - otherPoint[3]
+        };
     }
 
     template<arithmetic T>
@@ -74,7 +75,6 @@ public:
 template<arithmetic First, arithmetic... Rest> requires same_type<First, Rest...>
 Point(First, Rest...)->Point<First, sizeof...(Rest) + 1>;
 
-#pragma region TypeDefineForPoint
 // for 2d Point
 template<arithmetic T>
 using point2 = Point<T, 2>;
@@ -101,7 +101,6 @@ using point4f = Point<float, 4>;
 using point2d = Point<double, 2>;
 using point3d = Point<double, 3>;
 using point4d = Point<double, 4>;
-#pragma endregion
 
 }
 

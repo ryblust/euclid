@@ -19,7 +19,7 @@ public:
 
 	consteval Matrix() noexcept {}
 
-	constexpr Matrix(std::initializer_list<value_type> list) noexcept {
+	constexpr Matrix(const std::initializer_list<value_type> list) noexcept {
 		for (size_t row = 0; row < Row; ++row) {
 			for (size_t col = 0; col < Col; ++col) {
 				mat[col][row] = *(list.begin() + row * Col + col);
@@ -27,10 +27,23 @@ public:
 		}
 	}
 
+	/* To-do
+	constexpr Matrix(const Vector<Type, Row>&... vec) noexcept {
+
+	} */
+
 	static constexpr this_type identity() noexcept requires (Row == Col) {
-		Matrix retMat{};
+		Matrix retMat;
 		for (size_t i = 0; i < Col; ++i) {
 			retMat[i][i] = 1;
+		}
+		return retMat;
+	}
+
+	static constexpr this_type identity(arithmetic auto const val) noexcept requires (Row == Col) {
+		Matrix retMat;
+		for (size_t i = 0; i < Col; ++i) {
+			retMat[i][i] = val;
 		}
 		return retMat;
 	}
@@ -126,7 +139,10 @@ public:
 
 	template<arithmetic T> requires acceptable_loss<Type, T>
 	constexpr this_ref operator*=(const T scalar) noexcept {
-		return (*this) *= Scalar(scalar);
+		for (size_t i = 0; i < Col; ++i) {
+			mat[i] *= scalar;
+		}
+		return *this;
 	}
 
 	template<arithmetic T>
@@ -141,13 +157,18 @@ public:
 
 	template<arithmetic T>
 	constexpr auto operator*(const T scalar) const noexcept {
-		return (*this) * Scalar(scalar);
+		using type = arithmetic_promotion_t<Type, T>;
+		Matrix<type, Row, Col> retMat;
+		for (size_t i = 0; i < Col; ++i) {
+			retMat[i] = mat[i] * scalar;
+		}
+		return retMat;
 	}
 
 	template<arithmetic T>
 	constexpr auto operator*(const Vector<T, Col>& vec) const noexcept {
 		using type = arithmetic_promotion_t<Type, T>;
-		Vector<type, Col> retVec;
+		Vector<type, Row> retVec;
 		for (size_t i = 0; i < Col; ++i) {
 			retVec += mat[i] * vec[i];
 		}
@@ -157,8 +178,14 @@ public:
 	template<arithmetic T>
 	constexpr auto operator*(const Point<T, Col>& point) const noexcept {
 		using type = arithmetic_promotion_t<Type, T>;
-		Point<type, Col> retPoint;
-		// to-do
+		Point<type, Row> retPoint;
+		for (size_t i = 0; i < Col; ++i) {
+			const auto v = mat[i] * point[i];
+			retPoint[0] += v[0];
+			retPoint[1] += v[1];
+			retPoint[2] += v[2];
+			retPoint[3] += v[3];
+		}
 		return retPoint;
 	}
 
@@ -193,7 +220,6 @@ constexpr auto operator*(const Ty1 scalar, const Matrix<Ty2, Row, Col>& mat) noe
 	return mat * scalar;
 }
 
-#pragma region TypeDefineForMatrix
 // for 2d Matrix
 template<arithmetic T>
 using mat2 = Matrix<T, 2, 2>;
@@ -220,7 +246,6 @@ using mat4f = Matrix<float, 4, 4>;
 using mat2d = Matrix<double, 2, 2>;
 using mat3d = Matrix<double, 3, 3>;
 using mat4d = Matrix<double, 4, 4>;
-#pragma endregion
 
 }
 

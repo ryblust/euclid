@@ -25,6 +25,9 @@ inline constexpr bool is_float_point_type_v = is_any_type_of_v<Ty, float, double
 template<typename First, typename... Rest>
 concept same_type = detail::is_same_type_v<First, Rest...>;
 
+template<typename First, typename Rest>
+concept not_same_type = !detail::is_same_type_v<First, Rest>;
+
 // Euclid only supports arithmetic_type
 template<typename Ty>
 concept arithmetic = detail::is_arithmetic_type_v<Ty>;

@@ -2,7 +2,7 @@
 #ifndef _SORRYSCALAR_HPP
 #define _SORRYSCALAR_HPP
 
-#include "Common/Concepts.hpp"
+#include "Common/Core.hpp"
 
 namespace euclid {
 
