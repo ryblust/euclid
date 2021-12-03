@@ -21,19 +21,19 @@ Vector<char, 3>; // compiler-time error
 ```
 - ```.print()```
 ```c++
-    // 如要将数据打印到 Console，请先 #include <iostream>
-    #include <iostream>
-    #include <Euclid.h>
-    
-    vec3i v1{ 1,2,0 };
-    v1.print();
-    
-    point3f p1 { 1.2f, 2.3f, 1.f };
-    p1.print();
-    
-    mat2i m1{ 1,  0,
-              0, -1 };
-    m1.print();
+// 如要将数据打印到 Console，请先 #include <iostream>
+#include <iostream>
+#include <Euclid.h>
+
+vec3i v1{ 1,2,0 };
+v1.print();
+
+point3f p1 { 1.2f, 2.3f, 1.f };
+p1.print();
+
+mat2i m1{ 1,  0,
+          0, -1 };
+m1.print();
 ```
 
 
