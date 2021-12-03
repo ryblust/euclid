@@ -10,10 +10,6 @@ template<arithmetic Type>
 class Triangle {
 public:
 
-
-
-
-
 public:
 	point3<Type> vertex[3];
 };

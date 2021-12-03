@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _SORRYVECTOR_HPP
-#define _SORRYVECTOR_HPP
+#ifndef _WEEKNDVECTOR_HPP
+#define _WEEKNDVECTOR_HPP
 
 #include "Scalar.hpp"
 #include "Common/Math.hpp"
@@ -217,4 +217,4 @@ using vec4d = Vector<double, 4>;
 
 }
 
-#endif // _SORRYVECTOR_HPP
+#endif // _WEEKNDVECTOR_HPP

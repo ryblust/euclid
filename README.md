@@ -19,6 +19,13 @@ Vecotr<int, 3>; // OK
 Point<float, 3>; // OK
 Vector<char, 3>; // compiler-time error
 ```
+- ```.print()```
+```c++
+    // 如要将数据打印到 Console，请先 #include <iostream>
+    #include <iostream>
+    #include <Euclid.h>
+```
+
 
 - **自动算术类型提升**
     

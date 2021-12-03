@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _SORRYPOINT_HPP
-#define _SORRYPOINT_HPP
+#ifndef _WEEKNDPOINT_HPP
+#define _WEEKNDPOINT_HPP
 
 #include "Vector.hpp"
 
@@ -104,4 +104,4 @@ using point4d = Point<double, 4>;
 
 }
 
-#endif // _SORRYPOINT_HPP
+#endif // _WEEKNDPOINT_HPP

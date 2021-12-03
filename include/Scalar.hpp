@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _SORRYSCALAR_HPP
-#define _SORRYSCALAR_HPP
+#ifndef _WEEKNDSCALAR_HPP
+#define _WEEKNDSCALAR_HPP
 
 #include "Common/Core.hpp"
 
@@ -49,4 +49,4 @@ using scalard = Scalar<double>;
 
 }
 
-#endif // _SORRYSCALAR_HPP
+#endif // _WEEKNDSCALAR_HPP

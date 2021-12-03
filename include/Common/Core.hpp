@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _SORRYCONCEPTS_HPP
-#define _SORRYCONCEPTS_HPP
+#ifndef _WEEKNDCORE_HPP
+#define _WEEKNDCORE_HPP
 
 #include <type_traits>
 
@@ -56,4 +56,4 @@ concept acceptable_loss = float_point_type<Des> || same_type<Des, Src>;
 
 }
 
-#endif // _SORRYCONCEPTS_HPP
+#endif // _WEEKNDCORE_HPP
