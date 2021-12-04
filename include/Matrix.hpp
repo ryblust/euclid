@@ -210,12 +210,12 @@ public:
 	Vector<Type, Row> mat[Col];
 };
 
-template<arithmetic Ty1, arithmetic Ty2, size_t Row, size_t Col> inline
+template<arithmetic Ty1, arithmetic Ty2, size_t Row, size_t Col>
 constexpr auto operator*(const Scalar<Ty1> scalar, const Matrix<Ty2, Row, Col>& mat) noexcept {
 	return mat * scalar;
 }
 
-template<arithmetic Ty1, arithmetic Ty2, size_t Row, size_t Col> inline
+template<arithmetic Ty1, arithmetic Ty2, size_t Row, size_t Col>
 constexpr auto operator*(const Ty1 scalar, const Matrix<Ty2, Row, Col>& mat) noexcept {
 	return mat * scalar;
 }

@@ -175,12 +175,12 @@ public:
     value_type vec[4]{};
 };
 
-template<arithmetic Ty1, arithmetic Ty2, size_t S> inline
+template<arithmetic Ty1, arithmetic Ty2, size_t S>
 constexpr auto operator*(const Scalar<Ty1> scalar, const Vector<Ty2, S>& vec) noexcept {
     return vec * scalar;
 }
 
-template<arithmetic Ty1, arithmetic Ty2, size_t S> inline
+template<arithmetic Ty1, arithmetic Ty2, size_t S>
 constexpr auto operator*(const Ty1 scalar, const Vector<Ty2, S>& vec) noexcept {
     return vec * scalar;
 }
