@@ -8,7 +8,7 @@
 #ifdef _WIN64
 	#define Euclid_Math_Forceinline __forceinline
 #else
-	#define Euclid_Math_Force_Inline inline __attribute__((always_inline))
+	#define Euclid_Math_Forceinline inline __attribute__((always_inline))
 #endif
 
 namespace euclid {
