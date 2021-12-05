@@ -17,7 +17,7 @@
 ```c++
 Vecotr<int, 3>; // OK
 Point<float, 3>; // OK
-Vector<char, 3>; // compiler-time error
+Vector<char, 3>; // compile-time error
 ```
 - ```.print()```
 ```c++
