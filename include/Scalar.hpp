@@ -9,37 +9,35 @@ namespace euclid {
 template<arithmetic Type>
 class Scalar {
 public:
-    using value_type = Type;
-    using this_type  = Scalar;
-    using this_ref   = Scalar&;
+    constexpr Scalar() noexcept {}
 
-    constexpr Scalar(const value_type val) noexcept : scalar(val) {}
+    constexpr Scalar(const Type val) noexcept : scalar(val) {}
 
-    constexpr operator value_type() const noexcept {
+    constexpr operator Type() const noexcept {
         return scalar;
     }
 
-    constexpr this_ref negative() noexcept {
+    constexpr Scalar& negative() noexcept {
         scalar = -scalar;
         return *this;
     }
 
-    constexpr this_type operator-() const noexcept {
+    constexpr Scalar operator-() const noexcept {
         return -scalar;
     }
 
     constexpr void print() const noexcept {
         #ifdef _IOSTREAM_
             std::cout << scalar << '\n';
-        #endif // IOSTREAM_
+        #endif // _IOSTREAM_
     }
 
     template<arithmetic T>
     constexpr Scalar<T> cast() const noexcept {
         return static_cast<T>(scalar);
     }
-public:
-    value_type scalar{};
+
+    Type scalar{};
 };
 
 using scalari = Scalar<int>;

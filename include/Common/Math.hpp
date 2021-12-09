@@ -16,10 +16,10 @@ namespace euclid {
 namespace math {
 
 template<float_point_type Ty>
-static inline constexpr Ty pi = static_cast<Ty>(3.1415926535897932384626433832795028841972);
+inline constexpr Ty pi = static_cast<Ty>(3.1415926535897932384626433832795028841972);
 
 template<float_point_type Ty>
-static inline constexpr Ty radian = pi<Ty> / 180;
+inline constexpr Ty radian = pi<Ty> / 180;
 
 namespace detail {
 

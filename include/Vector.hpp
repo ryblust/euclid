@@ -10,11 +10,6 @@ namespace euclid {
 template<arithmetic Type, size_t Size>
 class Vector {
 public:
-    using value_type = Type;
-    using reference  = Type&;
-    using this_type  = Vector;
-    using this_ref   = Vector&;
-
     template<arithmetic T>
     constexpr Vector<T, Size> cast() const noexcept {
         return { 
@@ -26,23 +21,29 @@ public:
     }
 
     constexpr arithmetic_promotion_t<Type, float> norm() const noexcept {
-        return math::sqrt(static_cast<float>(vec[0] * vec[0] +
-                                             vec[1] * vec[1] +
-                                             vec[2] * vec[2] +
-                                             vec[3] * vec[3]));
+        const Type squareSum = vec[0] * vec[0] + vec[1] * vec[1] + 
+                               vec[2] * vec[2] + vec[3] * vec[3];
+        if (squareSum) [[likely]] {
+            return math::sqrt(static_cast<float>(squareSum));
+        } else [[unlikely]] {
+            return 0;
+        }
     }
 
     constexpr Vector<arithmetic_promotion_t<Type, float>, Size> normalize() const noexcept {
-        const auto normValue = norm();
-        return {
-            vec[0] / normValue,
-            vec[1] / normValue,
-            vec[2] / normValue,
-            vec[3] / normValue
-        };
+        if (const auto normValue = this->norm(); normValue) [[likely]] {
+            return {
+                vec[0] / normValue,
+                vec[1] / normValue,
+                vec[2] / normValue,
+                vec[3] / normValue
+            };
+        } else [[unlikely]] {
+            return {};
+        }
     }
 
-    constexpr this_ref negative() noexcept {
+    constexpr Vector& negative() noexcept {
         vec[0] = -vec[0];
         vec[1] = -vec[1];
         vec[2] = -vec[2];
@@ -84,12 +85,12 @@ public:
         return ((*this) - otherVec).norm();
     }
 
-    constexpr this_type operator-() const noexcept {
+    constexpr Vector operator-() const noexcept {
         return { -vec[0], -vec[1], -vec[2], -vec[3] };
     }
 
     template<arithmetic T> requires acceptable_loss<Type, T>
-    constexpr this_ref operator+=(const Vector<T, Size>& otherVec) noexcept {
+    constexpr Vector& operator+=(const Vector<T, Size>& otherVec) noexcept {
         vec[0] += otherVec[0];
         vec[1] += otherVec[1];
         vec[2] += otherVec[2];
@@ -98,7 +99,7 @@ public:
     }
 
     template<arithmetic T> requires acceptable_loss<Type, T>
-    constexpr this_ref operator-=(const Vector<T, Size>& otherVec) noexcept {
+    constexpr Vector& operator-=(const Vector<T, Size>& otherVec) noexcept {
         vec[0] -= otherVec[0];
         vec[1] -= otherVec[1];
         vec[2] -= otherVec[2];
@@ -127,7 +128,7 @@ public:
     }
 
     template<arithmetic T> requires acceptable_loss<Type, T>
-    constexpr this_ref operator*=(const Scalar<T> scalar) noexcept {
+    constexpr Vector& operator*=(const Scalar<T> scalar) noexcept {
         vec[0] *= scalar;
         vec[1] *= scalar;
         vec[2] *= scalar;
@@ -136,7 +137,7 @@ public:
     }
 
     template<arithmetic T> requires acceptable_loss<Type, T>
-    constexpr this_ref operator*=(const T scalar) noexcept {
+    constexpr Vector& operator*=(const T scalar) noexcept {
         vec[0] *= scalar;
         vec[1] *= scalar;
         vec[2] *= scalar;
@@ -164,23 +165,23 @@ public:
         };
     }
 
-    constexpr reference operator[](const size_t pos) noexcept {
+    constexpr Type& operator[](const size_t pos) noexcept {
         return vec[pos];
     }
 
-    constexpr value_type operator[](const size_t pos) const noexcept {
+    constexpr Type operator[](const size_t pos) const noexcept {
         return vec[pos];
     }
-public:
-    value_type vec[4]{};
+
+    Type vec[4]{};
 };
 
-template<arithmetic Ty1, arithmetic Ty2, size_t S>
+template<arithmetic Ty1, arithmetic Ty2, size_t S> inline
 constexpr auto operator*(const Scalar<Ty1> scalar, const Vector<Ty2, S>& vec) noexcept {
     return vec * scalar;
 }
 
-template<arithmetic Ty1, arithmetic Ty2, size_t S>
+template<arithmetic Ty1, arithmetic Ty2, size_t S> inline
 constexpr auto operator*(const Ty1 scalar, const Vector<Ty2, S>& vec) noexcept {
     return vec * scalar;
 }
@@ -188,29 +189,27 @@ constexpr auto operator*(const Ty1 scalar, const Vector<Ty2, S>& vec) noexcept {
 template<arithmetic First, arithmetic... Rest> requires same_type<First, Rest...>
 Vector(First, Rest...)->Vector<First, sizeof...(Rest) + 1>;
 
-// for 2d Vector
 template<arithmetic T>
 using vec2 = Vector<T, 2>;
-// for 3d Vector
+
 template<arithmetic T>
 using vec3 = Vector<T, 3>;
-// for 4d Vector
+
 template<arithmetic T>
 using vec4 = Vector<T, 4>;
 
-// for integer Vector
 using vec2i = Vector<int, 2>;
 using vec3i = Vector<int, 3>;
 using vec4i = Vector<int, 4>;
-// for unsigned Vector
+
 using vec2u = Vector<unsigned, 2>;
 using vec3u = Vector<unsigned, 3>;
 using vec4u = Vector<unsigned, 4>;
-// for float Vector
+
 using vec2f = Vector<float, 2>;
 using vec3f = Vector<float, 3>;
 using vec4f = Vector<float, 4>;
-// for double Vector
+
 using vec2d = Vector<double, 2>;
 using vec3d = Vector<double, 3>;
 using vec4d = Vector<double, 4>;
