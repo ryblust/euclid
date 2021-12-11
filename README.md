@@ -6,7 +6,7 @@
 
 **Features**
 - 编译期的类型约束
-- ```SIMD```(To-do)
+- ```SIMD```(Working on)
 - Head-only
 - 齐次坐标下的```transformation```
 
