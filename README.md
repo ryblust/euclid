@@ -21,8 +21,8 @@ Vector<char, 3>; // compile-time error
 ```
 - ```.print()```
 ```c++
-// 如要将数据打印到 Console，请先 #include <iostream>
-#include <iostream>
+// 如要将数据打印到 Console，请先 #include <Euclid_io.h>
+#include <Euclid_io.h>
 #include <Euclid.h>
 
 vec3i v1{ 1,2,0 };
