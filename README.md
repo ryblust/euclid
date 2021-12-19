@@ -17,7 +17,7 @@
   
   It will be replaced by ```if consteval``` when mainstream compiler supports
   
-  Run-time using SIMD(AVX2) to speed up
+  Using SIMD(AVX2) intrinsics to speed up ar Run-time
 
 - 编译期的类型约束 - using ```concept```
     
