@@ -5,12 +5,20 @@
 **Euclid** 是一个基于 C++20 的图形数学库，提供编译期的计算支持和严格的类型约束
 
 **Features**
+- 编译期的计算支持
 - 编译期的类型约束
-- ```SIMD```(Working on)
+- ```SIMD``` Speed up (AVX2 Intrinsics Supported)
 - Head-only
-- 齐次坐标下的```transformation```
 
 ## Introduction
+- 编译期的计算支持 - 
+
+  using ```__builtin_is_constant_evaluated()``` to check if a function was called in constant-evaluated context
+  
+  It will be replaced by ```if consteval``` when mainstream compiler supports
+  
+  Run-time using SIMD(AVX2) to speed up
+
 - 编译期的类型约束 - using ```concept```
     
     Euclid 支持的算术类型类型有 ```int, unsigned int, float, double```
@@ -19,21 +27,23 @@ Vecotr<int, 3>; // OK
 Point<float, 3>; // OK
 Vector<char, 3>; // compile-time error
 ```
-- ```.print()```
+- ```euclid::io::print(...args)```
 ```c++
-// 如要将数据打印到 Console，请先 #include <Euclid_io.h>
-#include <Euclid_io.h>
+// 如要将数据打印到 Console，请在 <Euclid.h> 之后 
+// #include <Euclid_io.h>
+
 #include <Euclid.h>
+#include <Euclid_io.h>
 
 vec3i v1{ 1,2,0 };
-v1.print();
 
 point3f p1 { 1.2f, 2.3f, 1.f };
-p1.print();
 
 mat2i m1{ 1,  0,
           0, -1 };
-m1.print();
+
+io::print(v1, p1, m1);
+          
 ```
 
 
@@ -60,13 +70,17 @@ auto res = mat2i * v1; // get ve2f
 constexpr auto res1 = math::cos(45); // res1 : float
 constexpr auto res2 = math::sin(35.f) // res2 : float
 constexpr auto res3 = math::tan(45.2) // res3 : double
-constexpr float res2 = math::sqrt(2);
+constexpr float res4 = math::sqrt(2);
 ```
 
 - 类型转换
+
+    Euclid 只支持向上的类型转换且不支持 ```int``` cast to ```unsigned```
 ```c++
 vec3f a{ 1,1f,2,2f,3.3f };
-vec3i b = a.cast<int>(); // [1, 2, 3]
+vec3i b = a.cast<double>();
+vec4i v1{ 1,2,3,4 };
+vec4f = v1.cast<float>();
 vec3i c = a; // Euclid 并不提供隐式的类型转换
 ```
 
@@ -74,11 +88,11 @@ vec3i c = a; // Euclid 并不提供隐式的类型转换
 ```c++
 vec2i v1{ 1, 2 };
 vec2f v2{ 1.1f, 2.2f };
-vec2f v3{ 1.1, 2.2 };
-scalarf a = 1.2f;
-v1 *= a; // compile-time error: int *= float unacceptable precision loss
+vec2d v3{ 1.1, 2.2 };
+v1 *= 2.2f; // concept constraint is false: int *= float unacceptable precision loss
 v1 += v2; // same reason
-v2 += v3; // no error: acceptable precision loss
+v2 += v1 // no error: acceptable precision loss
+v2 += v3; // same reason
 ```
 
 - ```Transformation in Homogeneous Coordinates```
