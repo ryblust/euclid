@@ -1,8 +1,12 @@
 #pragma once
-#ifndef _WEEKNDCORE_HPP
-#define _WEEKNDCORE_HPP
 
-#include <type_traits>
+#ifdef _MSC_VER
+    #define Euclid_Forceinline [[msvc::forceinline]]
+#elif __has_cpp_attribute(gnu::always_inline)
+    #define Euclid_Force_Inline [[gnu::always_inline]]
+#else
+    #define Euclid_Force_Inline inline __attribute__((always_inline))
+#endif // Euclid_Forceinline
 
 namespace euclid {
 
@@ -25,9 +29,6 @@ inline constexpr bool is_float_point_type_v = is_any_type_of_v<Ty, float, double
 template<typename First, typename... Rest>
 concept same_type = detail::is_same_type_v<First, Rest...>;
 
-template<typename First, typename Rest>
-concept not_same_type = !detail::is_same_type_v<First, Rest>;
-
 // Euclid only supports arithmetic_type
 template<typename Ty>
 concept arithmetic = detail::is_arithmetic_type_v<Ty>;
@@ -40,20 +41,19 @@ struct arithmetic_promotion {
     using type = decltype((First{} + ... + Rest{}));
 };
 
-template<arithmetic auto... val>
-struct arithmetic_value_promotion {
-    using type = decltype((... + val));
-};
-
 template<arithmetic... Ty>
 using arithmetic_promotion_t = typename arithmetic_promotion<Ty...>::type;
 
-template<arithmetic auto... val>
-using arithmetic_value_promotion_t = typename arithmetic_value_promotion<val...>::type;
+template<typename Ty>
+concept signed_type = detail::is_any_type_of_v<Ty, int, float, double>;
 
 template<typename Des, typename Src>
-concept acceptable_loss = float_point_type<Des> || same_type<Des, Src>;
+concept acceptable_loss = signed_type<Des> && same_type<Des, arithmetic_promotion_t<Des, Src>>;
+
+template<typename Ty, typename CastT>
+concept promotion_cast = acceptable_loss<CastT, Ty> && !same_type<Ty, CastT>;
+
+template<typename Des, typename Src>
+concept acceptable_loss_basic = float_point_type<Des> || same_type<Des, Src>;
 
 }
-
-#endif // _WEEKNDCORE_HPP

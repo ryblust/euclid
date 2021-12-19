@@ -1,193 +1,334 @@
 #pragma once
-#ifndef _WEEKNDVECTOR_HPP
-#define _WEEKNDVECTOR_HPP
+#pragma warning(disable : 4324 4820)
 
-#include "Scalar.hpp"
-#include "Common/Math.hpp"
+/*
+
+                  Why Stop Working on the Automatic type convertion
+               (e.g., vec4f + vec4i = vec4i, vec4i * 2.f = vec4f, etc.)
+    ----------------------------------------------------------------------------
+
+    Reasons I concerned:
+
+    1. Hard to Maintain & Costs Many Time to Write
+       It's hard to keep code readable and clean,
+       you have to consider every type combination and have to give two impls,
+       a compile-time one and a run-time one
+
+    2. Performance Overhead & Tradeoff
+       Return Vector<double, Size> type, it generates a lot of extra codes,
+       which may due to the x64 'calling convention' I think, So you need to
+       decide whether let double type join the type convertion
+       Automatical type convertion is just a simple warpper of .cast<type>()
+       It needs a lot of if constexpr and more time in the compile-time
+    
+    3. Potential Errors
+       Automatical type convertion essentially is a implicit type convertion,
+       So it may cause the unexpected behavior
+
+    4. Not So Common
+       I think Vec4f and Vec3f is the most common use one, So it makes
+       automatical type convertion a little bit redundant
+
+    5. The Truth
+       I was too lazy! :)
+
+    -----------------------------------------------------------------------------
+
+    Basic Implementations:
+
+    template<typename Des, typename Src>
+    concept acceptable_loss = signed_type<Des> &&
+                              same_type<Des, arithmetic_promotion_t<Des, Src>> &&
+                              !same_type<Des, double>;
+
+    template<arithmetic T> requires acceptable_loss_in_return<Type, T>
+    constexpr Vector& operator+=(const Vector<T, Size> otherVec) noexcept {
+        return (*this += otherVec.cast<Type>());
+    }
+
+    template<arithmetic T> requires acceptable_loss_in_return<Type, T>
+    constexpr Vector& operator-=(const Vector<T, Size> otherVec) noexcept {
+        return (*this -= otherVec.cast<Type>());
+    }
+
+    template<arithmetic T> requires (!same_type<Type, double> && !same_type<T, double>)
+    constexpr auto operator*(const Vector<T, Size> otherVec) const noexcept {
+        using type = arithmetic_promotion_t<Type, T>;
+        if constexpr (same_type<Type, type>) {
+            return (*this) * otherVec.cast<type>();
+        } else {
+            return this->cast<type>() * otherVec;
+        }
+    }
+
+    template<arithmetic T> requires acceptable_loss<Type, T>
+    constexpr Vector& operator*=(const T mul) noexcept {
+        if (__builtin_is_constant_evaluated()) {
+            vec[0] *= mul;
+            vec[1] *= mul;
+            vec[2] *= mul;
+            vec[3] *= mul;
+        } else {
+            if constexpr (same_type<Type, float>) {
+                ::_mm256_store_ps(vec, _mm256_mul_ps(*(__m256*)this, ::_mm256_set1_ps(mul)));
+            } else if constexpr (same_type<Type, double>) {
+                ::_mm256_store_pd(vec, _mm256_mul_pd(*(__m256d*)this, ::_mm256_set1_pd(mul)));
+            } else {
+                ::_mm256_store_si256((__m256i*)this, _mm256_mullo_epi32(*(__m256i*)this, ::_mm256_set1_epi32(static_cast<int>(mul))));
+            }
+        }
+        return *this;
+    }
+
+    --------------------------------------------------------------------------
+
+    I left my shit here and hope one day i could finish it :)
+                                                                
+                                      THE END
+
+*/
 
 namespace euclid {
 
-template<arithmetic Type, size_t Size>
-class Vector {
+template<arithmetic Type, std::size_t Size>
+struct alignas(32) Vector {
 public:
-    template<arithmetic T>
-    constexpr Vector<T, Size> cast() const noexcept {
-        return { 
-            static_cast<T>(vec[0]),
-            static_cast<T>(vec[1]),
-            static_cast<T>(vec[2]),
-            static_cast<T>(vec[3])
-        };
-    }
+    using value_type = Type;
 
-    constexpr arithmetic_promotion_t<Type, float> norm() const noexcept {
-        const Type squareSum = vec[0] * vec[0] + vec[1] * vec[1] + 
-                               vec[2] * vec[2] + vec[3] * vec[3];
-        if (squareSum) [[likely]] {
-            return math::sqrt(static_cast<float>(squareSum));
-        } else [[unlikely]] {
-            return 0;
-        }
-    }
-
-    constexpr Vector<arithmetic_promotion_t<Type, float>, Size> normalize() const noexcept {
-        if (const auto normValue = this->norm(); normValue) [[likely]] {
+    template<arithmetic CastT> requires promotion_cast<Type, CastT>
+    constexpr Vector<CastT, Size> cast() const noexcept {
+        if (__builtin_is_constant_evaluated()) {
             return {
-                vec[0] / normValue,
-                vec[1] / normValue,
-                vec[2] / normValue,
-                vec[3] / normValue
+                static_cast<CastT>(vec[0]),
+                static_cast<CastT>(vec[1]),
+                static_cast<CastT>(vec[2]),
+                static_cast<CastT>(vec[3])
             };
-        } else [[unlikely]] {
-            return {};
+        } else {
+            Vector<CastT, Size> retVec;
+            if constexpr (same_type<CastT, float>) {
+                ::_mm256_store_ps(retVec.vec, _mm256_cvtepi32_ps(*(__m256i*)this));
+            } else {
+                if constexpr (same_type<Type, float>) {
+                    ::_mm256_store_pd(retVec.vec, _mm256_cvtps_pd(*(__m128*)this));
+                } else {
+                    ::_mm256_store_pd(retVec.vec, _mm256_cvtepi32_pd(*(__m128i*)this));
+                }
+            }
+            return retVec;
         }
     }
 
-    constexpr Vector& negative() noexcept {
-        vec[0] = -vec[0];
-        vec[1] = -vec[1];
-        vec[2] = -vec[2];
-        vec[3] = -vec[3];
+    constexpr Vector& negative() noexcept requires (signed_type<Type>) {
+        if (__builtin_is_constant_evaluated()) {
+            vec[0] = -vec[0];
+            vec[1] = -vec[1];
+            vec[2] = -vec[2];
+            vec[3] = -vec[3];
+        } else {
+            if constexpr (same_type<Type, float>) {
+                ::_mm256_store_ps(vec, _mm256_sub_ps(_mm256_setzero_ps(), *(__m256*)this));
+            } else if constexpr (same_type<Type, double>) {
+                ::_mm256_store_pd(vec, _mm256_sub_pd(_mm256_setzero_pd(), *(__m256d*)this));
+            } else {
+                ::_mm256_store_si256((__m256i*)this, _mm256_sub_epi32(_mm256_setzero_si256(), *(__m256i*)this));
+            }
+        }
         return *this;
     }
 
-    template<arithmetic T>
-    constexpr Vector<arithmetic_promotion_t<Type, T>, Size == 2 ? 3 : Size> cross(const Vector<T, Size>& otherVec) const noexcept {
-        return { 
-            vec[1] * otherVec[2] - vec[2] * otherVec[1],
-            vec[2] * otherVec[0] - vec[0] * otherVec[2],
-            vec[0] * otherVec[1] - vec[1] * otherVec[0]
-        };
-    }
-
-    template<arithmetic T>
-    constexpr auto dot(const Vector<T, Size>& otherVec) const noexcept {
-        return vec[0] * otherVec[0] + vec[1] * otherVec[1] + vec[2] * otherVec[2];
-    }
-
-    template<arithmetic T>
-    constexpr auto included_angle(const Vector<T, Size>& otherVec) const noexcept {
-        return this->dot(otherVec) / (this->norm() * otherVec.norm());
-    }
-
-    constexpr void print() const noexcept {
-        #ifdef _IOSTREAM_
-            std::cout << '[';
-            for (size_t i = 0; i < Size - 1; ++i) {
-                std::cout << vec[i] << ", ";
+    constexpr auto norm() const noexcept {
+        if (__builtin_is_constant_evaluated()) {
+            const value_type squreSum = vec[0] * vec[0] + vec[1] * vec[1] + 
+                                        vec[2] * vec[2] + vec[3] * vec[3];
+            return math::sqrt(static_cast<float>(squreSum));
+        } else {
+            if constexpr (same_type<Type, float>) {
+                const auto dot_temp1 = _mm256_mul_ps(*(__m256*)this, *(__m256*)this);
+                const auto dot_temp2 = _mm256_hadd_ps(dot_temp1, dot_temp1);
+                return _mm256_sqrt_ps(_mm256_hadd_ps(dot_temp2, dot_temp2)).m256_f32[0];
+            } else if constexpr (same_type<Type, double>) {
+                const auto dot_temp1 = _mm256_mul_pd(*(__m256d*)this, *(__m256d*)this);
+                const auto dot_temp2 = _mm256_hadd_pd(dot_temp1, dot_temp1);
+                return _mm256_sqrt_pd(_mm256_hadd_pd(dot_temp2, dot_temp2)).m256d_f64[0];
+            } else {
+                const auto dot_temp1 = _mm256_mullo_epi32(*(__m256i*)this, *(__m256i*)this);
+                const auto dot_temp2 = _mm256_hadd_epi32(dot_temp1, dot_temp1);
+                return _mm256_sqrt_ps(_mm256_cvtepi32_ps(_mm256_hadd_epi32(dot_temp2, dot_temp2))).m256_f32[0];
             }
-            std::cout << vec[Size - 1] << "]\n";
-        #endif // _IOSTREAM_
+        }
     }
 
-    template<arithmetic T>
-    constexpr auto distance(const Vector<T, Size>& otherVec) const noexcept {
+    constexpr auto distance(const Vector otherVec) const noexcept {
         return ((*this) - otherVec).norm();
     }
 
+    constexpr auto normalize() const noexcept {
+        return this->cast<arithmetic_promotion_t<Type, float>>() / this->norm();
+    }
+
+    constexpr value_type dot(const Vector otherVec) const noexcept {
+        if (__builtin_is_constant_evaluated()) {
+            return vec[0] * otherVec.vec[0] +
+                   vec[1] * otherVec.vec[1] +
+                   vec[2] * otherVec.vec[2];
+        } else {
+            if constexpr (same_type<Type, float>) {
+                const auto dot_temp1 = _mm256_mul_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherVec));
+                const auto dot_temp2 = _mm256_hadd_ps(dot_temp1, dot_temp1);
+                return _mm256_hadd_ps(dot_temp2, dot_temp2).m256_f32[0];
+            } else if constexpr (same_type<Type, double>) {
+                const auto dot_temp1 = _mm256_mul_pd(*(__m256d*)this, *(__m256d*)__builtin_addressof(otherVec));
+                const auto dot_temp2 = _mm256_hadd_pd(dot_temp1, dot_temp1);
+                return _mm256_hadd_pd(dot_temp2, dot_temp2).m256d_f64[0];
+            } else {
+                const auto dot_temp1 = _mm256_mullo_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherVec));
+                const auto dot_temp2 = _mm256_hadd_epi32(dot_temp1, dot_temp1);
+                if constexpr (same_type<Type, int>) {
+                    return _mm256_hadd_epi32(dot_temp2, dot_temp2).m256i_i32[0];
+                } else {
+                    return _mm256_hadd_epi32(dot_temp2, dot_temp2).m256i_u32[0];
+                }
+            }
+        }
+    }
+
+    constexpr value_type operator*(const Vector otherVec) const noexcept {
+        if (__builtin_is_constant_evaluated()) {
+            return vec[0] * otherVec.vec[0] +
+                   vec[1] * otherVec.vec[1] +
+                   vec[2] * otherVec.vec[2] +
+                   vec[3] * otherVec.vec[3];
+        } else {
+            if constexpr (same_type<Type, float>) {
+                const auto dot_temp1 = _mm256_mul_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherVec));
+                const auto dot_temp2 = _mm256_hadd_ps(dot_temp1, dot_temp1);
+                return _mm256_hadd_ps(dot_temp2, dot_temp2).m256_f32[0];
+            } else if constexpr (same_type<Type, double>) {
+                const auto dot_temp1 = _mm256_mul_pd(*(__m256d*)this, *(__m256d*)__builtin_addressof(otherVec));
+                const auto dot_temp2 = _mm256_hadd_pd(dot_temp1, dot_temp1);
+                return _mm256_hadd_pd(dot_temp2, dot_temp2).m256d_f64[0];
+            } else {
+                const auto dot_temp1 = _mm256_mullo_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherVec));
+                const auto dot_temp2 = _mm256_hadd_epi32(dot_temp1, dot_temp1);
+                if constexpr (same_type<Type, int>) {
+                    return _mm256_hadd_epi32(dot_temp2, dot_temp2).m256i_i32[0];
+                } else {
+                    return _mm256_hadd_epi32(dot_temp2, dot_temp2).m256i_u32[0];
+                }
+            }
+        }
+    }
+
+    constexpr Vector& operator+=(const Vector otherVec) noexcept {
+        if (__builtin_is_constant_evaluated()) {
+            vec[0] += otherVec.vec[0];
+            vec[1] += otherVec.vec[1];
+            vec[2] += otherVec.vec[2];
+            vec[3] += otherVec.vec[3];
+        } else {
+            if constexpr (same_type<Type, float>) {
+                ::_mm256_store_ps(vec, _mm256_add_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherVec)));
+            } else if constexpr (same_type<Type, double>) {
+                ::_mm256_store_pd(vec, _mm256_add_pd(*(__m256d*)this, *(__m256d*)__builtin_addressof(otherVec)));
+            } else {
+                ::_mm256_store_si256((__m256i*)this, _mm256_add_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherVec)));
+            }
+        }
+        return *this;
+    }
+
+    constexpr Vector& operator-=(const Vector otherVec) noexcept {
+        if (__builtin_is_constant_evaluated()) {
+            vec[0] -= otherVec.vec[0];
+            vec[1] -= otherVec.vec[1];
+            vec[2] -= otherVec.vec[2];
+            vec[3] -= otherVec.vec[3];
+        } else {
+            if constexpr (same_type<Type, float>) {
+                ::_mm256_store_ps(vec, _mm256_sub_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherVec)));
+            } else if constexpr (same_type<Type, double>) {
+                ::_mm256_store_pd(vec, _mm256_sub_pd(*(__m256d*)this, *(__m256d*)__builtin_addressof(otherVec)));
+            } else {
+                ::_mm256_store_si256((__m256i*)this, _mm256_sub_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherVec)));
+            }
+        }
+        return *this;
+    }
+
+    constexpr Vector operator+(const Vector otherVec) const noexcept {
+        Vector temp = *this;
+        return temp += otherVec;
+    }
+
+    constexpr Vector operator-(const Vector otherVec) const noexcept {
+        Vector temp = *this;
+        return temp -= otherVec;
+    }
+
+    template<arithmetic T> requires acceptable_loss_basic<Type, T>
+    constexpr Vector& operator*=(const T mul) noexcept  {
+        if (__builtin_is_constant_evaluated()) {
+            vec[0] *= mul;
+            vec[1] *= mul;
+            vec[2] *= mul;
+            vec[3] *= mul;
+        } else {
+            if constexpr (same_type<Type, float>) {
+                ::_mm256_store_ps(vec, _mm256_mul_ps(*(__m256*)this, ::_mm256_set1_ps(mul)));
+            } else if constexpr (same_type<Type, double>) {
+                ::_mm256_store_pd(vec, _mm256_mul_pd(*(__m256d*)this, ::_mm256_set1_pd(mul)));
+            } else {
+                ::_mm256_store_si256((__m256i*)this, _mm256_mullo_epi32(*(__m256i*)this, ::_mm256_set1_epi32(static_cast<int>(mul))));
+            }
+        }
+        return *this;
+    }
+
+    template<arithmetic T> requires acceptable_loss_basic<Type, T>
+    constexpr Vector& operator/=(const T div) noexcept {
+        if (__builtin_is_constant_evaluated()) {
+            vec[0] /= div;
+            vec[1] /= div;
+            vec[2] /= div;
+            vec[3] /= div;
+        } else {
+            if constexpr (same_type<Type, double>) {
+                ::_mm256_store_pd(vec, _mm256_div_pd(*(__m256d*)this, ::_mm256_set1_pd(div)));
+            } else {
+                ::_mm256_store_ps(vec, _mm256_div_ps(*(__m256*)this, ::_mm256_set1_ps(static_cast<float>(div))));
+            }
+        }
+        return *this;
+    }
+
+    template<arithmetic T> requires acceptable_loss_basic<Type, T>
+    constexpr Vector operator*(const T mul) const noexcept {
+        Vector temp = *this;
+        return temp *= mul;
+    }
+
+    template<arithmetic T> requires acceptable_loss_basic<Type, T>
+    constexpr Vector operator/(const T div) const noexcept {
+        Vector temp = *this;
+        return temp /= div;
+    }
+
     constexpr Vector operator-() const noexcept {
-        return { -vec[0], -vec[1], -vec[2], -vec[3] };
+        Vector temp = *this;
+        return temp.negative();
     }
 
-    template<arithmetic T> requires acceptable_loss<Type, T>
-    constexpr Vector& operator+=(const Vector<T, Size>& otherVec) noexcept {
-        vec[0] += otherVec[0];
-        vec[1] += otherVec[1];
-        vec[2] += otherVec[2];
-        vec[3] += otherVec[3];
-        return *this;
-    }
-
-    template<arithmetic T> requires acceptable_loss<Type, T>
-    constexpr Vector& operator-=(const Vector<T, Size>& otherVec) noexcept {
-        vec[0] -= otherVec[0];
-        vec[1] -= otherVec[1];
-        vec[2] -= otherVec[2];
-        vec[3] -= otherVec[3];
-        return *this;
-    }
-
-    template<arithmetic T>
-    constexpr Vector<arithmetic_promotion_t<Type, T>, Size> operator+(const Vector<T, Size>& otherVec) const noexcept {
-        return {
-            vec[0] + otherVec[0],
-            vec[1] + otherVec[1],
-            vec[2] + otherVec[2],
-            vec[3] + otherVec[3]
-        };
-    }
-
-    template<arithmetic T>
-    constexpr Vector<arithmetic_promotion_t<Type, T>, Size> operator-(const Vector<T, Size>& otherVec) const noexcept {
-        return { 
-            vec[0] - otherVec[0],
-            vec[1] - otherVec[1],
-            vec[2] - otherVec[2],
-            vec[3] - otherVec[3]
-        };
-    }
-
-    template<arithmetic T> requires acceptable_loss<Type, T>
-    constexpr Vector& operator*=(const Scalar<T> scalar) noexcept {
-        vec[0] *= scalar;
-        vec[1] *= scalar;
-        vec[2] *= scalar;
-        vec[3] *= scalar;
-        return *this;
-    }
-
-    template<arithmetic T> requires acceptable_loss<Type, T>
-    constexpr Vector& operator*=(const T scalar) noexcept {
-        vec[0] *= scalar;
-        vec[1] *= scalar;
-        vec[2] *= scalar;
-        vec[3] *= scalar;
-        return *this;
-    }
-
-    template<arithmetic T>
-    constexpr Vector<arithmetic_promotion_t<Type, T>, Size> operator*(const Scalar<T> scalar) const noexcept {
-        return { 
-            vec[0] * scalar,
-            vec[1] * scalar,
-            vec[2] * scalar,
-            vec[3] * scalar
-        };
-    }
-
-    template<arithmetic T>
-    constexpr Vector<arithmetic_promotion_t<Type, T>, Size> operator*(const T scalar) const noexcept {
-        return {
-            vec[0] * scalar,
-            vec[1] * scalar,
-            vec[2] * scalar,
-            vec[3] * scalar
-        };
-    }
-
-    constexpr Type& operator[](const size_t pos) noexcept {
+    constexpr value_type operator[](const std::size_t pos) const noexcept {
         return vec[pos];
     }
 
-    constexpr Type operator[](const size_t pos) const noexcept {
+    constexpr value_type& operator[](const std::size_t pos) noexcept {
         return vec[pos];
     }
 
-    Type vec[4]{};
+    value_type vec[4];
 };
-
-template<arithmetic Ty1, arithmetic Ty2, size_t S> inline
-constexpr auto operator*(const Scalar<Ty1> scalar, const Vector<Ty2, S>& vec) noexcept {
-    return vec * scalar;
-}
-
-template<arithmetic Ty1, arithmetic Ty2, size_t S> inline
-constexpr auto operator*(const Ty1 scalar, const Vector<Ty2, S>& vec) noexcept {
-    return vec * scalar;
-}
-
-template<arithmetic First, arithmetic... Rest> requires same_type<First, Rest...>
-Vector(First, Rest...)->Vector<First, sizeof...(Rest) + 1>;
 
 template<arithmetic T>
 using vec2 = Vector<T, 2>;
@@ -214,6 +355,7 @@ using vec2d = Vector<double, 2>;
 using vec3d = Vector<double, 3>;
 using vec4d = Vector<double, 4>;
 
-}
+template<arithmetic First, arithmetic... Rest> requires same_type<First, Rest...>
+Vector(First, Rest...)->Vector<First, sizeof...(Rest) + 1>;
 
-#endif // _WEEKNDVECTOR_HPP
+}

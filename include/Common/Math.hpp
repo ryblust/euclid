@@ -1,15 +1,4 @@
 #pragma once
-#ifndef _WEEKNDMATH_HPP
-#define _WEEKNDMATH_HPP
-
-#include "Core.hpp"
-#include <bit>
-
-#ifdef _WIN64
-	#define Euclid_Math_Forceinline __forceinline
-#else
-	#define Euclid_Math_Force_Inline inline __attribute__((always_inline))
-#endif
 
 namespace euclid {
 
@@ -23,7 +12,7 @@ inline constexpr Ty radian = pi<Ty> / 180;
 
 namespace detail {
 
-constexpr Euclid_Math_Forceinline float pow_int_exp(const float number, const unsigned exp) noexcept {
+Euclid_Forceinline constexpr float pow_int_exp(const float number, const unsigned exp) noexcept {
 	// do not use this function in your code :)
 	float res = 1;
 	for (unsigned i = 0; i < exp; ++i) {
@@ -32,7 +21,7 @@ constexpr Euclid_Math_Forceinline float pow_int_exp(const float number, const un
 	return res;
 }
 
-constexpr Euclid_Math_Forceinline double pow_int_exp(const double number, const unsigned exp) noexcept {
+Euclid_Forceinline constexpr double pow_int_exp(const double number, const unsigned exp) noexcept {
 	// do not use this function in your code :)
 	double res = 1;
 	for (unsigned i = 0; i < exp; ++i) {
@@ -43,13 +32,13 @@ constexpr Euclid_Math_Forceinline double pow_int_exp(const double number, const 
 
 }
 
-constexpr Euclid_Math_Forceinline float sqrt(const float number) noexcept {
+Euclid_Forceinline constexpr float sqrt(const float number) noexcept {
 	float magic = std::bit_cast<float>(0x5f1ffff9 - (std::bit_cast<unsigned>(number) >> 1));
 	return magic *= (0.703952253f * (2.38924456f - number * magic * magic)) * number;
 }
 
 template<arithmetic Ty>
-constexpr Euclid_Math_Forceinline auto cos(const Ty angle) noexcept {
+Euclid_Forceinline constexpr auto cos(const Ty angle) noexcept {
 	using namespace detail;
 	using type = arithmetic_promotion_t<Ty, float>;
 	const type rad = static_cast<type>(angle) * radian<type>;
@@ -59,7 +48,7 @@ constexpr Euclid_Math_Forceinline auto cos(const Ty angle) noexcept {
 }
 
 template<arithmetic Ty>
-constexpr Euclid_Math_Forceinline auto sin(const Ty angle) noexcept {
+Euclid_Forceinline constexpr auto sin(const Ty angle) noexcept {
 	using namespace detail;
 	using type = arithmetic_promotion_t<Ty, float>;
 	const type rad = static_cast<type>(angle) * radian<type>;
@@ -69,7 +58,7 @@ constexpr Euclid_Math_Forceinline auto sin(const Ty angle) noexcept {
 }
 
 template<arithmetic Ty>
-constexpr Euclid_Math_Forceinline auto tan(const Ty angle) noexcept {
+Euclid_Forceinline constexpr auto tan(const Ty angle) noexcept {
 	using namespace detail;
 	using type = arithmetic_promotion_t<Ty, float>;
 	const type rad = static_cast<type>(angle) * radian<type>;
@@ -81,5 +70,3 @@ constexpr Euclid_Math_Forceinline auto tan(const Ty angle) noexcept {
 }
 
 }
-
-#endif // _WEEKNDMATH_HPP

@@ -1,8 +1,4 @@
 #pragma once
-#ifndef _WEEKNDTRIANGLE_HPP
-#define _WEEKNDTRIANGLE_HPP
-
-#include "Point.hpp"
 
 namespace euclid {
 
@@ -20,5 +16,3 @@ using trianglef = Triangle<float>;
 using triangled = Triangle<double>;
 
 }
-
-#endif // _WEEKNDTRIANGLE_HPP

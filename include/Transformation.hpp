@@ -1,15 +1,11 @@
 #pragma once
-#ifndef _WEEKNDTRANSFORMATION_HPP
-#define _WEEKNDTRANSFORMATION_HPP
-
-#include "Matrix.hpp"
 
 namespace euclid {
 
 struct transform3d {
 
-template<arithmetic Ty>
-static constexpr mat3<arithmetic_promotion_t<Ty, float>> rotate(const Ty angle) noexcept {
+template<arithmetic T>
+static constexpr mat3<arithmetic_promotion_t<T, float>> rotate(const T angle) noexcept {
 	return {
 		math::cos(angle), -math::sin(angle), 0,
 		math::sin(angle),  math::cos(angle), 0,
@@ -29,7 +25,7 @@ static constexpr auto scale(const T x, const S y) noexcept {
 
 template<arithmetic T, arithmetic S>
 static constexpr auto translate(const T x, const S y) noexcept {
-	using type = arithmetic_value_promotion_t<T, S>;
+	using type = arithmetic_promotion_t<T, S>;
 	return mat3<type> {
 		1, 0, static_cast<type>(x),
 		0, 1, static_cast<type>(y),
@@ -51,7 +47,7 @@ struct transform4d {
 
 template<arithmetic X, arithmetic Y, arithmetic Z>
 static constexpr auto translate(const X x, const Y y, const Z z) noexcept {
-	using type = arithmetic_value_promotion_t<X, Y, Z>;
+	using type = arithmetic_promotion_t<X, Y, Z>;
 	return mat4<type> { 
 		1, 0, 0, static_cast<type>(x),
 		0, 1, 0, static_cast<type>(y),
@@ -62,7 +58,7 @@ static constexpr auto translate(const X x, const Y y, const Z z) noexcept {
 
 template<arithmetic X, arithmetic Y, arithmetic Z>
 static constexpr auto scale(const X x, const Y y, const Z z) noexcept {
-	using type = arithmetic_value_promotion_t<X, Y, Z>;
+	using type = arithmetic_promotion_t<X, Y, Z>;
 	return mat4<type> {
 		static_cast<type>(x),          0,                    0,           0,
 			     0,           static_cast<type>(y),          0,           0,
@@ -106,5 +102,3 @@ static constexpr mat4u viewport(unsigned width, unsigned height) noexcept {
 };
 
 }
-
-#endif // _WEEKNDTRANSFORMATION_HPP

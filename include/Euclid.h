@@ -1,8 +1,10 @@
 #pragma once
-#ifndef _WEEKNDEUCLID_H
-#define	_WEEKNDEUCLID_H
-
-#include "Transformation.hpp"
-#include "Triangle.hpp"
-
-#endif // _WEEKNDEUCLID_H
+#include <bit>
+#include "Common/Core.hpp"
+#include "Common/Math.hpp"
+#include <immintrin.h>
+#include "Vector.hpp"
+#include "Point.hpp"
+//#include "Matrix.hpp"
+//#include "Transformation.hpp"
+//#include "Triangle.hpp"
