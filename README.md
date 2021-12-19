@@ -13,7 +13,7 @@
 ## Introduction
 - 编译期的计算支持 - 
 
-  using ```__builtin_is_constant_evaluated()``` to check if a function was called in constant-evaluated context
+  Using ```__builtin_is_constant_evaluated()``` to check whether a function was called in a constant-evaluated context
   
   It will be replaced by ```if consteval``` when mainstream compiler supports
   
