@@ -5,7 +5,7 @@
 - **Euclid** 是一个基于 C++20 的图形数学库
 
 **Features**
-- 编译期的计算支持 (C++23)
+- 编译期的计算支持
 - 编译期的类型约束
 - ```SIMD``` Speed up (AVX2 Intrinsics Supported)
 - Head-only
@@ -13,7 +13,9 @@
 ## Introduction
 - 编译期的计算支持
   
-  Available at C++23 with ```if consteval``` (不考虑 ```std::is_constant_evaluated()```)
+  Use ```__builtin_is_constant_evaluated()```
+  
+  Better with C++23 by using ```if consteval```
   
   Using SIMD(AVX2) intrinsics to speed up at the run-time
 
