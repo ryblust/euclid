@@ -2,24 +2,24 @@
 > w11knd's Graphics Mathematics Library
 
 ## Overview
-**Euclid** 是一个基于 C++20 的图形数学库，提供编译期的计算支持和严格的类型约束
+- **Euclid** 是一个基于 C++20 的图形数学库
 
 **Features**
-- 编译期的计算支持
+- 编译期的计算支持 (C++23)
 - 编译期的类型约束
 - ```SIMD``` Speed up (AVX2 Intrinsics Supported)
 - Head-only
 
 ## Introduction
-- 编译期的计算支持 - 
-
-  Using ```__builtin_is_constant_evaluated()``` to check whether a function was called in a constant-evaluated context
+- 编译期的计算支持
   
-  It will be replaced by ```if consteval``` when mainstream compiler supports
+  Available at C++23 with ```if consteval``` (不考虑 ```std::is_constant_evaluated()```)
   
-  Using SIMD(AVX2) intrinsics to speed up ar Run-time
+  Using SIMD(AVX2) intrinsics to speed up at the run-time
 
-- 编译期的类型约束 - using ```concept```
+- 编译期的类型约束
+  
+   使用 ```concept```来约束某些操作
     
     Euclid 支持的算术类型类型有 ```int, unsigned int, float, double```
   ```c++
