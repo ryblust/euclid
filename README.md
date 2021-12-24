@@ -106,6 +106,6 @@
   constexpr auto res3 = transform4d::perspective(fov, aspectRatio, zNear, zFar); // 返回类型依据 Euclid 类型提升原则
   ```
 ## Tested Compiler
-- Add compile flag -arch:AVX2, -mavx2
+- Add compile flag /arch:AVX2, -mavx2
 - MSVC 16.10/17.0
 - GCC 11.2
