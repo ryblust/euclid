@@ -67,10 +67,10 @@
 - ```constexpr```数学函数
   ```c++
   // 返回类型依据 Euclid 类型提升规则
-  constexpr auto res1 = math::cos(45); // res1 : float
-  constexpr auto res2 = math::sin(35.f) // res2 : float
-  constexpr auto res3 = math::tan(45.2) // res3 : double
-  constexpr float res4 = math::sqrt(2);
+  auto res1 = math::cos(45); // res1 : float
+  auto res2 = math::sin(35.f) // res2 : float
+  auto res3 = math::tan(45.2) // res3 : double
+  float res4 = math::sqrt(2);
   ```
 
 - 类型转换
@@ -97,11 +97,11 @@
 
 - ```Transformation in Homogeneous Coordinates```
   ```c++
-  constexpr auto res = transform4d::scale(1, 2, 3); // res : mat4i 这里没有必要提升类型
-  constexpr vec4i axis{ 0,0,1,0 };
-  constexpr auto res1 = transform4d::rotate(axis, 45); // res1 : float
-  constexpr auto res2 = transform4d::translate(1, 2, 3); // res2 : mat4i same reason with res
-  constexpr auto res3 = transform4d::perspective(fov, aspectRatio, zNear, zFar); // 返回类型依据 Euclid 类型提升原则
+  auto res = transform4d::scale(1, 2, 3); // res : mat4i 这里没有必要提升类型
+  vec4i axis{ 0,0,1,0 };
+  auto res1 = transform4d::rotate(axis, 45); // res1 : float
+  auto res2 = transform4d::translate(1, 2, 3); // res2 : mat4i same reason with res
+  auto res3 = transform4d::perspective(fov, aspectRatio, zNear, zFar); // 返回类型依据 Euclid 类型提升原则
   ```
 ## Tested Compiler
 - Add compile flag /arch:AVX2, -mavx2
