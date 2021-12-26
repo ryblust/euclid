@@ -21,7 +21,7 @@
   
    使用 ```concept```来约束某些操作
     
-    Euclid 支持的算术类型类型有 ```int, unsigned int, float, double```
+    Euclid 支持的算术类型类型有 ```int, float```
   ```c++
   Vecotr<int, 3>; // OK
   Point<float, 3>; // OK
@@ -46,53 +46,28 @@
 
   ```
 
-
-- 自动算术类型提升
-    
-    Euclid 的类型提升规则（仅在需要类型提升的情况下）\
-    函数参数仅有 ```int, float``` 则得到 ```float``` 的结果 \
-    函数参数中有 ```double``` 则得到 ```double``` 的结果
-
-  ```c++
-  scalarf a = 1.1f;
-  vec2i vec{ 1,2 };
-  auto res = a * vec; // get vec2f
-
-  mat2f { 1, 2,
-          2, 1 };
-  vec2i v1{ 1.2f, 2.5f };
-  auto res = mat2i * v1; // get ve2f
-  ```
-
 - ```constexpr```数学函数
   ```c++
   // 返回类型依据 Euclid 类型提升规则
   auto res1 = math::cos(45); // res1 : float
   auto res2 = math::sin(35.f) // res2 : float
-  auto res3 = math::tan(45.2) // res3 : double
   float res4 = math::sqrt(2);
   ```
 
 - 类型转换
 
-    Euclid 只支持向上的类型转换且不支持 ```int``` cast to ```unsigned```
   ```c++
-  vec3f a{ 1,1f,2,2f,3.3f };
-  vec3i b = a.cast<double>();
   vec4i v1{ 1,2,3,4 };
-  vec4f = v1.cast<float>();
-  vec3i c = a; // Euclid 并不提供隐式的类型转换
+  vec4f = v1.cast();
+  vec4f c = a; // Euclid 并不提供隐式的类型转换
   ```
 
 - ```operator+=, *=, -=``` 的约束
   ```c++
   vec2i v1{ 1, 2 };
   vec2f v2{ 1.1f, 2.2f };
-  vec2d v3{ 1.1, 2.2 };
   v1 *= 2.2f; // concept constraint is false: int *= float unacceptable precision loss
   v1 += v2; // same reason
-  v2 += v1 // no error: acceptable precision loss
-  v2 += v3; // same reason
   ```
 
 - ```Transformation in Homogeneous Coordinates```
