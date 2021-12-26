@@ -58,7 +58,7 @@
 
   ```c++
   vec4i v1{ 1,2,3,4 };
-  vec4f = v1.cast();
+  vec4f = v1.cast(); // 只支持 int cast to float
   vec4f c = a; // Euclid 并不提供隐式的类型转换
   ```
 
