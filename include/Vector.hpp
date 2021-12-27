@@ -1,6 +1,6 @@
 #pragma once
 
-#define w11knd_shuffle_ps(vec, imm8) _mm256_shuffle_ps(vec, vec, imm8)
+#define _euclid_shuffle_ps(vec, imm8) _mm256_shuffle_ps(vec, vec, imm8)
 
 namespace euclid {
 
@@ -24,9 +24,17 @@ public:
 
     float norm() const noexcept {
         if constexpr (same_type<Type, float>) {
-            return _mm256_sqrt_ps(_mm256_dp_ps(*(__m256*)this, *(__m256*)this, 0b11111111)).m256_f32[0];
+            #ifdef _MSC_VER
+                return _mm256_sqrt_ps(_mm256_dp_ps(*(__m256*)this, *(__m256*)this, 0b11111111)).m256_f32[0];
+            #else
+                return _mm256_sqrt_ps(_mm256_dp_ps(*(__m256*)this, *(__m256*)this, 0b11111111))[0];
+            #endif // _MSC_VER
         } else {
-            return _mm256_sqrt_ps(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)this), 0b1111111)).m256_f32[0];
+            #ifdef _MSC_VER
+                return _mm256_sqrt_ps(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)this), 0b1111111)).m256_f32[0];
+            #else
+                return _mm256_sqrt_ps(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)this), 0b1111111))[0]; 
+            #endif // _MSC_VER
         }
     }
 
@@ -55,12 +63,12 @@ public:
         Vector crossVec;
         if constexpr (same_type<Type, float>) {
             ::_mm256_store_ps((float*)__builtin_addressof(crossVec),
-                w11knd_shuffle_ps(
+                _euclid_shuffle_ps(
                     _mm256_sub_ps(
                         _mm256_mul_ps(*(__m256*)this,
-                            w11knd_shuffle_ps(*(__m256*)__builtin_addressof(otherVec), 0b11001001)),
+                            _euclid_shuffle_ps(*(__m256*)__builtin_addressof(otherVec), 0b11001001)),
                         _mm256_mul_ps(
-                            w11knd_shuffle_ps(*(__m256*)this, 0b11001001), *(__m256*)__builtin_addressof(otherVec))), 0b11001001));
+                            _euclid_shuffle_ps(*(__m256*)this, 0b11001001), *(__m256*)__builtin_addressof(otherVec))), 0b11001001));
         } else {
             ::_mm256_store_si256((__m256i*)__builtin_addressof(crossVec),
                 _mm256_shuffle_epi32(
@@ -79,9 +87,17 @@ public:
 
     value_type operator*(const Vector otherVec) const noexcept {
         if constexpr (same_type<Type, int>) {
-            return static_cast<int>(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)__builtin_addressof(otherVec)), 0b1111111).m256_f32[0]);
+            #ifdef _MSC_VER
+                return static_cast<int>(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)__builtin_addressof(otherVec)), 0b1111111).m256_f32[0]);
+            #else
+                return static_cast<int>(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)__builtin_addressof(otherVec)), 0b1111111)[0]);
+            #endif // _MSC_VER           
         } else {
-            return _mm256_dp_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherVec), 0b11111111).m256_f32[0];
+            #ifdef _MSC_VER
+                return _mm256_dp_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherVec), 0b11111111).m256_f32[0];
+            #else
+                return _mm256_dp_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherVec), 0b11111111)[0];
+            #endif // _MSC_VER
         }
     }
 
@@ -138,7 +154,7 @@ public:
 };
 
 template<arithmetic Mul, arithmetic T, std::size_t S> requires acceptable_loss<T, Mul>
-EUCLID_FORCEINLINE auto operator*(const Mul mul, const Vector<T, S> vector) noexcept {
+Euclid_Forceinline auto operator*(const Mul mul, const Vector<T, S> vector) noexcept {
     return vector * mul;
 }
 
