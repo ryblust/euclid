@@ -5,18 +5,8 @@ namespace euclid {
 template<arithmetic Type, std::size_t Row, std::size_t Col>
 class Matrix {
 public:
-	consteval Matrix() noexcept {}
 
-	constexpr Matrix(const std::initializer_list<Type> list) noexcept {
-		const auto begin = list.begin();
-		for (std::size_t row = 0; row < Row; ++row) {
-			for (std::size_t col = 0; col < Col; ++col) {
-				mat[col][row] = *(begin + row * Col + col);
-			}
-		}
-	}
-
-	static constexpr Matrix identity() noexcept requires (Row == Col) {
+	static Matrix identity() noexcept requires (Row == Col) {
 		Matrix retMat;
 		for (std::size_t i = 0; i < Col; ++i) {
 			retMat[i][i] = 1;
@@ -24,7 +14,7 @@ public:
 		return retMat;
 	}
 
-	static constexpr Matrix identity(arithmetic auto const val) noexcept requires (Row == Col) {
+	static Matrix identity(arithmetic auto const val) noexcept requires (Row == Col) {
 		Matrix retMat;
 		for (std::size_t i = 0; i < Col; ++i) {
 			retMat[i][i] = val;
@@ -32,16 +22,15 @@ public:
 		return retMat;
 	}
 
-	template<arithmetic T>
-	constexpr Matrix<T, Row, Col> cast() const noexcept {
-		Matrix<T, Row, Col> retMat;
+	Matrix<float, Row, Col> cast() const noexcept {
+		Matrix<float, Row, Col> retMat;
 		for (std::size_t i = 0; i < Col; ++i) {
 			retMat[i] = mat[i].cast<T>();
 		}
 		return retMat;
 	}
 
-	constexpr Matrix<Type, Col, Row> transpose() const noexcept {
+	Matrix<Type, Col, Row> transpose() const noexcept {
 		Matrix<Type, Col, Row> retMat;
 		for (std::size_t col = 0; col < Col; ++col) {
 			for (std::size_t row = 0; row < Row; ++row) {
@@ -50,116 +39,80 @@ public:
 		}
 		return retMat;
 	}
-	
-#ifdef _has_Euclid_io
-	constexpr void print() const noexcept {
-		for (size_t row = 0; row < Row; ++row) {
-			for (size_t col = 0; col < Col; ++col) {
-				if (col != Col - 1) [[likely]] {
-					std::printf(io::detail::format_traits<Type>::start, mat[col][row]);
-				} else [[unlikely]] {
-					std::printf(io::detail::format_traits<Type>::end, mat[col][row]);
-				}
-			}
-			std::printf("\n");
-		}
-	}
-#endif // _has_Euclid_io
 
-	constexpr Matrix& negative() noexcept {
+	Matrix& negative() noexcept {
 		for (std::size_t i = 0; i < Col; ++i) {
 			mat[i].negative();
 		}
 		return *this;
 	}
 
-	constexpr Matrix operator-() const noexcept {
+	Matrix operator-() const noexcept {
 		Matrix retMat = *this;
 		return retMat.negative();
 	}
 
-	template<arithmetic T> requires acceptable_loss<Type, T>
-	constexpr Matrix& operator+=(const Matrix<T, Row, Col>& otherMat) noexcept {
+	Matrix& operator+=(const Matrix& otherMat) noexcept {
 		for (std::size_t i = 0; i < Col; ++i) {
 			mat[i] += otherMat[i];
 		}
 		return *this;
 	}
 
-	template<arithmetic T> requires acceptable_loss<Type, T>
-	constexpr Matrix& operator-=(const Matrix<T, Row, Col>& otherMat) noexcept {
+	Matrix& operator-=(const Matrix& otherMat) noexcept {
 		for (std::size_t i = 0; i < Col; ++i) {
 			mat[i] -= otherMat[i];
 		}
 		return *this;
 	}
 
-	template<arithmetic T>
-	constexpr auto operator+(const Matrix<T, Row, Col>& otherMat) const noexcept {
-		using type = arithmetic_promotion_t<Type, T>;
-		Matrix<type, Row, Col> retMat;
-		for (std::size_t i = 0; i < Col; ++i) {
-			retMat[i] = mat[i] + otherMat[i];
-		}
-		return retMat;
+	Matrix operator+(const Matrix& otherMat) const noexcept {
+		Matrix retMat = *this;
+		return retMat += otherMat;
 	}
 
-	template<arithmetic T>
-	constexpr auto operator-(const Matrix<T, Row, Col>& otherMat) const noexcept {
-		using type = arithmetic_promotion_t<Type, T>;
-		Matrix<type, Row, Col> retMat;
-		for (std::size_t i = 0; i < Col; ++i) {
-			retMat[i] = mat[i] - otherMat[i];
-		}
-		return retMat;
+	Matrix operator-(const Matrix& otherMat) const noexcept {
+		Matrix retMat = *this;
+		return retMat -= otherMat;
 	}
 
-	template<arithmetic T> requires acceptable_loss<Type, T>
-	constexpr Matrix& operator*=(const T scalar) noexcept {
+	template<arithmetic Mul> requires acceptable_loss<Type, Mul>
+	Matrix& operator*=(const Mul scalar) noexcept {
 		for (std::size_t i = 0; i < Col; ++i) {
 			mat[i] *= scalar;
 		}
 		return *this;
 	}
 
-	template<arithmetic T>
-	constexpr auto operator*(const T scalar) const noexcept {
-		using type = arithmetic_promotion_t<Type, T>;
-		Matrix<type, Row, Col> retMat;
-		for (std::size_t i = 0; i < Col; ++i) {
-			retMat[i] = mat[i] * scalar;
-		}
-		return retMat;
+	template<arithmetic Mul> requires acceptable_loss<Type, Mul>
+	Matrix operator*(const Mul scalar) const noexcept {
+		Matrix retMat = *this;
+		return retMat *= scalar;
 	}
 
-	template<arithmetic T>
-	constexpr auto operator*(const Vector<T, Col>& vector) const noexcept {
-		using type = arithmetic_promotion_t<Type, T>;
-		Vector<type, Row> retVec;
+	Vector<Type, Col> operator*(const Vector<Type, Col> vector) const noexcept {
+		Vector<Type, Row> retVec;
 		for (std::size_t i = 0; i < Col; ++i) {
 			retVec += mat[i] * vector[i];
 		}
 		return retVec;
 	}
 
-	template<arithmetic T>
-	constexpr auto operator*(const Point<T, Col>& point) const noexcept {
-		using type = arithmetic_promotion_t<Type, T>;
-		Point<type, Row> retPoint;
+	Point<Type, Col> operator*(const Point<Type, Col> point) const noexcept {
+		Point<Type, Row> retPoint;
 		for (std::size_t i = 0; i < Col; ++i) {
 			const auto v = mat[i] * point[i];
-			retPoint[0] += v[0];
-			retPoint[1] += v[1];
-			retPoint[2] += v[2];
-			retPoint[3] += v[3];
+			//retPoint[0] += v[0];
+			//retPoint[1] += v[1];
+			//retPoint[2] += v[2];
+			//retPoint[3] += v[3];
 		}
 		return retPoint;
 	}
 
-	template<arithmetic T, std::size_t C>
-	constexpr auto operator*(const Matrix<T, Col, C>& otherMat) const noexcept {
-		using type = arithmetic_promotion_t<Type, T>;
-		Matrix<type, Row, C> retMat;
+	template<std::size_t C>
+	Matrix<Type, Row, C> operator*(const Matrix<Type, Col, C>& otherMat) const noexcept {
+		Matrix<Type, Row, C> retMat;
 		for (std::size_t i = 0; i < C; ++i) {
 			retMat[i] = (*this) * otherMat[i];
 		}
@@ -177,8 +130,8 @@ public:
 	Vector<Type, Row> mat[Col];
 };
 
-template<arithmetic Ty1, arithmetic Ty2, std::size_t Row, std::size_t Col> inline
-constexpr auto operator*(const Ty1 scalar, const Matrix<Ty2, Row, Col>& mat) noexcept {
+template<arithmetic Mul, arithmetic T, std::size_t Row, std::size_t Col>
+EUCLID_FORCEINLINE auto operator*(const Mul scalar, const Matrix<T, Row, Col>& mat) noexcept {
 	return mat * scalar;
 }
 
@@ -195,16 +148,8 @@ using mat2i = Matrix<int, 2, 2>;
 using mat3i = Matrix<int, 3, 3>;
 using mat4i = Matrix<int, 4, 4>;
 
-using mat2u = Matrix<unsigned, 2, 2>;
-using mat3u = Matrix<unsigned, 3, 3>;
-using mat4u = Matrix<unsigned, 4, 4>;
-
 using mat2f = Matrix<float, 2, 2>;
 using mat3f = Matrix<float, 3, 3>;
 using mat4f = Matrix<float, 4, 4>;
-
-using mat2d = Matrix<double, 2, 2>;
-using mat3d = Matrix<double, 3, 3>;
-using mat4d = Matrix<double, 4, 4>;
 
 }
