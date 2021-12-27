@@ -9,7 +9,7 @@
     #define Euclid_Forceinline [[gnu::always_inline]]
 */
 #else
-    #define EUCLID_FORCEINLINE inline __attribute__((always_inline))
+    #define Euclid_Forceinline inline __attribute__((always_inline))
 #endif // Euclid_Forceinline
 
 namespace euclid {
