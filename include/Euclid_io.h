@@ -1,22 +1,71 @@
 #pragma once
 
+#include <cstdio>
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 5045) // Ignore compiler's complain about Qspectre
+#endif // _MSC_VER
+
 namespace euclid::io {
 
-template<arithmetic T, std::size_t Size>
-Euclid_Forceinline constexpr void print_vec(const Vector<T, Size> vec) noexcept {
+namespace detail {
+
+template<arithmetic T>
+EUCLID_FORCEINLINE void printContainerImpl(const T* data, std::size_t size) noexcept {
 	if constexpr (same_type<T, int>) {
-		std::printf("[%d, %d, %d, %d]\n", vec[0], vec[1], vec[2], vec[3]);
-	} else if constexpr (same_type<T, unsigned>) {
-		std::printf("[%u, %u, %u, %u]\n", vec[0], vec[1], vec[2], vec[3]);
+		std::printf("[");
+		for (std::size_t i = 0; i < size - 1; ++i) {
+			std::printf("%d, ", data[i]);
+		}
+		std::printf("%d]\n", data[size - 1]);
 	} else {
-		std::printf("[%.3f, %.3f, %.3f, %.3f]\n", vec[0], vec[1], vec[2], vec[3]);
+		std::printf("[");
+		for (std::size_t i = 0; i < size - 1; ++i) {
+			std::printf("%.3f, ", data[i]);
+		}
+		std::printf("%.3f]\n", data[size - 1]);
 	}
 }
 
-// Working on euclid::io::print()
-template<typename... T>
-Euclid_Forceinline constexpr void print(const T... obj) noexcept {
-	(print_vec(obj), ...);
+template<arithmetic T>
+EUCLID_FORCEINLINE void printImpl(const T value) noexcept {
+	if constexpr (same_type<T, int>) {
+		std::printf("%d ", value);
+	} else {
+		std::printf("%.3f ", value);
+	}
+}
+
+template<arithmetic T>
+EUCLID_FORCEINLINE void printlnImpl(const T value) noexcept {
+	if constexpr (same_type<T, int>) {
+		std::printf("%d\n", value);
+	}
+	else {
+		std::printf("%.3f\n", value);
+	}
 }
 
 }
+
+template<typename... Container> 
+EUCLID_FORCEINLINE void print(const Container... container) noexcept {
+	(detail::printContainerImpl((typename Container::value_type*)__builtin_addressof(container), container.size()), ...);
+}
+
+template<arithmetic... T>
+EUCLID_FORCEINLINE void print(const T... value) noexcept {
+	(detail::printImpl(value), ...);
+}
+
+template<arithmetic... T>
+EUCLID_FORCEINLINE void println(const T... value) noexcept {
+	(detail::printlnImpl(value), ...);
+}
+
+}
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif // _MSC_VER
