@@ -3,13 +3,13 @@
 #include <type_traits>
 
 #ifdef _MSC_VER
-    #define EUCLID_FORCEINLINE [[msvc::forceinline]]
+    #define Euclid_Forceinline [[msvc::forceinline]]
 /* 
 #elif __has_cpp_attribute(gnu::always_inline)
     #define Euclid_Forceinline [[gnu::always_inline]]
 */
 #else
-    #define Euclid_Forceinline inline __attribute__((always_inline))
+    #define EUCLID_FORCEINLINE inline __attribute__((always_inline))
 #endif // Euclid_Forceinline
 
 namespace euclid {

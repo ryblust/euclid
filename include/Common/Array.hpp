@@ -104,7 +104,7 @@ struct alignas(32) Array {
 };
 
 template<arithmetic Mul, arithmetic T, std::size_t S> requires acceptable_loss<T, Mul>
-EUCLID_FORCEINLINE auto operator*(const Mul mul, const Array<T, S> array) noexcept {
+Euclid_Forceinline auto operator*(const Mul mul, const Array<T, S> array) noexcept {
     return array * mul;
 }
 

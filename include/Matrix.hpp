@@ -25,7 +25,7 @@ public:
 	Matrix<float, Row, Col> cast() const noexcept {
 		Matrix<float, Row, Col> retMat;
 		for (std::size_t i = 0; i < Col; ++i) {
-			retMat[i] = mat[i].cast<T>();
+			retMat[i] = mat[i].cast();
 		}
 		return retMat;
 	}
@@ -131,7 +131,7 @@ public:
 };
 
 template<arithmetic Mul, arithmetic T, std::size_t Row, std::size_t Col>
-EUCLID_FORCEINLINE auto operator*(const Mul scalar, const Matrix<T, Row, Col>& mat) noexcept {
+Euclid_Forceinline auto operator*(const Mul scalar, const Matrix<T, Row, Col>& mat) noexcept {
 	return mat * scalar;
 }
 

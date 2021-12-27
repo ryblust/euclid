@@ -10,12 +10,12 @@ namespace euclid::math {
 namespace detail {
 
 template <typename Des, typename Src> requires bitwise_copyable<Des, Src>
-EUCLID_FORCEINLINE constexpr Des bit_cast(const Src& val) noexcept {
+Euclid_Forceinline constexpr Des bit_cast(const Src& val) noexcept {
 	return __builtin_bit_cast(Des, val);
 }
 
 template<float_point_type float_point>
-EUCLID_FORCEINLINE constexpr float_point pow(const float_point number, const unsigned exp) noexcept {
+Euclid_Forceinline constexpr float_point pow(const float_point number, const unsigned exp) noexcept {
 	// do not use this function in your code :)
 	float_point res = 1;
 	for (unsigned i = 0; i < exp; ++i) {
