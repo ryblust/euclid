@@ -5,7 +5,7 @@
 **Euclid** 是一个基于 C++20 的图形数学库，提供编译期的计算支持和严格的类型约束
 
 **Features**
-- 编译期的计算支持
+- 编译期的计算支持 (requires C++23) - if consteval
 - 编译期的类型约束
 - ```SIMD``` Speed up (AVX2 Intrinsics Supported)
 - Head-only
@@ -17,7 +17,7 @@
   
   It will be replaced by ```if consteval``` when mainstream compiler supports
   
-  Using SIMD(AVX2) intrinsics to speed up ar Run-time
+  Using SIMD(AVX2) intrinsics to speed up at Run-time
 
 - 编译期的类型约束 - using ```concept```
     
