@@ -3,14 +3,14 @@
 #include <type_traits>
 
 #ifdef _MSC_VER
-    #define Euclid_Forceinline [[msvc::forceinline]]
+    #define EuclidForceinline [[msvc::forceinline]]
 /* 
 #elif __has_cpp_attribute(gnu::always_inline)
-    #define Euclid_Forceinline [[gnu::always_inline]]
+    #define EuclidForceinline [[gnu::always_inline]]
 */
 #else
-    #define Euclid_Forceinline inline __attribute__((always_inline))
-#endif // Euclid_Forceinline
+    #define EuclidForceinline inline __attribute__((always_inline))
+#endif // EuclidForceinline
 
 namespace euclid {
 
@@ -23,10 +23,10 @@ template<typename Ty, typename... Rest>
 inline constexpr bool is_any_type_of_v = std::disjunction_v<std::is_same<Ty, Rest>...>;
 
 template<typename Ty>
-inline constexpr bool is_arithmetic_type_v = is_any_type_of_v<Ty, int, float>;
+inline constexpr bool is_arithmetic_type_v = is_any_type_of_v<Ty, int, float, double>;
 
 template<typename Ty>
-inline constexpr bool is_float_point_type_v = is_any_type_of_v<Ty, float>;
+inline constexpr bool is_float_point_type_v = is_any_type_of_v<Ty, float, double>;
 
 }
 

@@ -131,7 +131,7 @@ public:
 };
 
 template<arithmetic Mul, arithmetic T, std::size_t Row, std::size_t Col>
-Euclid_Forceinline auto operator*(const Mul scalar, const Matrix<T, Row, Col>& mat) noexcept {
+EuclidForceinline auto operator*(const Mul scalar, const Matrix<T, Row, Col>& mat) noexcept {
 	return mat * scalar;
 }
 

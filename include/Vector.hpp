@@ -154,7 +154,7 @@ public:
 };
 
 template<arithmetic Mul, arithmetic T, std::size_t S> requires acceptable_loss<T, Mul>
-Euclid_Forceinline auto operator*(const Mul mul, const Vector<T, S> vector) noexcept {
+EuclidForceinline auto operator*(const Mul mul, const Vector<T, S> vector) noexcept {
     return vector * mul;
 }
 

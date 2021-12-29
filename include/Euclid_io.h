@@ -12,7 +12,7 @@ namespace euclid::io {
 namespace detail {
 
 template<arithmetic T>
-Euclid_Forceinline void printContainerImpl(const T* data, std::size_t size) noexcept {
+EuclidForceinline void printContainerImpl(const T* data, std::size_t size) noexcept {
 	if constexpr (same_type<T, int>) {
 		std::printf("[");
 		for (std::size_t i = 0; i < size - 1; ++i) {
@@ -29,7 +29,7 @@ Euclid_Forceinline void printContainerImpl(const T* data, std::size_t size) noex
 }
 
 template<arithmetic T>
-Euclid_Forceinline void printImpl(const T value) noexcept {
+EuclidForceinline void printImpl(const T value) noexcept {
 	if constexpr (same_type<T, int>) {
 		std::printf("%d ", value);
 	} else {
@@ -38,11 +38,10 @@ Euclid_Forceinline void printImpl(const T value) noexcept {
 }
 
 template<arithmetic T>
-Euclid_Forceinline void printlnImpl(const T value) noexcept {
+EuclidForceinline void printlnImpl(const T value) noexcept {
 	if constexpr (same_type<T, int>) {
 		std::printf("%d\n", value);
-	}
-	else {
+	} else {
 		std::printf("%.3f\n", value);
 	}
 }
@@ -50,17 +49,17 @@ Euclid_Forceinline void printlnImpl(const T value) noexcept {
 }
 
 template<typename... Container> 
-Euclid_Forceinline void print(const Container... container) noexcept {
+EuclidForceinline void print(const Container... container) noexcept {
 	(detail::printContainerImpl((typename Container::value_type*)__builtin_addressof(container), container.size()), ...);
 }
 
 template<arithmetic... T>
-Euclid_Forceinline void print(const T... value) noexcept {
+EuclidForceinline void print(const T... value) noexcept {
 	(detail::printImpl(value), ...);
 }
 
 template<arithmetic... T>
-Euclid_Forceinline void println(const T... value) noexcept {
+EuclidForceinline void println(const T... value) noexcept {
 	(detail::printlnImpl(value), ...);
 }
 

@@ -33,7 +33,7 @@ static constexpr auto translate(const T x, const S y) noexcept {
 	};
 }
 
-static constexpr mat3u viewport(const unsigned width, const unsigned height) noexcept {
+static constexpr mat3i viewport(const unsigned width, const unsigned height) noexcept {
 	return {
 		width / 2,      0,      width / 2,
 		    0,     height / 2, height / 2,
@@ -90,7 +90,7 @@ static constexpr auto perspective(const Fov fov, const AspectRatio aspectRatio, 
 	};
 }
 
-static constexpr mat4u viewport(unsigned width, unsigned height) noexcept {
+static constexpr mat4i viewport(unsigned width, unsigned height) noexcept {
 	return {
 		width / 2,      0,      0,   width / 2,
 		    0,     height / 2,  0,  height / 2,
