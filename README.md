@@ -14,7 +14,7 @@
 ## Introduction
 - 编译期的计算支持
   
-  Using C++23 ```if consteval``` (不考虑 ```std::is_constant_evaluated()```)
+  Waiting for C++23 ```if consteval``` (不考虑 ```std::is_constant_evaluated()```)
 
   Using SIMD(AVX2) intrinsics to speed up at the run-time
 
