@@ -1,10 +1,5 @@
 #pragma once
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4514) // Ignore compiler's complain about removing uninlined functions
-#endif // _MSC_VER
-
 namespace euclid::math {
 
 template<float_point_type Ty>
@@ -22,7 +17,7 @@ EuclidForceinline constexpr float sqrt(const float number) noexcept {
 		return _mm256_sqrt_ps(_mm256_set1_ps(number)).m256_f32[0];
 #else // __GNUC__
 		return _mm256_sqrt_ps(_mm256_set1_ps(number))[0];
-#endif // _MSC_VER
+#endif
 	}
 }
 
@@ -43,9 +38,9 @@ EuclidForceinline constexpr float cos(const float angle) noexcept {
 											_mm256_mul_ps(_mm256_set1_ps(0.001361971023f), third))));
 #ifdef _MSC_VER
 		return result.m256_f32[0];
-#else
+#else // __GNUC__
 		return result[0];
-#endif // _MSC_VER
+#endif
 	}
 }
 
@@ -69,9 +64,9 @@ EuclidForceinline constexpr float sin(const float angle) noexcept {
 											_mm256_mul_ps(_mm256_set1_ps(0.0001984127011f), forth))));
 #ifdef _MSC_VER
 		return result.m256_f32[0];
-#else
+#else // __GUNC__
 		return result[0];
-#endif // _MSC_VER
+#endif
 	}
 }
 
@@ -97,14 +92,10 @@ EuclidForceinline constexpr float tan(const float angle) noexcept {
 											_mm256_mul_ps(_mm256_set1_ps(0.0002116402175f), forth))))));
 #ifdef _MSC_VER
 		return result.m256_f32[0];
-#else
+#else // __GUNC__
 		return result[0];
-#endif // _MSC_VER
+#endif
 	}
 }
 
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif // _MSC_VER

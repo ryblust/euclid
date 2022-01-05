@@ -11,25 +11,23 @@ public:
         return Size;
     }
 
-    Point<float, Size> cast() const noexcept requires (same_type<Type, int>) {
-        return { point.cast() };
+    constexpr Point<float, Size> castTofloat() const noexcept requires (same_type<Type, int>) {
+        return { point.castTofloat() };
     }
 
-    Point& negative() noexcept {
+    constexpr void negative() noexcept {
         point.negative();
-        return *this;
     }
 
-    Point operator-() const noexcept {
-        Point retPoint = *this;
-        return retPoint.negative();
+    constexpr Point operator-() const noexcept {
+        return { -point };
     }
 
-    Vector<Type, Size> operator-(const Point otherPoint) const noexcept {
+    constexpr Vector<Type, Size> operator-(const Point otherPoint) const noexcept {
         return { point - otherPoint.point };
     }
 
-    float distance(const Point otherPoint) const noexcept {
+    constexpr float distance(const Point otherPoint) const noexcept {
         return ((*this) - otherPoint).norm();
     }
 
@@ -38,15 +36,6 @@ public:
 
 template<arithmetic First, arithmetic... Rest> requires same_type<First, Rest...>
 Point(First, Rest...)->Point<First, sizeof...(Rest) + 1>;
-
-template<arithmetic T>
-using point2 = Point<T, 2>;
-
-template<arithmetic T>
-using point3 = Point<T, 3>;
-
-template<arithmetic T>
-using point4 = Point<T, 4>;
 
 using point2i = Point<int, 2>;
 using point3i = Point<int, 3>;

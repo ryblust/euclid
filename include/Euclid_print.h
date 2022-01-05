@@ -2,11 +2,6 @@
 
 #include <cstdio>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 5045) // Ignore compiler's complain about Qspectre
-#endif // _MSC_VER
-
 namespace euclid::io {
 
 namespace detail {
@@ -64,7 +59,3 @@ EuclidForceinline void println(const T... value) noexcept {
 }
 
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif // _MSC_VER

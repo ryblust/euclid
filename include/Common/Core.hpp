@@ -14,31 +14,17 @@
 
 namespace euclid {
 
-namespace detail {
-
 template<typename First, typename... Rest>
-inline constexpr bool is_same_type_v = std::conjunction_v<std::is_same<First, Rest>...>;
-
-template<typename Ty, typename... Rest>
-inline constexpr bool is_any_type_of_v = std::disjunction_v<std::is_same<Ty, Rest>...>;
+concept same_type = std::conjunction_v<std::is_same<First, Rest>...>;
 
 template<typename Ty>
-inline constexpr bool is_arithmetic_type_v = is_any_type_of_v<Ty, int, float, double>;
+concept arithmetic = std::is_arithmetic_v<Ty>;
 
 template<typename Ty>
-inline constexpr bool is_float_point_type_v = is_any_type_of_v<Ty, float, double>;
-
-}
-
-template<typename First, typename... Rest>
-concept same_type = detail::is_same_type_v<First, Rest...>;
-
-// Euclid only supports arithmetic_type
-template<typename Ty>
-concept arithmetic = detail::is_arithmetic_type_v<Ty>;
+concept integer_type = std::is_integral_v<Ty>;
 
 template<typename Ty>
-concept float_point_type = detail::is_float_point_type_v<Ty>;
+concept float_point_type = std::is_floating_point_v<Ty>;
 
 template<arithmetic First, arithmetic... Rest>
 struct arithmetic_promotion {
@@ -49,11 +35,6 @@ template<arithmetic... Ty>
 using arithmetic_promotion_t = typename arithmetic_promotion<Ty...>::type;
 
 template<typename Des, typename Src>
-concept acceptable_loss = float_point_type<Des> || same_type<Des, Src>;
-
-template<typename Des, typename Src>
-concept bitwise_copyable = (sizeof(Des) == sizeof(Src)) && 
-                           std::is_trivially_copyable_v<Des> && 
-                           std::is_trivially_copyable_v<Src>;
+concept acceptable_loss = float_point_type<Des> || (integer_type<Des> && integer_type<Src>);
 
 }
