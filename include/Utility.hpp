@@ -24,10 +24,12 @@ EuclidForceinline Vector<T, S> clamp(const Vector<T, S> vec,
 	Vector<T, S> clampVec;
 	if constexpr (same_type<T, float>) {
 		_mm256_store_ps((float*)__builtin_addressof(clampVec),
-		_mm256_max_ps(_mm256_min_ps(*(__m256*)__builtin_addressof(vec), *(__m256*)__builtin_addressof(max)), *(__m256*)__builtin_addressof(min)));
+		_mm256_max_ps(_mm256_min_ps(*(__m256*)__builtin_addressof(vec),
+		*(__m256*)__builtin_addressof(max)), *(__m256*)__builtin_addressof(min)));
 	} else {
 		_mm256_store_si256((__m256i*)__builtin_addressof(clampVec),
-		_mm256_max_epi32(_mm256_min_epi32(*(__m256i*)__builtin_addressof(vec), *(__m256i*)__builtin_addressof(max)), *(__m256i*)__builtin_addressof(min)));
+		_mm256_max_epi32(_mm256_min_epi32(*(__m256i*)__builtin_addressof(vec),
+		*(__m256i*)__builtin_addressof(max)), *(__m256i*)__builtin_addressof(min)));
 	}
 	return clampVec;
 }
@@ -38,9 +40,8 @@ EuclidForceinline Vector<float, S> lerp(const Vector<float, S> a,
 										const Vector<float, S> t) noexcept {
 	Vector<float, S> lerpVec;
 	_mm256_store_ps((float*)&lerpVec, _mm256_add_ps(*(__m256*)__builtin_addressof(a),
-									  _mm256_mul_ps(*(__m256*)__builtin_addressof(t),
-									  _mm256_sub_ps(*(__m256*)__builtin_addressof(b),
-													*(__m256*)__builtin_addressof(a)))));
+	_mm256_mul_ps(*(__m256*)__builtin_addressof(t),
+	_mm256_sub_ps(*(__m256*)__builtin_addressof(b), *(__m256*)__builtin_addressof(a)))));
 	return lerpVec;
 }
 
