@@ -22,7 +22,7 @@
   
    使用 `concept`来约束某些操作
     
-    Euclid 支持的算术类型类型有 `int, float`
+    **Euclid** 支持的算术类型类型有 `int, float`
   ```c++
   Vecotr<int, 3>; // OK
   Point<float, 3>; // OK
@@ -58,7 +58,7 @@
 
   ```c++
   vec4i v1{ 1,2,3,4 };
-  vec4f = v1.cast(); // 只支持 int cast to float
+  vec4f = v1.castTofloat(); // 只支持 int cast to float
   ```
 
 - `operator+=, *=, -=` 的约束
