@@ -2,7 +2,7 @@
 
 namespace euclid {
 
-template<arithmetic Type>
+template<euclid_type Type>
 struct alignas(32) Mat2 {
 public:
 	using value_type = Type;
@@ -149,15 +149,25 @@ public:
 	Array<Type, 4> mat;
 };
 
-template<arithmetic Mul, arithmetic T>
+template<arithmetic Mul, euclid_type T>
 EuclidForceinline constexpr Mat2<T> operator*(const Mul mul, const Mat2<T> matrix) noexcept {
 	return matrix * mul;
 }
 
-template<arithmetic First, arithmetic... Rest> requires same_type<First, Rest...>
+template<euclid_type First, euclid_type... Rest> requires same_type<First, Rest...>
 Mat2(First, Rest...)->Mat2<First>;
 
 using mat2i = Mat2<int>;
 using mat2f = Mat2<float>;
+
+template<typename T>
+struct is_mat2 {
+	static constexpr bool value = false;
+};
+
+template<euclid_type T>
+struct is_mat2<Mat2<T>> {
+	static constexpr bool value = true;
+};
 
 }

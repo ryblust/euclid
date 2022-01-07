@@ -2,7 +2,7 @@
 
 namespace euclid {
 
-template<arithmetic Type, std::size_t Size>
+template<euclid_type Type, std::size_t Size>
 struct alignas(32) Array {
 	using value_type = Type;
     using reference  = Type&;
@@ -35,7 +35,7 @@ struct alignas(32) Array {
         }
     }
 
-    constexpr void operator+=(const Array otherAry) noexcept {
+    constexpr Array& operator+=(const Array otherAry) noexcept {
         if (__builtin_is_constant_evaluated()) {
             util::transformArrayFromOther(data, otherAry.data, [](reference dst, value_type src) noexcept { dst += src; });
         } else {
@@ -45,9 +45,10 @@ struct alignas(32) Array {
                 ::_mm256_store_si256((__m256i*)data, _mm256_add_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
             }
         }
+        return *this;
     }
 
-    constexpr void operator-=(const Array otherAry) noexcept {
+    constexpr Array& operator-=(const Array otherAry) noexcept {
         if (__builtin_is_constant_evaluated()) {
             util::transformArrayFromOther(data, otherAry.data, [](reference dst, value_type src) noexcept { dst -= src; });
         } else {
@@ -57,9 +58,10 @@ struct alignas(32) Array {
                 ::_mm256_store_si256((__m256i*)data, _mm256_sub_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
             }
         }
+        return *this;
     }
 
-    constexpr void operator*=(const Array otherAry) noexcept {
+    constexpr Array& operator*=(const Array otherAry) noexcept {
         if (__builtin_is_constant_evaluated()) {
             util::transformArrayFromOther(data, otherAry.data, [](reference dst, value_type src) noexcept { dst *= src; });
         } else {
@@ -69,28 +71,26 @@ struct alignas(32) Array {
                 ::_mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
             }
         }
+        return *this;
     }
 
     constexpr Array operator+(const Array otherAry) const noexcept {
         Array temp = *this;
-        temp += otherAry;
-        return temp;
+        return temp += otherAry;
     }
 
     constexpr Array operator-(const Array otherAry) const noexcept {
         Array temp = *this;
-        temp -= otherAry;
-        return temp;
+        return temp -= otherAry;
     }
 
     constexpr Array operator*(const Array otherAry) const noexcept {
         Array temp = *this;
-        temp *= otherAry;
-        return temp;
+        return temp *= otherAry;
     }
 
     template<arithmetic Mul> requires acceptable_loss<Type, Mul>
-    constexpr void operator*=(const Mul mul) noexcept {
+    constexpr Array& operator*=(const Mul mul) noexcept {
         if (__builtin_is_constant_evaluated()) {
             util::transformToArray(data, [=](reference val) noexcept { val *= mul; });
         } else {
@@ -100,29 +100,29 @@ struct alignas(32) Array {
                 ::_mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)this, ::_mm256_set1_epi32(static_cast<int>(mul))));
             }
         }
+        return *this;
     }
 
     template<arithmetic Div> requires acceptable_loss<Type, Div>
-    constexpr void operator/=(const Div div) noexcept {
+    constexpr Array& operator/=(const Div div) noexcept {
         if (__builtin_is_constant_evaluated()) {
             util::transformToArray(data, [=](reference val) noexcept { val /= div; });
         } else {
             ::_mm256_store_ps((float*)data, _mm256_div_ps(*(__m256*)this, _mm256_set1_ps(static_cast<float>(div))));
         }
+        return *this;
     }
 
     template<arithmetic Mul> requires acceptable_loss<Type, Mul>
     constexpr Array operator*(const Mul mul) const noexcept {
         Array temp = *this;
-        temp *= mul;
-        return temp;
+        return temp *= mul;
     }
 
     template<arithmetic Div> requires acceptable_loss<Type, Div>
     constexpr Array operator/(const Div div) const noexcept {
         Array temp = *this;
-        temp /= div;
-        return temp;
+        return temp /= div;
     }
 
     constexpr Array operator-() const noexcept {
@@ -134,15 +134,25 @@ struct alignas(32) Array {
 	value_type data[Size];
 };
 
-template<arithmetic Mul, arithmetic T, std::size_t S> requires acceptable_loss<T, Mul>
+template<arithmetic Mul, euclid_type T, std::size_t S> requires acceptable_loss<T, Mul>
 EuclidForceinline constexpr Array<T, S> operator*(const Mul mul, const Array<T, S> array) noexcept {
     return array * mul;
 }
 
-template<arithmetic First, arithmetic... Rest> requires same_type<First, Rest...>
+template<euclid_type First, euclid_type... Rest> requires same_type<First, Rest...>
 Array(First, Rest...)->Array<First, sizeof...(Rest) + 1>;
 
 using float3 = Array<float, 3>;
 using float4 = Array<float, 4>;
+
+template<typename T>
+struct is_array {
+    static constexpr bool value = false;
+};
+
+template<euclid_type T, std::size_t S>
+struct is_array<Array<T, S>> {
+    static constexpr bool value = true;
+};
 
 }

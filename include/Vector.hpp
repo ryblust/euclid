@@ -2,7 +2,7 @@
 
 namespace euclid {
 
-template<arithmetic Type, std::size_t Size>
+template<euclid_type Type, std::size_t Size>
 struct alignas(32) Vector {
 public:
     using value_type = Type;
@@ -116,12 +116,14 @@ public:
         }
     }
 
-    constexpr void operator+=(const Vector otherVec) noexcept {
+    constexpr Vector& operator+=(const Vector otherVec) noexcept {
         vector += otherVec.vector;
+        return *this;
     }
 
-    constexpr void operator-=(const Vector otherVec) noexcept {
+    constexpr Vector& operator-=(const Vector otherVec) noexcept {
         vector -= otherVec.vector;
+        return *this;
     }
 
     constexpr Vector operator+(const Vector otherVec) const noexcept {
@@ -133,13 +135,15 @@ public:
     }
 
     template<arithmetic Mul> requires acceptable_loss<Type, Mul>
-    constexpr void operator*=(const Mul mul) noexcept  {
+    constexpr Vector& operator*=(const Mul mul) noexcept  {
         vector *= mul;
+        return *this;
     }
 
     template<arithmetic Div> requires acceptable_loss<Type, Div>
-    constexpr void operator/=(const Div div) noexcept {
+    constexpr Vector& operator/=(const Div div) noexcept {
         vector /= div;
+        return *this;
     }
 
     template<arithmetic Mul> requires acceptable_loss<Type, Mul>
@@ -159,7 +163,7 @@ public:
     Array<Type, Size> vector;
 };
 
-template<arithmetic Mul, arithmetic T, std::size_t S> requires acceptable_loss<T, Mul>
+template<arithmetic Mul, euclid_type T, std::size_t S> requires acceptable_loss<T, Mul>
 EuclidForceinline constexpr Vector<T, S> operator*(const Mul mul, const Vector<T, S> vector) noexcept {
     return vector * mul;
 }
@@ -172,7 +176,17 @@ using vec2f = Vector<float, 2>;
 using vec3f = Vector<float, 3>;
 using vec4f = Vector<float, 4>;
 
-template<arithmetic First, arithmetic... Rest> requires same_type<First, Rest...>
+template<euclid_type First, euclid_type... Rest> requires same_type<First, Rest...>
 Vector(First, Rest...)->Vector<First, sizeof...(Rest) + 1>;
+
+template<typename T>
+struct is_vector {
+    static constexpr bool value = false;
+};
+
+template<euclid_type T, std::size_t S>
+struct is_vector<Vector<T, S>> {
+    static constexpr bool value = true;
+};
 
 }

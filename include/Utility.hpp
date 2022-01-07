@@ -3,8 +3,8 @@
 namespace euclid::util {
 
 template<arithmetic T>
-EuclidForceinline constexpr T clamp(const T val, const T low, const T high) noexcept {
-	return val < low ? low : high < val ? high : val;
+EuclidForceinline constexpr T clamp(const T val, const T min, const T max) noexcept {
+	return val < min ? min : max < val ? max : val;
 }
 
 template<float_point_type T> 
@@ -59,5 +59,9 @@ EuclidForceinline Vector<T, S> saturate(Vector<T, S> vec) noexcept {
 	}
 	return saturateVec;
 }
+
+template<typename T>
+concept euclid_component = is_array<T>::value  || is_point<T>::value ||
+						   is_vector<T>::value || is_mat2<T>::value;
 
 }
