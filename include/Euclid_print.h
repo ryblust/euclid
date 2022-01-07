@@ -1,61 +1,62 @@
 #pragma once
 
-#include <cstdio>
+#include <cstdio> // Waiting for std::print
 
 namespace euclid::io {
 
 namespace detail {
 
-template<arithmetic T>
-EuclidForceinline void printContainerImpl(const T* data, std::size_t size) noexcept {
-	if constexpr (same_type<T, int>) {
-		std::printf("[");
-		for (std::size_t i = 0; i < size - 1; ++i) {
-			std::printf("%d, ", data[i]);
+template<euclid_type T, std::size_t S> requires (S >= 2 && S <= 4)
+EuclidForceinline void printImpl(const T(&data)[S]) noexcept {
+	if constexpr (S == 4) {
+		if constexpr (same_type<T, float>) {
+			std::printf("%.3f, %.3f, %.3f, %.3f", data[0], data[1], data[2], data[3]);
+		} else {
+			std::printf("%d, %d, %d, %d", data[0], data[1], data[2], data[3]);
 		}
-		std::printf("%d]\n", data[size - 1]);
-	} else {
-		std::printf("[");
-		for (std::size_t i = 0; i < size - 1; ++i) {
-			std::printf("%.3f, ", data[i]);
+	} else if constexpr (S == 3) {
+		if constexpr (same_type<T, float>) {
+			std::printf("%.3f, %.3f, %.3f", data[0], data[1], data[2]);
+		} else {
+			std::printf("%d, %d, %d", data[0], data[1], data[2]);
 		}
-		std::printf("%.3f]\n", data[size - 1]);
-	}
-}
-
-template<arithmetic T>
-EuclidForceinline void printImpl(const T value) noexcept {
-	if constexpr (same_type<T, int>) {
-		std::printf("%d ", value);
-	} else {
-		std::printf("%.3f ", value);
-	}
-}
-
-template<arithmetic T>
-EuclidForceinline void printlnImpl(const T value) noexcept {
-	if constexpr (same_type<T, int>) {
-		std::printf("%d\n", value);
-	} else {
-		std::printf("%.3f\n", value);
+	} else if constexpr (S == 2) {
+		if constexpr (same_type<T, float>) {
+			std::printf("%.3f, %.3f", data[0], data[1]);
+		} else {
+			std::printf("%d, %d", data[0], data[1]);
+		}
 	}
 }
 
 }
 
-template<typename... Container> 
-EuclidForceinline void print(const Container... container) noexcept {
-	(detail::printContainerImpl((typename Container::value_type*)__builtin_addressof(container), container.size()), ...);
-}
-
-template<arithmetic... T>
-EuclidForceinline void print(const T... value) noexcept {
-	(detail::printImpl(value), ...);
-}
-
-template<arithmetic... T>
-EuclidForceinline void println(const T... value) noexcept {
-	(detail::printlnImpl(value), ...);
+template<util::euclid_component Container, util::euclid_component... Rest>
+void print(const Container container, const Rest... rest) noexcept {
+	if constexpr (is_array<Container>::value) {
+		detail::printImpl(container.data);
+		std::putchar('\n');
+	} else if constexpr (is_point<Container>::value) {
+		std::putchar('(');
+		detail::printImpl(container.point.data);
+		std::puts(")");
+	} else if constexpr (is_vector<Container>::value) {
+		std::putchar('[');
+		detail::printImpl(container.vector.data);
+		std::puts("]");
+	} else if constexpr (is_mat2<Container>::value) {
+		if constexpr (same_type<typename Container::value_type, float>) {
+			std::printf("%.3f, %.3f\n%.3f, %.3f\n", container.mat.data[0], container.mat.data[1],
+												    container.mat.data[2], container.mat.data[3]);
+		} else {
+			std::printf("%d, %d\n%d, %d\n", container.mat.data[0], container.mat.data[1],
+											container.mat.data[2], container.mat.data[3]);
+		}
+	}
+	if constexpr (sizeof...(rest) != 0) {
+		std::putchar('\n');
+		io::print(rest...);
+	}
 }
 
 }
