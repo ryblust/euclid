@@ -17,8 +17,14 @@ namespace euclid {
 template<typename First, typename... Rest>
 concept same_type = std::conjunction_v<std::is_same<First, Rest>...>;
 
+template<typename First, typename... Rest>
+concept is_any_type_of = std::disjunction_v<std::is_same<First, Rest>...>;
+
 template<typename Ty>
 concept arithmetic = std::is_arithmetic_v<Ty>;
+
+template<typename Ty>
+concept euclid_type = is_any_type_of<Ty, int, float>;
 
 template<typename Ty>
 concept integer_type = std::is_integral_v<Ty>;
