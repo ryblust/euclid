@@ -4,7 +4,7 @@ namespace euclid {
 
 template<euclid_type Type, std::size_t Size>
 struct alignas(32) Array {
-	using value_type = Type;
+    using value_type = Type;
     using reference  = Type&;
 
     constexpr std::size_t size() const noexcept {
@@ -131,7 +131,7 @@ struct alignas(32) Array {
         return temp;
     }
 
-	value_type data[Size];
+    value_type data[Size];
 };
 
 template<arithmetic Mul, euclid_type T, std::size_t S> requires acceptable_loss<T, Mul>

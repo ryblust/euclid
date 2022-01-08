@@ -2,17 +2,10 @@
 
 namespace euclid {
 
-template<arithmetic Type>
-class Triangle {
+template<euclid_type Type>
+struct Triangle {
 public:
 
-
-	point3<Type> vertex[3];
 };
-
-using trianglei = Triangle<int>;
-using triangleu = Triangle<unsigned>;
-using trianglef = Triangle<float>;
-using triangled = Triangle<double>;
 
 }
