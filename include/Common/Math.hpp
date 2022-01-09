@@ -33,8 +33,8 @@ EuclidForceinline constexpr float cos(const float angle) noexcept {
         const __m256 second = _mm256_mul_ps(first, first);
         const __m256 third  = _mm256_mul_ps(first, second);
         const __m256 result = _mm256_sub_ps(_mm256_set1_ps(1.f),
-                              _mm256_add_ps(_mm256_mul_ps(_mm256_set1_ps(0.5f), first),
-                              _mm256_sub_ps(_mm256_mul_ps(_mm256_set1_ps(0.04166666791f), second),
+                              _mm256_add_ps(_mm256_mul_ps(_mm256_set1_ps(0.5f),            first),
+                              _mm256_sub_ps(_mm256_mul_ps(_mm256_set1_ps(0.04166666791f),  second),
                                             _mm256_mul_ps(_mm256_set1_ps(0.001361971023f), third))));
 #ifdef _MSC_VER
         return result.m256_f32[0];
