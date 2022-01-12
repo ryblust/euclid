@@ -16,7 +16,9 @@
   
   Better with C++23 `(if consteval)`
 
-  暂时使用 `__builtin_is_constant_evaluated()`
+  暂时使用 `__builtin_is_constant_evaluated()` 来判断是否是常量求值上下文
+
+  在使用 `constexpr` 创建变量时，IDE (Visual Studio) 可能会报错，但可以通过编译
 
 - 编译期的类型约束
   

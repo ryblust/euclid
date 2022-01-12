@@ -1,5 +1,10 @@
 #pragma once
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4514)
+#endif // _MSC_VER
+
 namespace euclid::math {
 
 template<float_point_type Ty>
@@ -99,3 +104,7 @@ EuclidForceinline constexpr float tan(const float angle) noexcept {
 }
 
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif // _MSC_VER

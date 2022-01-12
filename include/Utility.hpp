@@ -62,6 +62,7 @@ EuclidForceinline Vector<T, S> saturate(Vector<T, S> vec) noexcept {
 
 template<typename T>
 concept euclid_component = is_array<T>::value  || is_point<T>::value ||
-                           is_vector<T>::value || is_mat2<T>::value;
+                           is_vector<T>::value || is_mat2<T>::value  ||
+                           is_mat4<T>::value;
 
 }

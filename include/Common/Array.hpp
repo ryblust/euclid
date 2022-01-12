@@ -5,44 +5,47 @@ namespace euclid {
 template<euclid_type Type, std::size_t Size>
 struct alignas(32) Array {
     using value_type = Type;
-    using reference  = Type&;
 
     constexpr std::size_t size() const noexcept {
         return Size;
     }
 
     constexpr Array<float, Size> castTofloat() const noexcept requires(same_type<Type, int>) {
-        Array<float, Size> castArray;
+        Array<float, Size> castAry;
         if (__builtin_is_constant_evaluated()) {
             for (std::size_t i = 0; i < Size; ++i) {
-                castArray.data[i] = static_cast<float>(data[i]);
+                castAry.data[i] = static_cast<float>(data[i]);
             }
         } else {
-            ::_mm256_store_ps(castArray.data, _mm256_cvtepi32_ps(*(__m256i*)this));
+            _mm256_store_ps(castAry.data, _mm256_cvtepi32_ps(*(__m256i*)this));
         }
-        return castArray;
+        return castAry;
     }
 
     constexpr void negative() noexcept {
         if (__builtin_is_constant_evaluated()) {
-            util::transformToArray(data, [](reference val) noexcept { val = -val; });
+            for (std::size_t i = 0; i < Size; ++i) {
+                data[i] = -data[i];
+            }
         } else {
             if constexpr (same_type<Type, float>) {
-                ::_mm256_store_ps(data, _mm256_sub_ps(_mm256_setzero_ps(), *(__m256*)this));
+                _mm256_store_ps(data, _mm256_sub_ps(_mm256_setzero_ps(), *(__m256*)this));
             } else {
-                ::_mm256_store_si256((__m256i*)data, _mm256_sub_epi32(_mm256_setzero_si256(), *(__m256i*)this));
+                _mm256_store_si256((__m256i*)data, _mm256_sub_epi32(_mm256_setzero_si256(), *(__m256i*)this));
             }
         }
     }
 
     constexpr Array& operator+=(const Array otherAry) noexcept {
         if (__builtin_is_constant_evaluated()) {
-            util::transformArrayFromOther(data, otherAry.data, [](reference dst, value_type src) noexcept { dst += src; });
+            for (std::size_t i = 0; i < Size; ++i) {
+                data[i] += otherAry.data[0];
+            }
         } else {
             if constexpr (same_type<Type, float>) {
-                ::_mm256_store_ps(data, _mm256_add_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherAry)));
+                _mm256_store_ps(data, _mm256_add_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherAry)));
             } else {
-                ::_mm256_store_si256((__m256i*)data, _mm256_add_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
+                _mm256_store_si256((__m256i*)data, _mm256_add_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
             }
         }
         return *this;
@@ -50,12 +53,14 @@ struct alignas(32) Array {
 
     constexpr Array& operator-=(const Array otherAry) noexcept {
         if (__builtin_is_constant_evaluated()) {
-            util::transformArrayFromOther(data, otherAry.data, [](reference dst, value_type src) noexcept { dst -= src; });
+            for (std::size_t i = 0; i < Size; ++i) {
+                data[i] -= otherAry.data[i];
+            }
         } else {
             if constexpr (same_type<Type, float>) {
-                ::_mm256_store_ps(data, _mm256_sub_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherAry)));
+                _mm256_store_ps(data, _mm256_sub_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherAry)));
             } else {
-                ::_mm256_store_si256((__m256i*)data, _mm256_sub_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
+                _mm256_store_si256((__m256i*)data, _mm256_sub_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
             }
         }
         return *this;
@@ -63,12 +68,14 @@ struct alignas(32) Array {
 
     constexpr Array& operator*=(const Array otherAry) noexcept {
         if (__builtin_is_constant_evaluated()) {
-            util::transformArrayFromOther(data, otherAry.data, [](reference dst, value_type src) noexcept { dst *= src; });
+            for (std::size_t i = 0; i < Size; ++i) {
+                data[i] *= otherAry.data[i];
+            }
         } else {
             if constexpr (same_type<Type, float>) {
-                ::_mm256_store_ps(data, _mm256_mul_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherAry)));
+                _mm256_store_ps(data, _mm256_mul_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherAry)));
             } else {
-                ::_mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
+                _mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
             }
         }
         return *this;
@@ -92,12 +99,14 @@ struct alignas(32) Array {
     template<arithmetic Mul> requires acceptable_loss<Type, Mul>
     constexpr Array& operator*=(const Mul mul) noexcept {
         if (__builtin_is_constant_evaluated()) {
-            util::transformToArray(data, [=](reference val) noexcept { val *= mul; });
+            for (std::size_t i = 0; i < Size; ++i) {
+                data[i] *= static_cast<value_type>(mul);
+            }
         } else {
             if constexpr (same_type<Type, float>) {
-                ::_mm256_store_ps(data, _mm256_mul_ps(*(__m256*)this, _mm256_set1_ps(static_cast<float>(mul))));
+                _mm256_store_ps(data, _mm256_mul_ps(*(__m256*)this, _mm256_set1_ps(static_cast<float>(mul))));
             } else {
-                ::_mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)this, ::_mm256_set1_epi32(static_cast<int>(mul))));
+                _mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)this, ::_mm256_set1_epi32(static_cast<int>(mul))));
             }
         }
         return *this;
@@ -106,9 +115,11 @@ struct alignas(32) Array {
     template<arithmetic Div> requires acceptable_loss<Type, Div>
     constexpr Array& operator/=(const Div div) noexcept {
         if (__builtin_is_constant_evaluated()) {
-            util::transformToArray(data, [=](reference val) noexcept { val /= div; });
+            for (std::size_t i = 0; i < Size; ++i) {
+                data[i] /= static_cast<value_type>(div);
+            }
         } else {
-            ::_mm256_store_ps((float*)data, _mm256_div_ps(*(__m256*)this, _mm256_set1_ps(static_cast<float>(div))));
+            _mm256_store_ps((float*)data, _mm256_div_ps(*(__m256*)this, _mm256_set1_ps(static_cast<float>(div))));
         }
         return *this;
     }

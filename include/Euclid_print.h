@@ -46,11 +46,35 @@ void print(const Container container, const Rest... rest) noexcept {
         std::puts("]");
     } else if constexpr (is_mat2<Container>::value) {
         if constexpr (same_type<typename Container::value_type, float>) {
-            std::printf("%.3f, %.3f\n%.3f, %.3f\n", container.mat.data[0], container.mat.data[1],
-                                                    container.mat.data[2], container.mat.data[3]);
+            std::printf("%.3f, %.3f\n%.3f, %.3f\n",
+                container.mat.data[0], container.mat.data[1],
+                container.mat.data[2], container.mat.data[3]);
         } else {
-            std::printf("%d, %d\n%d, %d\n", container.mat.data[0], container.mat.data[1],
-                                            container.mat.data[2], container.mat.data[3]);
+            std::printf("%d, %d\n%d, %d\n",
+                container.mat.data[0], container.mat.data[1],
+                container.mat.data[2], container.mat.data[3]);
+        }
+    } else if constexpr (is_mat4<Container>::value) {
+        if constexpr (same_type<typename Container::value_type, float>) {
+            std::printf("%.3f, %.3f, %.3f, %.3f\n%.3f, %.3f, %.3f, %.3f\n%.3f, %.3f, %.3f, %.3f\n%.3f, %.3f, %.3f, %.3f\n",
+                container.first.data[0],  container.first.data[1],
+                container.first.data[2],  container.first.data[3],
+                container.first.data[4],  container.first.data[5],
+                container.first.data[6],  container.first.data[7],
+                container.second.data[0], container.second.data[1],
+                container.second.data[2], container.second.data[3],
+                container.second.data[4], container.second.data[5],
+                container.second.data[6], container.second.data[7]);
+        } else {
+            std::printf("%d, %d, %d, %d\n%d, %d, %d, %d\n%d, %d, %d, %d\n%d, %d, %d, %d\n",
+                container.first.data[0],  container.first.data[1],
+                container.first.data[2],  container.first.data[3],
+                container.first.data[4],  container.first.data[5],
+                container.first.data[6],  container.first.data[7],
+                container.second.data[0], container.second.data[1],
+                container.second.data[2], container.second.data[3],
+                container.second.data[4], container.second.data[5],
+                container.second.data[6], container.second.data[7]);
         }
     }
     if constexpr (sizeof...(rest) != 0) {
