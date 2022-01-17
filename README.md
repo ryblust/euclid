@@ -18,8 +18,6 @@
 
   暂时使用 `__builtin_is_constant_evaluated()` 来判断是否是常量求值上下文
 
-  在使用 `constexpr` 创建变量时，IDE (Visual Studio) 可能会报错，但可以通过编译
-
 - 编译期的类型约束
   
    使用 `concept`来约束某些操作
@@ -38,6 +36,8 @@
   #include <Euclid.h>
   #include <Euclid_io.h>
 
+  using namespace euclid;
+
   vec3i v1{ 1,2,0 };
 
   point3f p1 { 1.2f, 2.3f, 1.f };
@@ -51,16 +51,17 @@
 
 - `constexpr` 数学函数
   ```c++
-  float res1 = math::cos(45);
-  float res2 = math::sin(35.f)
-  float res4 = math::sqrt(2);
+  constexpr float res1 = euclid::math::cos(45);
+  constexpr float res2 = euclid::math::sin(35.f)
+  constexpr float res4 = euclid::math::sqrt(2);
   ```
 
 - 类型转换
 
   ```c++
   vec4i v1{ 1,2,3,4 };
-  vec4f = v1.castTofloat(); // 只支持 int cast to float
+  vec4f v2 = v1.castTofloat();
+  vec4i v3 = v2.castToint(); // Not implemented yet
   ```
 
 - `operator+=, *=, -=` 的约束
@@ -72,13 +73,7 @@
   ```
 
 - `Transformation in Homogeneous Coordinates`
-  ```c++
-  auto res = transform4d::scale(1, 2, 3); // res : mat4i 这里没有必要提升类型
-  vec4i axis{ 0,0,1,0 };
-  auto res1 = transform4d::rotate(axis, 45); // res1 : float
-  auto res2 = transform4d::translate(1, 2, 3); // res2 : mat4i same reason with res
-  auto res3 = transform4d::perspective(fov, aspectRatio, zNear, zFar); // 返回类型依据 Euclid 类型提升原则
-  ```
+
 ## Tested Compiler
 - Add compile flag /arch:AVX2, -mavx2
 - MSVC 16.10/17.0
