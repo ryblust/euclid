@@ -1,0 +1,8 @@
+*.vscode
+*.sln
+*.vcxproj
+*.filters
+*.user
+*.vs
+Euclid.cpp
+x64
