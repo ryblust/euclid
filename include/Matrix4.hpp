@@ -23,7 +23,7 @@ public:
         return { first.data[2], first.data[6], second.data[2], second.data[6] };
     }
 
-    constexpr Vector<Type, 4> getForthCol() const noexcept {
+    constexpr Vector<Type, 4> getFourthCol() const noexcept {
         return { first.data[3], first.data[7], second.data[3], second.data[7] };
     }
 
@@ -38,11 +38,11 @@ public:
         } else {
             Mat4 identityMat;
             if constexpr (same_type<Type, float>) {
-                _mm256_store_ps((float*)__builtin_addressof(identityMat.first), _mm256_set_ps(0, 0, 1, 0, 0, 0, 0, 1));
-                _mm256_store_ps((float*)__builtin_addressof(identityMat.second), _mm256_set_ps(1, 0, 0, 0, 0, 1, 0, 0));
+                _mm256_store_ps((float*)&identityMat.first,  _mm256_set_ps(0, 0, 1, 0, 0, 0, 0, 1));
+                _mm256_store_ps((float*)&identityMat.second, _mm256_set_ps(1, 0, 0, 0, 0, 1, 0, 0));
             } else {
-                _mm256_store_si256((__m256i*)__builtin_addressof(identityMat.first), _mm256_set_epi32(0, 0, 1, 0, 0, 0, 0, 1));
-                _mm256_store_si256((__m256i*)__builtin_addressof(identityMat.second), _mm256_set_epi32(1, 0, 0, 0, 0, 1, 0, 0));
+                _mm256_store_si256((__m256i*)&identityMat.first,  _mm256_set_epi32(0, 0, 1, 0, 0, 0, 0, 1));
+                _mm256_store_si256((__m256i*)&identityMat.second, _mm256_set_epi32(1, 0, 0, 0, 0, 1, 0, 0));
             }
             return identityMat;
         }
@@ -58,7 +58,11 @@ public:
     }
 
     constexpr void transposed() noexcept {
-        // Todo
+        if (__builtin_is_constant_evaluated()) {
+
+        } else {
+
+        }
     }
 
     constexpr Mat4 transpose() const noexcept {
@@ -95,15 +99,37 @@ public:
         if (__builtin_is_constant_evaluated()) {
 
         } else {
+            if constexpr (same_type<Type, float>) {
 
+            } else {
+
+            }
         }
     }
 
     constexpr Vector<Type, 4> operator*(const Vector<Type, 4> vec) const noexcept {
         if (__builtin_is_constant_evaluated()) {
-
+            Vector<Type, 4> result{};
+            // Todo
+            return result;
         } else {
-
+            Vector<Type, 4> result;
+            if constexpr (same_type<Type, float>) {
+                const auto tempData = _mm256_permute2f128_ps(*(__m256*)&vec, *(__m256*)&vec, 0);
+                const auto mulData1 = _mm256_mul_ps(*(__m256*)&first,  tempData);
+                const auto mulData2 = _mm256_mul_ps(*(__m256*)&second, tempData);
+                const auto addData1 = _mm256_hadd_ps(mulData1, mulData2);
+                const auto addData2 = _mm256_hadd_ps(addData1, addData1);
+                _mm256_store_ps((float*)&result, _mm256_permutevar8x32_ps(addData2, _mm256_set_epi32(0,0,0,0,5,1,4,0)));
+            } else {
+                const auto tempData = _mm256_permute2x128_si256(*(__m256i*)&vec, *(__m256i*)&vec, 0);
+                const auto mulData1 = _mm256_mullo_epi32(*(__m256i*)&first,  tempData);
+                const auto mulData2 = _mm256_mullo_epi32(*(__m256i*)&second, tempData);
+                const auto addData1 = _mm256_hadd_epi32(mulData1, mulData2);
+                const auto addData2 = _mm256_hadd_epi32(addData1, addData1);
+                _mm256_store_si256((__m256i*)&result, _mm256_permutevar8x32_epi32(addData2, _mm256_set_epi32(0,0,0,0,5,1,4,0)));
+            }
+            return result;
         }
     }
 
@@ -112,8 +138,13 @@ public:
         return { first * mul, second * mul };
     }
 
-    Array<Type, 8> first;
-    Array<Type, 8> second;
+    union {
+        struct {
+            Array<Type, 8> first;
+            Array<Type, 8> second;
+        };
+        value_type mat[4][4];
+    };
 };
 
 template<arithmetic Mul, euclid_type T> requires acceptable_loss<T, Mul>

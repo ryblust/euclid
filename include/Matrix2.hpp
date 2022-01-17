@@ -8,18 +8,18 @@ public:
     using value_type = Type;
 
     constexpr Mat2<float> castTofloat() const noexcept requires(same_type<Type, int>) {
-        return { mat.castTofloat() };
+        return { simdMat.castTofloat() };
     }
 
     constexpr Vector<Type, 2> getFirstCol() const noexcept {
         if (__builtin_is_constant_evaluated()) {
-            return { mat.data[0], mat.data[2] };
+            return { simdMat.data[0], simdMat.data[2] };
         } else {
             Vector<Type, 2> firstCol;
             if constexpr (same_type<Type, float>) {
-                _mm256_store_ps((float*)__builtin_addressof(firstCol), _mm256_permute_ps(*(__m256*)this, 0b1000));
+                _mm256_store_ps((float*)&firstCol, _mm256_permute_ps(*(__m256*)this, 0b1000));
             } else {
-                _mm256_store_si256((__m256i*)__builtin_addressof(firstCol), _mm256_shuffle_epi32(*(__m256i*)this, 0b1000));
+                _mm256_store_si256((__m256i*)&firstCol, _mm256_shuffle_epi32(*(__m256i*)this, 0b1000));
             }
             return firstCol;
         }
@@ -27,13 +27,13 @@ public:
 
     constexpr Vector<Type, 2> getSecondCol() const noexcept {
         if (__builtin_is_constant_evaluated()) {
-            return { mat.data[1], mat.data[3] };
+            return { simdMat.data[1], simdMat.data[3] };
         } else {
             Vector<Type, 2> secondCol;
             if constexpr (same_type<Type, float>) {
-                _mm256_store_ps((float*)__builtin_addressof(secondCol), _mm256_permute_ps(*(__m256*)this, 0b1101));
+                _mm256_store_ps((float*)&secondCol, _mm256_permute_ps(*(__m256*)this, 0b1101));
             } else {
-                _mm256_store_si256((__m256i*)__builtin_addressof(secondCol), _mm256_shuffle_epi32(*(__m256i*)this, 0b1101));
+                _mm256_store_si256((__m256i*)&secondCol, _mm256_shuffle_epi32(*(__m256i*)this, 0b1101));
             }
             return secondCol;
         }
@@ -41,23 +41,20 @@ public:
 
     static constexpr Mat2 identity() noexcept {
         if (__builtin_is_constant_evaluated()) {
-            return {
-                1, 0,
-                0, 1
-            };
+            return { 1,0,0,1 };
         } else {
             Mat2 identityMat;
             if constexpr (same_type<Type, float>) {
-                _mm256_store_ps((float*)__builtin_addressof(identityMat), _mm256_set_ps(0, 0, 0, 0, 1, 0, 0, 1));
+                _mm256_store_ps((float*)&identityMat, _mm256_set_ps(0,0,0,0,1,0,0,1));
             } else {
-                _mm256_store_si256((__m256i*)__builtin_addressof(identityMat), _mm256_set_epi32(0, 0, 0, 0, 1, 0, 0, 1));
+                _mm256_store_si256((__m256i*)&identityMat, _mm256_set_epi32(0,0,0,0,1,0,0,1));
             }
             return identityMat;
         }
     }
 
     constexpr void negative() noexcept {
-        mat.negative();
+        simdMat.negative();
     }
 
     constexpr std::size_t size() const noexcept {
@@ -66,7 +63,7 @@ public:
 
     constexpr void transposed() noexcept {
         if (__builtin_is_constant_evaluated()) {
-            util::swap(mat.data[1], mat.data[2]);
+            util::swap(simdMat.data[1], simdMat.data[2]);
         } else {
             if constexpr (same_type<Type, float>) {
                 _mm256_store_ps((float*)this, _mm256_permute_ps(*(__m256*)this, 0b11011000));
@@ -83,24 +80,24 @@ public:
     }
 
     constexpr void operator+=(const Mat2 otherMat) noexcept {
-        mat += otherMat.mat;
+        simdMat += otherMat.simdMat;
     }
 
     constexpr void operator-=(const Mat2 otherMat) noexcept {
-        mat += otherMat.mat;
+        simdMat += otherMat.simdMat;
     }
 
     template<arithmetic Mul> requires acceptable_loss<Type, Mul>
     constexpr void operator*=(const Mul mul) noexcept {
-        mat *= mul;
+        simdMat *= mul;
     }
 
     constexpr Mat2 operator+(const Mat2 otherMat) const noexcept {
-        return { mat + otherMat.mat };
+        return { simdMat + otherMat.simdMat };
     }
 
     constexpr Mat2 operator-(const Mat2 otherMat) const noexcept {
-        return { mat - otherMat.mat };
+        return { simdMat - otherMat.simdMat };
     }
 
     constexpr Mat2 operator*(const Mat2 otherMat) const noexcept {
@@ -109,55 +106,86 @@ public:
             const auto [a1, a3] = ((*this) * this->getSecondCol()).vector.data;
             return { a0,a1,a2,a3 };
         } else {
-            Mat2<Type> mulMat;
+            Mat2 result;
             if constexpr (same_type<Type, float>) {
-                const auto interData1 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)__builtin_addressof(otherMat), 0b10001000));
-                const auto interData2 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)__builtin_addressof(otherMat), 0b11011101));
-                const auto haddData1  = _mm256_hadd_ps(interData1, interData1);
-                const auto haddData2  = _mm256_hadd_ps(interData2, interData2);
-                _mm256_store_ps((float*)__builtin_addressof(mulMat), _mm256_unpacklo_ps(haddData1, haddData2));
+                const auto temp = _mm256_mul_ps(_mm256_permute2f128_ps(*(__m256*)this, *(__m256*)this, 0),
+                                  _mm256_permutevar8x32_ps(_mm256_permute2f128_ps(*(__m256*)&otherMat, *(__m256*)&otherMat, 0),
+                                  _mm256_set_epi32(3,1,3,1,2,0,2,0)));
+               _mm256_store_ps((float*)&result, _mm256_permutevar8x32_ps(_mm256_hadd_ps(temp, temp), _mm256_set_epi32(0,0,0,0,5,1,4,0)));
             } else {
-                const auto interData1 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)__builtin_addressof(otherMat), 0b10001000));
-                const auto interData2 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)__builtin_addressof(otherMat), 0b11011101));
-                const auto haddData1  = _mm256_hadd_epi32(interData1, interData1);
-                const auto haddData2  = _mm256_hadd_epi32(interData2, interData2);
-                _mm256_store_si256((__m256i*)__builtin_addressof(mulMat), _mm256_unpacklo_epi32(haddData1, haddData2));
+                const auto temp = _mm256_mullo_epi32(_mm256_permute2x128_si256(*(__m256i*)this, *(__m256i*)this, 0), 
+                                  _mm256_permutevar8x32_epi32(_mm256_permute2x128_si256(*(__m256i*)&otherMat, *(__m256i*)&otherMat, 0),
+                                  _mm256_set_epi32(3,1,3,1,2,0,2,0)));
+                _mm256_store_si256((__m256i*)&result, _mm256_permutevar8x32_epi32(_mm256_hadd_epi32(temp, temp), _mm256_set_epi32(0,0,0,0,5,1,4,0)));
             }
-            return mulMat;
+            return result;
         }
     }
+
+    /*
+        Another Implementation of Matrix Multiplication
+
+        constexpr Mat2 operator*(const Mat2 otherMat) const noexcept {
+            if (__builtin_is_constant_evaluated()) {
+                const auto [a0, a2] = ((*this) * this->getFirstCol()).vector.data;
+                const auto [a1, a3] = ((*this) * this->getSecondCol()).vector.data;
+                return { a0,a1,a2,a3 };
+            } else {
+                Mat2<Type> mulMat;
+                if constexpr (same_type<Type, float>) {
+                    const auto interData1 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)__builtin_addressof(otherMat), 0b10001000));
+                    const auto interData2 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)__builtin_addressof(otherMat), 0b11011101));
+                    const auto haddData1  = _mm256_hadd_ps(interData1, interData1);
+                    const auto haddData2  = _mm256_hadd_ps(interData2, interData2);
+                    _mm256_store_ps((float*)__builtin_addressof(mulMat), _mm256_unpacklo_ps(haddData1, haddData2));
+                } else {
+                    const auto interData1 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)__builtin_addressof(otherMat), 0b10001000));
+                    const auto interData2 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)__builtin_addressof(otherMat), 0b11011101));
+                    const auto haddData1  = _mm256_hadd_epi32(interData1, interData1);
+                    const auto haddData2  = _mm256_hadd_epi32(interData2, interData2);
+                    _mm256_store_si256((__m256i*)__builtin_addressof(mulMat), _mm256_unpacklo_epi32(haddData1, haddData2));
+                }
+                return mulMat;
+            }
+        }
+    */
 
     constexpr Vector<Type, 2> operator*(const Vector<Type, 2> vec) const noexcept {
         if (__builtin_is_constant_evaluated()) {
             return { 
-                mat.data[0] * vec.vector.data[0] + mat.data[1] * vec.vector.data[1],
-                mat.data[2] * vec.vector.data[0] + mat.data[3] * vec.vector.data[1]
+                simdMat.data[0] * vec.vector.data[0] + simdMat.data[1] * vec.vector.data[1],
+                simdMat.data[2] * vec.vector.data[0] + simdMat.data[3] * vec.vector.data[1]
             };
         } else {
-            Vector<Type, 2> mulVec;
+            Vector<Type, 2> result;
             if constexpr (same_type<Type, float>) {
-                const auto interVec = _mm256_mul_ps(*(__m256*)__builtin_addressof(mat),
-                                      _mm256_permute_ps(*(__m256*)__builtin_addressof(vec), 0b01000100));
-                _mm256_store_ps((float*)__builtin_addressof(mulVec), _mm256_hadd_ps(interVec, interVec));
+                const auto intData = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)&vec, 0b01000100));
+                _mm256_store_ps((float*)&result, _mm256_hadd_ps(intData, intData));
             } else {
-                const auto interVec = _mm256_mullo_epi32(*(__m256i*)__builtin_addressof(mat),
-                                      _mm256_shuffle_epi32(*(__m256i*)__builtin_addressof(vec), 0b01000100));
-                _mm256_store_si256((__m256i*)__builtin_addressof(mulVec), _mm256_hadd_epi32(interVec, interVec));
+                const auto intData = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)&vec, 0b01000100));
+                _mm256_store_si256((__m256i*)&result, _mm256_hadd_epi32(intData, intData));
             }
-            return mulVec;
+            return result;
         }
     }
 
     template<arithmetic Mul> requires acceptable_loss<Type, Mul>
     constexpr Mat2 operator*(const Mul mul) const noexcept {
-        return { mat * mul };
+        return { simdMat * mul };
     }
 
     constexpr Mat2 operator-() const noexcept {
-        return { -mat };
+        return { -simdMat };
     }
 
-    Array<Type, 4> mat;
+    union {
+        Array<Type, 4> simdMat;
+        struct {
+            value_type mat[2][2];
+            value_type forAlignment[4];
+        };
+    };
+
 };
 
 template<arithmetic Mul, euclid_type T>
