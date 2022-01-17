@@ -2,7 +2,7 @@
 
 namespace euclid {
 
-template<euclid_type Type, std::size_t Size>
+template<euclid_type Type, std::size_t Size> requires (Size <= 8)
 struct alignas(32) Array {
     using value_type = Type;
 
@@ -11,15 +11,17 @@ struct alignas(32) Array {
     }
 
     constexpr Array<float, Size> castTofloat() const noexcept requires(same_type<Type, int>) {
-        Array<float, Size> castAry;
         if (__builtin_is_constant_evaluated()) {
+            Array<float, Size> floatAry{}; // constexpr return value must to be initialized;
             for (std::size_t i = 0; i < Size; ++i) {
-                castAry.data[i] = static_cast<float>(data[i]);
+                floatAry.data[i] = static_cast<float>(data[i]);
             }
+            return floatAry;
         } else {
-            _mm256_store_ps(castAry.data, _mm256_cvtepi32_ps(*(__m256i*)this));
+            Array<float, Size> floatAry;
+            _mm256_store_ps(floatAry.data, _mm256_cvtepi32_ps(*(__m256i*)data));
+            return floatAry;
         }
-        return castAry;
     }
 
     constexpr void negative() noexcept {
@@ -29,9 +31,9 @@ struct alignas(32) Array {
             }
         } else {
             if constexpr (same_type<Type, float>) {
-                _mm256_store_ps(data, _mm256_sub_ps(_mm256_setzero_ps(), *(__m256*)this));
+                _mm256_store_ps(data, _mm256_sub_ps(_mm256_setzero_ps(), *(__m256*)data));
             } else {
-                _mm256_store_si256((__m256i*)data, _mm256_sub_epi32(_mm256_setzero_si256(), *(__m256i*)this));
+                _mm256_store_si256((__m256i*)data, _mm256_sub_epi32(_mm256_setzero_si256(), *(__m256i*)data));
             }
         }
     }
@@ -39,13 +41,13 @@ struct alignas(32) Array {
     constexpr Array& operator+=(const Array otherAry) noexcept {
         if (__builtin_is_constant_evaluated()) {
             for (std::size_t i = 0; i < Size; ++i) {
-                data[i] += otherAry.data[0];
+                data[i] += otherAry.data[i];
             }
         } else {
             if constexpr (same_type<Type, float>) {
-                _mm256_store_ps(data, _mm256_add_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherAry)));
+                _mm256_store_ps(data, _mm256_add_ps(*(__m256*)data, *(__m256*)&otherAry));
             } else {
-                _mm256_store_si256((__m256i*)data, _mm256_add_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
+                _mm256_store_si256((__m256i*)data, _mm256_add_epi32(*(__m256i*)data, *(__m256i*)&otherAry));
             }
         }
         return *this;
@@ -58,9 +60,9 @@ struct alignas(32) Array {
             }
         } else {
             if constexpr (same_type<Type, float>) {
-                _mm256_store_ps(data, _mm256_sub_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherAry)));
+                _mm256_store_ps(data, _mm256_sub_ps(*(__m256*)data, *(__m256*)&otherAry));
             } else {
-                _mm256_store_si256((__m256i*)data, _mm256_sub_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
+                _mm256_store_si256((__m256i*)data, _mm256_sub_epi32(*(__m256i*)data, *(__m256i*)&otherAry));
             }
         }
         return *this;
@@ -73,9 +75,24 @@ struct alignas(32) Array {
             }
         } else {
             if constexpr (same_type<Type, float>) {
-                _mm256_store_ps(data, _mm256_mul_ps(*(__m256*)this, *(__m256*)__builtin_addressof(otherAry)));
+                _mm256_store_ps(data, _mm256_mul_ps(*(__m256*)data, *(__m256*)&otherAry));
             } else {
-                _mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)this, *(__m256i*)__builtin_addressof(otherAry)));
+                _mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)data, *(__m256i*)&otherAry));
+            }
+        }
+        return *this;
+    }
+
+    constexpr Array& operator/=(const Array otherAry) noexcept {
+        if (__builtin_is_constant_evaluated()) {
+            for (std::size_t i = 0; i < Size; ++i) {
+                data[i] /= otherAry.data[i];
+            }
+        } else {
+            if constexpr (same_type<Type, float>) {
+                _mm256_store_ps((float*)data, _mm256_div_ps(*(__m256*)data, *(__m256*)&otherAry));
+            } else {
+                _mm256_store_si256((__m256i*)data, _mm256_cvtps_epi32(_mm256_div_ps(*(__m256*)data, *(__m256*)&otherAry)));
             }
         }
         return *this;
@@ -96,17 +113,22 @@ struct alignas(32) Array {
         return temp *= otherAry;
     }
 
+    constexpr Array operator/(const Array otherAry) const noexcept {
+        Array temp = *this;
+        return temp /= otherAry;
+    }
+
     template<arithmetic Mul> requires acceptable_loss<Type, Mul>
     constexpr Array& operator*=(const Mul mul) noexcept {
         if (__builtin_is_constant_evaluated()) {
             for (std::size_t i = 0; i < Size; ++i) {
-                data[i] *= static_cast<value_type>(mul);
+                data[i] *= static_cast<Type>(mul);
             }
         } else {
             if constexpr (same_type<Type, float>) {
-                _mm256_store_ps(data, _mm256_mul_ps(*(__m256*)this, _mm256_set1_ps(static_cast<float>(mul))));
+                _mm256_store_ps(data, _mm256_mul_ps(*(__m256*)data, _mm256_set1_ps(static_cast<float>(mul))));
             } else {
-                _mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)this, ::_mm256_set1_epi32(static_cast<int>(mul))));
+                _mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)data, _mm256_set1_epi32(static_cast<int>(mul))));
             }
         }
         return *this;
@@ -116,10 +138,10 @@ struct alignas(32) Array {
     constexpr Array& operator/=(const Div div) noexcept {
         if (__builtin_is_constant_evaluated()) {
             for (std::size_t i = 0; i < Size; ++i) {
-                data[i] /= static_cast<value_type>(div);
+                data[i] /= static_cast<Type>(div);
             }
         } else {
-            _mm256_store_ps((float*)data, _mm256_div_ps(*(__m256*)this, _mm256_set1_ps(static_cast<float>(div))));
+            _mm256_store_ps((float*)data, _mm256_div_ps(*(__m256*)data, _mm256_set1_ps(static_cast<float>(div))));
         }
         return *this;
     }

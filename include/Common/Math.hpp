@@ -2,7 +2,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4514)
+#pragma warning(disable : 4514) // remove unused inline functions
 #endif // _MSC_VER
 
 namespace euclid::math {

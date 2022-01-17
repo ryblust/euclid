@@ -2,7 +2,7 @@
 
 namespace euclid {
 
-template<euclid_type Type, std::size_t Size>
+template<euclid_type Type, std::size_t Size> requires (Size <= 8)
 struct alignas(32) Point {
 public:
     using value_type = Type;
