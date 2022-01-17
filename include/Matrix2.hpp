@@ -133,17 +133,17 @@ public:
             } else {
                 Mat2<Type> mulMat;
                 if constexpr (same_type<Type, float>) {
-                    const auto interData1 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)__builtin_addressof(otherMat), 0b10001000));
-                    const auto interData2 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)__builtin_addressof(otherMat), 0b11011101));
+                    const auto interData1 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)&otherMat, 0b10001000));
+                    const auto interData2 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)&otherMat, 0b11011101));
                     const auto haddData1  = _mm256_hadd_ps(interData1, interData1);
                     const auto haddData2  = _mm256_hadd_ps(interData2, interData2);
-                    _mm256_store_ps((float*)__builtin_addressof(mulMat), _mm256_unpacklo_ps(haddData1, haddData2));
+                    _mm256_store_ps((float*)&mulMat, _mm256_unpacklo_ps(haddData1, haddData2));
                 } else {
-                    const auto interData1 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)__builtin_addressof(otherMat), 0b10001000));
-                    const auto interData2 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)__builtin_addressof(otherMat), 0b11011101));
+                    const auto interData1 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)&otherMat, 0b10001000));
+                    const auto interData2 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)&otherMat, 0b11011101));
                     const auto haddData1  = _mm256_hadd_epi32(interData1, interData1);
                     const auto haddData2  = _mm256_hadd_epi32(interData2, interData2);
-                    _mm256_store_si256((__m256i*)__builtin_addressof(mulMat), _mm256_unpacklo_epi32(haddData1, haddData2));
+                    _mm256_store_si256((__m256i*)&mulMat, _mm256_unpacklo_epi32(haddData1, haddData2));
                 }
                 return mulMat;
             }
@@ -182,7 +182,7 @@ public:
         Array<Type, 4> simdMat;
         struct {
             value_type mat[2][2];
-            value_type forAlignment[4];
+            value_type alignment[4];
         };
     };
 
