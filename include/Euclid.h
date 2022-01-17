@@ -8,7 +8,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4324 4820)
+#pragma warning(disable : 4324 4820 4201) // struct alignment & anonymous union
 #endif
 
 #include "Common/Array.hpp"
