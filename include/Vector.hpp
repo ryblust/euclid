@@ -22,21 +22,19 @@ public:
     constexpr float norm() const noexcept {
         if (__builtin_is_constant_evaluated()) {
             return math::sqrt(static_cast<float>(this->dot(*this)));
-        } else {
-            if constexpr (same_type<Type, float>) {
-    #ifdef _MSC_VER
-                return _mm256_sqrt_ps(_mm256_dp_ps(*(__m256*)this, *(__m256*)this, 0b11111111)).m256_f32[0];
-    #else
-                return _mm256_sqrt_ps(_mm256_dp_ps(*(__m256*)this, *(__m256*)this, 0b11111111))[0];
-    #endif
-            } else {
-    #ifdef _MSC_VER
-                return _mm256_sqrt_ps(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)this), 0b1111111)).m256_f32[0];
-    #else
-                return _mm256_sqrt_ps(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)this), 0b1111111))[0]; 
-    #endif
-            }
         }
+        if constexpr (same_type<Type, float>) {
+    #ifdef _MSC_VER
+            return _mm256_sqrt_ps(_mm256_dp_ps(*(__m256*)this, *(__m256*)this, 0b11111111)).m256_f32[0];
+    #else
+            return _mm256_sqrt_ps(_mm256_dp_ps(*(__m256*)this, *(__m256*)this, 0b11111111))[0];
+    #endif
+        }
+    #ifdef _MSC_VER
+        return _mm256_sqrt_ps(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)this), 0b1111111)).m256_f32[0];
+    #else
+        return _mm256_sqrt_ps(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)this), 0b1111111))[0]; 
+    #endif
     }
 
     constexpr float distance(const Vector otherVec) const noexcept {
@@ -46,10 +44,10 @@ public:
     constexpr void normalized() noexcept requires(float_point_type<Type>) {
         if (__builtin_is_constant_evaluated()) {
             vector /= this->norm();
-        } else {
-            _mm256_store_ps((float*)this, _mm256_mul_ps(*(__m256*)this,
-            _mm256_rsqrt_ps(_mm256_dp_ps(*(__m256*)this, *(__m256*)this, 0b11111111))));
+            return;
         }
+        _mm256_store_ps((float*)this, _mm256_mul_ps(*(__m256*)this,
+        _mm256_rsqrt_ps(_mm256_dp_ps(*(__m256*)this, *(__m256*)this, 0b11111111))));
     }
 
     constexpr Vector<float, Size> normalize() const noexcept {
@@ -57,35 +55,33 @@ public:
             Vector normalizedVec = *this;
             normalizedVec.normalized();
             return normalizedVec;
-        } else {
-            Vector<float, Size> normalizedVec = this->castTofloat();
-            normalizedVec.normalized();
-            return normalizedVec;
         }
+        Vector<float, Size> normalizedVec = this->castTofloat();
+        normalizedVec.normalized();
+        return normalizedVec;
     }
 
     constexpr Vector cross(const Vector otherVec) const noexcept requires(Size >= 3) {
         if (__builtin_is_constant_evaluated()) {
-            Vector crossVec{}; // constexpr return value must to be initialized;
+            Vector crossVec{}; // constexpr return value must be initialized;
             crossVec.vector.data[0] = vector.data[1] * otherVec.vector.data[2] - vector.data[2] * otherVec.vector.data[1];
             crossVec.vector.data[1] = vector.data[2] * otherVec.vector.data[0] - vector.data[0] * otherVec.vector.data[2];
             crossVec.vector.data[2] = vector.data[0] * otherVec.vector.data[1] - vector.data[1] * otherVec.vector.data[0];
             return crossVec;
-        } else {
-            Vector crossVec;
-            if constexpr (same_type<Type, float>) {
-                _mm256_store_ps((float*)&crossVec,
-                _mm256_permute_ps(_mm256_sub_ps(_mm256_mul_ps(*(__m256*)this,
-                _mm256_permute_ps(*(__m256*)&otherVec, 0b11001001)),
-                _mm256_mul_ps(_mm256_permute_ps(*(__m256*)this, 0b11001001), *(__m256*)&otherVec)), 0b11001001));
-            } else {
-                _mm256_store_si256((__m256i*)&crossVec,
-                _mm256_shuffle_epi32(_mm256_sub_epi32(_mm256_mullo_epi32(*(__m256i*)this,
-                _mm256_shuffle_epi32(*(__m256i*)&otherVec, 0b11001001)),
-                _mm256_mullo_epi32(_mm256_shuffle_epi32(*(__m256i*)this, 0b11001001), *(__m256i*)&otherVec)), 0b11001001));
-            }
-            return crossVec;
         }
+        Vector crossVec;
+        if constexpr (same_type<Type, float>) {
+            _mm256_store_ps((float*)&crossVec,
+            _mm256_permute_ps(_mm256_sub_ps(_mm256_mul_ps(*(__m256*)this,
+            _mm256_permute_ps(*(__m256*)&otherVec, 0b11001001)), _mm256_mul_ps(
+            _mm256_permute_ps(*(__m256*)this, 0b11001001), *(__m256*)&otherVec)), 0b11001001));
+        } else {
+            _mm256_store_si256((__m256i*)&crossVec,
+            _mm256_shuffle_epi32(_mm256_sub_epi32(_mm256_mullo_epi32(*(__m256i*)this,
+            _mm256_shuffle_epi32(*(__m256i*)&otherVec, 0b11001001)), _mm256_mullo_epi32(
+            _mm256_shuffle_epi32(*(__m256i*)this, 0b11001001), *(__m256i*)&otherVec)), 0b11001001));
+        }
+        return crossVec;
     }
 
     constexpr value_type dot(const Vector otherVec) const noexcept {
@@ -99,20 +95,19 @@ public:
                 dotValue += vector.data[i] * otherVec.vector.data[i];
             }
             return dotValue;
+        }
+        if constexpr (same_type<Type, float>) {
+    #ifdef _MSC_VER
+            return _mm256_dp_ps(*(__m256*)this, *(__m256*)&otherVec, 0b11111111).m256_f32[0];
+    #else // __GUNC__
+            return _mm256_dp_ps(*(__m256*)this, *(__m256*)&otherVec, 0b11111111)[0];
+    #endif
         } else {
-            if constexpr (same_type<Type, float>) {
-        #ifdef _MSC_VER
-                return _mm256_dp_ps(*(__m256*)this, *(__m256*)&otherVec, 0b11111111).m256_f32[0];
-        #else // __GUNC__
-                return _mm256_dp_ps(*(__m256*)this, *(__m256*)&otherVec, 0b11111111)[0];
-        #endif
-            } else {
-        #ifdef _MSC_VER
-                return static_cast<int>(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)&otherVec), 0b1111111).m256_f32[0]);
-        #else // __GUNC__
-                return static_cast<int>(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)&otherVec), 0b1111111)[0]);
-        #endif
-            }
+    #ifdef _MSC_VER
+            return static_cast<int>(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)&otherVec), 0b1111111).m256_f32[0]);
+    #else // __GUNC__
+            return static_cast<int>(_mm256_dp_ps(_mm256_cvtepi32_ps(*(__m256i*)this), _mm256_cvtepi32_ps(*(__m256i*)&otherVec), 0b1111111)[0]);
+    #endif
         }
     }
 

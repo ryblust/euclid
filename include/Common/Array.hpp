@@ -12,16 +12,15 @@ struct alignas(32) Array {
 
     constexpr Array<float, Size> castTofloat() const noexcept requires(same_type<Type, int>) {
         if (__builtin_is_constant_evaluated()) {
-            Array<float, Size> floatAry{}; // constexpr return value must to be initialized;
+            Array<float, Size> floatAry{}; // constexpr return value must be initialized;
             for (std::size_t i = 0; i < Size; ++i) {
                 floatAry.data[i] = static_cast<float>(data[i]);
             }
             return floatAry;
-        } else {
-            Array<float, Size> floatAry;
-            _mm256_store_ps(floatAry.data, _mm256_cvtepi32_ps(*(__m256i*)data));
-            return floatAry;
         }
+        Array<float, Size> floatAry;
+        _mm256_store_ps(floatAry.data, _mm256_cvtepi32_ps(*(__m256i*)data));
+        return floatAry;
     }
 
     constexpr void negative() noexcept {
@@ -29,12 +28,14 @@ struct alignas(32) Array {
             for (std::size_t i = 0; i < Size; ++i) {
                 data[i] = -data[i];
             }
+            return;
+        } 
+        if constexpr (same_type<Type, float>) {
+            _mm256_store_ps(data,
+            _mm256_sub_ps(_mm256_setzero_ps(), *(__m256*)data));
         } else {
-            if constexpr (same_type<Type, float>) {
-                _mm256_store_ps(data, _mm256_sub_ps(_mm256_setzero_ps(), *(__m256*)data));
-            } else {
-                _mm256_store_si256((__m256i*)data, _mm256_sub_epi32(_mm256_setzero_si256(), *(__m256i*)data));
-            }
+            _mm256_store_si256((__m256i*)data,
+            _mm256_sub_epi32(_mm256_setzero_si256(), *(__m256i*)data));
         }
     }
 
@@ -43,12 +44,14 @@ struct alignas(32) Array {
             for (std::size_t i = 0; i < Size; ++i) {
                 data[i] += otherAry.data[i];
             }
+            return *this;
+        }
+        if constexpr (same_type<Type, float>) {
+            _mm256_store_ps(data,
+            _mm256_add_ps(*(__m256*)data, *(__m256*)&otherAry));
         } else {
-            if constexpr (same_type<Type, float>) {
-                _mm256_store_ps(data, _mm256_add_ps(*(__m256*)data, *(__m256*)&otherAry));
-            } else {
-                _mm256_store_si256((__m256i*)data, _mm256_add_epi32(*(__m256i*)data, *(__m256i*)&otherAry));
-            }
+            _mm256_store_si256((__m256i*)data,
+            _mm256_add_epi32(*(__m256i*)data, *(__m256i*)&otherAry));
         }
         return *this;
     }
@@ -58,12 +61,14 @@ struct alignas(32) Array {
             for (std::size_t i = 0; i < Size; ++i) {
                 data[i] -= otherAry.data[i];
             }
+            return *this;
+        }
+        if constexpr (same_type<Type, float>) {
+            _mm256_store_ps(data,
+            _mm256_sub_ps(*(__m256*)data, *(__m256*)&otherAry));
         } else {
-            if constexpr (same_type<Type, float>) {
-                _mm256_store_ps(data, _mm256_sub_ps(*(__m256*)data, *(__m256*)&otherAry));
-            } else {
-                _mm256_store_si256((__m256i*)data, _mm256_sub_epi32(*(__m256i*)data, *(__m256i*)&otherAry));
-            }
+            _mm256_store_si256((__m256i*)data,
+            _mm256_sub_epi32(*(__m256i*)data, *(__m256i*)&otherAry));
         }
         return *this;
     }
@@ -73,12 +78,14 @@ struct alignas(32) Array {
             for (std::size_t i = 0; i < Size; ++i) {
                 data[i] *= otherAry.data[i];
             }
+            return *this;
+        }
+        if constexpr (same_type<Type, float>) {
+            _mm256_store_ps(data,
+            _mm256_mul_ps(*(__m256*)data, *(__m256*)&otherAry));
         } else {
-            if constexpr (same_type<Type, float>) {
-                _mm256_store_ps(data, _mm256_mul_ps(*(__m256*)data, *(__m256*)&otherAry));
-            } else {
-                _mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)data, *(__m256i*)&otherAry));
-            }
+            _mm256_store_si256((__m256i*)data,
+            _mm256_mullo_epi32(*(__m256i*)data, *(__m256i*)&otherAry));
         }
         return *this;
     }
@@ -88,12 +95,14 @@ struct alignas(32) Array {
             for (std::size_t i = 0; i < Size; ++i) {
                 data[i] /= otherAry.data[i];
             }
+            return *this;
+        }
+        if constexpr (same_type<Type, float>) {
+            _mm256_store_ps((float*)data,
+            _mm256_div_ps(*(__m256*)data, *(__m256*)&otherAry));
         } else {
-            if constexpr (same_type<Type, float>) {
-                _mm256_store_ps((float*)data, _mm256_div_ps(*(__m256*)data, *(__m256*)&otherAry));
-            } else {
-                _mm256_store_si256((__m256i*)data, _mm256_cvtps_epi32(_mm256_div_ps(*(__m256*)data, *(__m256*)&otherAry)));
-            }
+            _mm256_store_si256((__m256i*)data,
+            _mm256_cvtps_epi32(_mm256_div_ps(*(__m256*)data, *(__m256*)&otherAry)));
         }
         return *this;
     }
@@ -124,12 +133,16 @@ struct alignas(32) Array {
             for (std::size_t i = 0; i < Size; ++i) {
                 data[i] *= static_cast<Type>(mul);
             }
+            return *this;
+        }
+        if constexpr (same_type<Type, float>) {
+            _mm256_store_ps(data,
+            _mm256_mul_ps(*(__m256*)data,
+            _mm256_set1_ps(static_cast<float>(mul))));
         } else {
-            if constexpr (same_type<Type, float>) {
-                _mm256_store_ps(data, _mm256_mul_ps(*(__m256*)data, _mm256_set1_ps(static_cast<float>(mul))));
-            } else {
-                _mm256_store_si256((__m256i*)data, _mm256_mullo_epi32(*(__m256i*)data, _mm256_set1_epi32(static_cast<int>(mul))));
-            }
+            _mm256_store_si256((__m256i*)data,
+            _mm256_mullo_epi32(*(__m256i*)data,
+            _mm256_set1_epi32(static_cast<int>(mul))));
         }
         return *this;
     }
@@ -140,8 +153,17 @@ struct alignas(32) Array {
             for (std::size_t i = 0; i < Size; ++i) {
                 data[i] /= static_cast<Type>(div);
             }
+            return *this;
+        }
+        if constexpr (same_type<Type, float>) {
+            _mm256_store_ps((float*)data,
+            _mm256_div_ps(*(__m256*)data,
+            _mm256_set1_ps(static_cast<float>(div))));
         } else {
-            _mm256_store_ps((float*)data, _mm256_div_ps(*(__m256*)data, _mm256_set1_ps(static_cast<float>(div))));
+            _mm256_store_si256((__m256i*)data,
+            _mm256_cvtps_epi32(_mm256_div_ps(
+            _mm256_cvtepi32_ps(*(__m256i*)data),
+            _mm256_set1_ps(static_cast<float>(div)))));
         }
         return *this;
     }

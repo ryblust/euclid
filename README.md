@@ -51,9 +51,10 @@
 
 - `constexpr` 数学函数
   ```c++
-  constexpr float res1 = euclid::math::cos(45);
-  constexpr float res2 = euclid::math::sin(35.f)
-  constexpr float res4 = euclid::math::sqrt(2);
+  using namespace euclid;
+  constexpr float res1 = math::cos(45);
+  constexpr float res2 = math::sin(35.f)
+  constexpr float res4 = math::sqrt(2);
   ```
 
 - 类型转换
@@ -68,7 +69,7 @@
   ```c++
   vec2i v1{ 1, 2 };
   vec2f v2{ 1.1f, 2.2f };
-  v1 *= 2.2f; // concept constraint is false: int *= float unacceptable precision loss
+  v1 *= 2.2f; // concept constraint failed : int *= float unacceptable precision loss
   v1 += v2; // same reason
   ```
 
