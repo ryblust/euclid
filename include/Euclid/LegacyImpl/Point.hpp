@@ -3,8 +3,7 @@
 namespace euclid {
 
 template<euclid_type Type, std::size_t Size> requires (Size <= 8)
-struct alignas(32) Point {
-public:
+struct alignas(Size <= 4 ? 16 : 32) Point {
     using value_type = Type;
 
     constexpr std::size_t size() const noexcept {
@@ -28,7 +27,7 @@ public:
     }
 
     constexpr float distance(const Point otherPoint) const noexcept {
-        return ((*this) - otherPoint).norm();
+        return ((*this) - otherPoint).length();
     }
 
     Array<Type, Size> point;
@@ -36,14 +35,6 @@ public:
 
 template<euclid_type First, euclid_type... Rest> requires same_type<First, Rest...>
 Point(First, Rest...)->Point<First, sizeof...(Rest) + 1>;
-
-using point2i = Point<int, 2>;
-using point3i = Point<int, 3>;
-using point4i = Point<int, 4>;
-
-using point2f = Point<float, 2>;
-using point3f = Point<float, 3>;
-using point4f = Point<float, 4>;
 
 template<typename T>
 struct is_point {

@@ -3,8 +3,7 @@
 namespace euclid {
     
 template<euclid_type Type>
-struct alignas(64) Mat4 {
-public:
+struct alignas(32) Mat4 {
     using value_type = Type;
 
     constexpr Mat4<float> castTofloat() const noexcept requires(same_type<Type, int>) {
@@ -38,15 +37,11 @@ public:
         }
         Mat4 identityMat;
         if constexpr (same_type<Type, float>) {
-            _mm256_store_ps((float*)&identityMat.first,
-            _mm256_set_ps(0,0,1,0,0,0,0,1));
-            _mm256_store_ps((float*)&identityMat.second,
-            _mm256_set_ps(1,0,0,0,0,1,0,0));
+            _mm256_store_ps((float*)&identityMat.first,  _mm256_set_ps(0,0,1,0,0,0,0,1));
+            _mm256_store_ps((float*)&identityMat.second, _mm256_set_ps(1,0,0,0,0,1,0,0));
         } else {
-            _mm256_store_si256((__m256i*)&identityMat.first,
-            _mm256_set_epi32(0,0,1,0,0,0,0,1));
-            _mm256_store_si256((__m256i*)&identityMat.second,
-            _mm256_set_epi32(1,0,0,0,0,1,0,0));
+            _mm256_store_si256((__m256i*)&identityMat.first,  _mm256_set_epi32(0,0,1,0,0,0,0,1));
+            _mm256_store_si256((__m256i*)&identityMat.second, _mm256_set_epi32(1,0,0,0,0,1,0,0));
         }
         return identityMat;
     }
@@ -54,10 +49,6 @@ public:
     constexpr void negative() noexcept {
         first.negative();
         second.negative();
-    }
-
-    constexpr std::size_t size() const noexcept {
-        return 16;
     }
 
     constexpr void transposed() noexcept {
@@ -183,17 +174,11 @@ public:
     constexpr Vector<Type, 4> operator*(const Vector<Type, 4> vec) const noexcept {
         if (__builtin_is_constant_evaluated()) {
             value_type a[4]{};
-            for (std::size_t i = 0; i < 2; ++i) {
-                const std::size_t offset = i * 4;
-                a[i]   = first.data[0 + offset]  * vec.vector.data[0] +
-                         first.data[1 + offset]  * vec.vector.data[1] +
-                         first.data[2 + offset]  * vec.vector.data[2] +
-                         first.data[3 + offset]  * vec.vector.data[3];
-
-                a[i+2] = second.data[0 + offset] * vec.vector.data[0] +
-                         second.data[1 + offset] * vec.vector.data[1] +
-                         second.data[2 + offset] * vec.vector.data[2] +
-                         second.data[3 + offset] * vec.vector.data[3];
+            for (std::size_t i = 0; i < 4; ++i) {
+                a[0] += first.data[i]      * vec.vector.data[i];
+                a[1] += first.data[i + 4]  * vec.vector.data[i];
+                a[2] += second.data[i]     * vec.vector.data[i];
+                a[3] += second.data[i + 4] * vec.vector.data[i];
             }
             return { a[0], a[1], a[2], a[3] };
         }
@@ -231,7 +216,7 @@ public:
 };
 
 template<arithmetic Mul, euclid_type T> requires acceptable_loss<T, Mul>
-EuclidForceinline constexpr Mat4<T> operator*(const Mul mul, const Mat4<T> mat) noexcept {
+EUCLID_FORCEINLINE constexpr Mat4<T> operator*(const Mul mul, const Mat4<T> mat) noexcept {
     return mat * mul;
 }
 

@@ -24,5 +24,5 @@
 
 #include "Utility.hpp"
 
-//#include "Transformation.hpp"
-//#include "Triangle.hpp"
+#include "Transformation.hpp"
+#include "Triangle.hpp"

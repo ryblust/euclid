@@ -4,7 +4,6 @@ namespace euclid {
 
 template<euclid_type Type>
 struct alignas(32) Mat2 {
-public:
     using value_type = Type;
 
     constexpr Mat2<float> castTofloat() const noexcept requires(same_type<Type, int>) {
@@ -58,10 +57,6 @@ public:
 
     constexpr void negative() noexcept {
         simdMat.negative();
-    }
-
-    constexpr std::size_t size() const noexcept {
-        return 4;
     }
 
     constexpr void transposed() noexcept {
@@ -127,31 +122,23 @@ public:
     }
 
     /*
-        Another Implementation of Matrix Multiplication
+        Another Implementation of Mat2 Multiplication
 
-        constexpr Mat2 operator*(const Mat2 otherMat) const noexcept {
-            if (__builtin_is_constant_evaluated()) {
-                const auto [a0, a2] = ((*this) * this->getFirstCol()).vector.data;
-                const auto [a1, a3] = ((*this) * this->getSecondCol()).vector.data;
-                return { a0,a1,a2,a3 };
-            } else {
-                Mat2 mulMat;
-                if constexpr (same_type<Type, float>) {
-                    const auto interData1 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)&otherMat, 0b10001000));
-                    const auto interData2 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)&otherMat, 0b11011101));
-                    const auto haddData1  = _mm256_hadd_ps(interData1, interData1);
-                    const auto haddData2  = _mm256_hadd_ps(interData2, interData2);
-                    _mm256_store_ps((float*)&mulMat, _mm256_unpacklo_ps(haddData1, haddData2));
-                } else {
-                    const auto interData1 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)&otherMat, 0b10001000));
-                    const auto interData2 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)&otherMat, 0b11011101));
-                    const auto haddData1  = _mm256_hadd_epi32(interData1, interData1);
-                    const auto haddData2  = _mm256_hadd_epi32(interData2, interData2);
-                    _mm256_store_si256((__m256i*)&mulMat, _mm256_unpacklo_epi32(haddData1, haddData2));
-                }
-                return mulMat;
-            }
+        Mat2 mulMat;
+        if constexpr (same_type<Type, float>) {
+            const auto interData1 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)&otherMat, 0b10001000));
+            const auto interData2 = _mm256_mul_ps(*(__m256*)this, _mm256_permute_ps(*(__m256*)&otherMat, 0b11011101));
+            const auto haddData1  = _mm256_hadd_ps(interData1, interData1);
+            const auto haddData2  = _mm256_hadd_ps(interData2, interData2);
+            _mm256_store_ps((float*)&mulMat, _mm256_unpacklo_ps(haddData1, haddData2));
+        } else {
+            const auto interData1 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)&otherMat, 0b10001000));
+            const auto interData2 = _mm256_mullo_epi32(*(__m256i*)this, _mm256_shuffle_epi32(*(__m256i*)&otherMat, 0b11011101));
+            const auto haddData1  = _mm256_hadd_epi32(interData1, interData1);
+            const auto haddData2  = _mm256_hadd_epi32(interData2, interData2);
+            _mm256_store_si256((__m256i*)&mulMat, _mm256_unpacklo_epi32(haddData1, haddData2));
         }
+        return mulMat;
     */
 
     constexpr Vector<Type, 2> operator*(const Vector<Type, 2> vec) const noexcept {
@@ -185,17 +172,13 @@ public:
 
     union {
         Array<Type, 4> simdMat;
-        struct {
-            value_type mat[2][2];
-            value_type alignment[4];
-        };
+        value_type mat[2][2];
     };
-
 };
 
 template<arithmetic Mul, euclid_type T>
-EuclidForceinline constexpr Mat2<T> operator*(const Mul mul, const Mat2<T> matrix) noexcept {
-    return matrix * mul;
+EUCLID_FORCEINLINE constexpr Mat2<T> operator*(const Mul mul, const Mat2<T> mat) noexcept {
+    return mat * mul;
 }
 
 template<euclid_type First, euclid_type... Rest> requires same_type<First, Rest...>

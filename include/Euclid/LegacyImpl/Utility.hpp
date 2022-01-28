@@ -3,22 +3,22 @@
 namespace euclid::util {
 
 template<arithmetic T>
-EuclidForceinline constexpr T clamp(const T val, const T min, const T max) noexcept {
+EUCLID_FORCEINLINE constexpr T clamp(const T val, const T min, const T max) noexcept {
     return val < min ? min : max < val ? max : val;
 }
 
 template<float_point_type T> 
-EuclidForceinline constexpr T lerp(const T a, const T b, const T t) noexcept {
+EUCLID_FORCEINLINE constexpr T lerp(const T a, const T b, const T t) noexcept {
     return a + t * (b - a);
 }
 
 template<arithmetic T>
-EuclidForceinline constexpr T saturate(const T val) noexcept {
+EUCLID_FORCEINLINE constexpr T saturate(const T val) noexcept {
     return val > 1 ? 1 : val < 0 ? 0 : val;
 }
 
 template<euclid_type T, std::size_t S>
-EuclidForceinline constexpr Vector<T, S> clamp(const Vector<T, S> vec, const Vector<T, S> min, const Vector<T, S> max) noexcept {
+EUCLID_FORCEINLINE constexpr Vector<T, S> clamp(const Vector<T, S> vec, const Vector<T, S> min, const Vector<T, S> max) noexcept {
     if (__builtin_is_constant_evaluated()) {
         Vector<T, S> clampVec{};
         for (std::size_t i = 0; i < S; ++i) {
@@ -38,7 +38,7 @@ EuclidForceinline constexpr Vector<T, S> clamp(const Vector<T, S> vec, const Vec
 }
 
 template<euclid_type T, std::size_t S>
-EuclidForceinline constexpr Vector<T, S> clamp(const Vector<T, S> vec, const T min, const T max) noexcept {
+EUCLID_FORCEINLINE constexpr Vector<T, S> clamp(const Vector<T, S> vec, const float min, const float max) noexcept {
     if (__builtin_is_constant_evaluated()) {
         Vector<T, S> clampVec{};
         for (std::size_t i = 0; i < S; ++i) {
@@ -54,13 +54,14 @@ EuclidForceinline constexpr Vector<T, S> clamp(const Vector<T, S> vec, const T m
     } else {
         _mm256_store_si256((__m256i*)&clampVec,
         _mm256_max_epi32(_mm256_min_epi32(*(__m256i*)&vec,
-        _mm256_set1_epi32(max)), _mm256_set1_epi32(min)));
+        _mm256_set1_epi32(static_cast<int>(max))),
+        _mm256_set1_epi32(static_cast<int>(min))));
     }
     return clampVec;
 }
 
 template<std::size_t S>
-EuclidForceinline constexpr Vector<float, S> lerp(const Vector<float, S> a, const Vector<float, S> b, const Vector<float, S> t) noexcept {
+EUCLID_FORCEINLINE constexpr Vector<float, S> lerp(const Vector<float, S> a, const Vector<float, S> b, const Vector<float, S> t) noexcept {
     if (__builtin_is_constant_evaluated()) {
         Vector<float, S> lerpVec{};
         for (std::size_t i = 0; i < S; ++i) {
@@ -76,7 +77,7 @@ EuclidForceinline constexpr Vector<float, S> lerp(const Vector<float, S> a, cons
 }
 
 template<std::size_t S>
-EuclidForceinline constexpr Vector<float, S> lerp(const Vector<float, S> a, const Vector<float, S> b, const float t) noexcept {
+EUCLID_FORCEINLINE constexpr Vector<float, S> lerp(const Vector<float, S> a, const Vector<float, S> b, const float t) noexcept {
     if (__builtin_is_constant_evaluated()) {
         Vector<float, S> lerpVec{};
         for (std::size_t i = 0; i < S; ++i) {
@@ -92,7 +93,7 @@ EuclidForceinline constexpr Vector<float, S> lerp(const Vector<float, S> a, cons
 }
 
 template<euclid_type T, std::size_t S>
-EuclidForceinline constexpr Vector<T, S> saturate(const Vector<T, S> vec) noexcept {
+EUCLID_FORCEINLINE constexpr Vector<T, S> saturate(const Vector<T, S> vec) noexcept {
     if (__builtin_is_constant_evaluated()) {
         Vector<T, S> saturateVec{};
         for (std::size_t i = 0; i < S; ++i) {

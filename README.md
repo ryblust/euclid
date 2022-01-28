@@ -24,28 +24,18 @@
     
     **Euclid** 支持的算术类型类型有 `int, float`
   ```c++
-  Vecotr<int, 3>; // OK
-  Point<float, 3>; // OK
-  Vector<char, 3>; // compile-time error
-  ```
-- `euclid::io::print(...args)`
-  ```c++
-  // 如要将数据打印到 Console，请在 <Euclid.h> 之后 
-  // #include <Euclid_print.h>
 
-  #include <Euclid.h>
-  #include <Euclid_io.h>
+  ```
+- `euclid::debug::printVec(...args)`
+  ```c++
+  #include <Euclid/Euclid.h>
+  #include <Euclid/Print.hpp>
 
   using namespace euclid;
 
-  vec3i v1{ 1,2,0 };
-
-  point3f p1 { 1.2f, 2.3f, 1.f };
-
-  mat2i m1{ 1,  0,
-            0, -1 };
-
-  io::print(v1, p1, m1);
+  vec4i v1 = setVec4i(1, 2, 3, 4);
+  vec4f v2 = setVec4f(1, 2, 3, 4);
+  debug::printVec(v1, v2);
 
   ```
 
@@ -60,9 +50,8 @@
 - 类型转换
 
   ```c++
-  vec4i v1{ 1,2,3,4 };
-  vec4f v2 = v1.castTofloat();
-  vec4i v3 = v2.castToint(); // Not implemented yet
+  vec4i ivec = setVec4i(1, 2, 3, 4);
+  vec4f fvec = castVec4iTo4f(ivec); // 暂定名称
   ```
 
 - `operator+=, *=, -=` 的约束
@@ -76,6 +65,6 @@
 - `Transformation in Homogeneous Coordinates`
 
 ## Tested Compiler
-- Add compile flag /arch:AVX2, -mavx2
-- MSVC 16.10/17.0
+- MSVC 19.29/19.30
 - GCC 11.2
+- Clang 13.0
