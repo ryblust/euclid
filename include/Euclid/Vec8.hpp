@@ -18,7 +18,7 @@ namespace euclid {
 */
 
 EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL setVec8i(const int a0, const int a1, const int a2, const int a3,
-                                                     const int a4, const int a5, const int a6, const int a7) noexcept {
+                                                 const int a4, const int a5, const int a6, const int a7) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         return { .m256i_i32 = { a0, a1, a2, a3, a4, a5, a6, a7 } };
@@ -28,7 +28,7 @@ EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL setVec8i(const int a0, const int a1, con
 }
 
 EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL setVec8f(const float a0, const float a1, const float a2, const float a3,
-                                                     const float a4, const float a5, const float a6, const float a7) noexcept {
+                                                 const float a4, const float a5, const float a6, const float a7) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         return { a0, a1, a2, a3, a4, a5, a6, a7 };
@@ -75,9 +75,37 @@ EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL setZeroVec8f() noexcept {
 
 /* ------------------------------------------------------------------------------- */
 
-/* Type convertion for Vector */
+/* Get Data from Vector */
 
-EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL castVec8fTo8i(const vec8f vec) noexcept {
+EUCLID_FUNC_QUALIFIER int&   getRefDataVec8(vec8i& a, const std::size_t pos) noexcept {
+#ifdef _MSC_VER
+    return a.m256i_i32[pos];
+#else
+    int* p = reinterpret_cast<int*>(&a);
+    return *(p + pos);
+#endif
+}
+
+EUCLID_FUNC_QUALIFIER float& getRefDataVec8(vec8f& a, const std::size_t pos) noexcept {
+#ifdef _MSC_VER
+    return a.m256_f32[pos];
+#else
+    float* p = reinterpret_cast<float*>(&a);
+    return *(p + pos);
+#endif
+}
+
+EUCLID_FUNC_QUALIFIER int    getDataVec8(vec8i a, const std::size_t pos) noexcept {
+    return getRefDataVec8(a, pos);
+}
+
+EUCLID_FUNC_QUALIFIER float  getDataVec8(vec8f a, const std::size_t pos) noexcept {
+    return getRefDataVec8(a, pos);
+}
+
+/* Type Convertion for Vector */
+
+EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL castToVec8i(const vec8f vec) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8i result{};
@@ -90,7 +118,7 @@ EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL castVec8fTo8i(const vec8f vec) noexcept 
     return _mm256_cvtps_epi32(vec);
 }
 
-EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL castVec8iTo8f(const vec8i vec) noexcept {
+EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL castToVec8f(const vec8i vec) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8f result{};
@@ -109,7 +137,7 @@ EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL castVec8iTo8f(const vec8i vec) noexcept 
 
 /* Negate Functions for Vector */
 
-EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL negateVec8i(const vec8i a) noexcept {
+EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL negateVec8(const vec8i a) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8i result{};
@@ -122,7 +150,7 @@ EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL negateVec8i(const vec8i a) noexcept {
     return _mm256_sub_epi32(_mm256_setzero_si256(), a);
 }
 
-EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL negateVec8f(const vec8f a) noexcept {
+EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL negateVec8(const vec8f a) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8f result{};
@@ -137,7 +165,7 @@ EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL negateVec8f(const vec8f a) noexcept {
 
 /* Add Functions for Vector */
 
-EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL addVec8i(const vec8i a, const vec8i b) noexcept {
+EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL addVec8(const vec8i a, const vec8i b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8i result{};
@@ -150,7 +178,7 @@ EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL addVec8i(const vec8i a, const vec8i b) n
     return _mm256_add_epi32(a, b);
 }
 
-EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL addVec8f(const vec8f a, const vec8f b) noexcept {
+EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL addVec8(const vec8f a, const vec8f b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8f result{};
@@ -165,7 +193,7 @@ EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL addVec8f(const vec8f a, const vec8f b) n
 
 /* Substract Functions for Vector */
 
-EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL subVec8i(const vec8i a, const vec8i b) noexcept {
+EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL subVec8(const vec8i a, const vec8i b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8i result{};
@@ -178,7 +206,7 @@ EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL subVec8i(const vec8i a, const vec8i b) n
     return _mm256_sub_epi32(a, b);
 }
 
-EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL subVec8f(const vec8f a, const vec8f b) noexcept {
+EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL subVec8(const vec8f a, const vec8f b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8f result{};
@@ -193,7 +221,7 @@ EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL subVec8f(const vec8f a, const vec8f b) n
 
 /* Multiplication Functions for Vector */
 
-EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL mulVec8i(const vec8i a, const vec8i b) noexcept {
+EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL mulVec8(const vec8i a, const vec8i b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8i result{};
@@ -206,7 +234,7 @@ EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL mulVec8i(const vec8i a, const vec8i b) n
     return _mm256_mullo_epi32(a, b);
 }
 
-EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL mulVec8f(const vec8f a, const vec8f b) noexcept {
+EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL mulVec8(const vec8f a, const vec8f b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8f result{};
@@ -221,7 +249,7 @@ EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL mulVec8f(const vec8f a, const vec8f b) n
 
 /* Division Functions for Vector */
 
-EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL divVec8i(const vec8i a, const vec8i b) noexcept {
+EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL divVec8(const vec8i a, const vec8i b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8i result{};
@@ -239,7 +267,7 @@ EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL divVec8i(const vec8i a, const vec8i b) n
 #endif
 }
 
-EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL divVec8f(const vec8f a, const vec8f b) noexcept {
+EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL divVec8(const vec8f a, const vec8f b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec8f result{};
@@ -254,86 +282,156 @@ EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL divVec8f(const vec8f a, const vec8f b) n
 
 /* ------------------------------------------------------------------------------- */
 
-#ifdef EUCLID_HAS_OPERATOR_OVERLOAD
+/* Scale Functions for Vector */
+
+EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL scaleVec8(const vec8i vec, const int val) noexcept {
+    return mulVec8(vec, set1Vec8i(val));
+}
+
+EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL scaleVec8(const vec8f vec, const float val) noexcept {
+    return mulVec8(vec, set1Vec8f(val));
+}
+
+/* ------------------------------------------------------------------------------- */
+
+#ifdef EUCLID_HAS_GLOBAL_OPERATOR_OVERLOAD
+
+/* Negate Operator Overload for Vector */
+
+EUCLID_FUNC_QUALIFIER vec8i EUCLID_CALL operator-(const vec8i a) noexcept {
+    return negateVec8(a);
+}
+
+EUCLID_FUNC_QUALIFIER vec8f EUCLID_CALL operator-(const vec8f a) noexcept {
+    return negateVec8(a);
+}
 
 /* Add Operator Overload for Vector */
 
 EUCLID_FUNC_QUALIFIER vec8i& EUCLID_CALL operator+=(vec8i& a, const vec8i b) noexcept {
-    a = addVec8i(a, b);
+    a = addVec8(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec8f& EUCLID_CALL operator+=(vec8f& a, const vec8f b) noexcept {
-    a = addVec8f(a, b);
+    a = addVec8(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec8i  EUCLID_CALL operator+(const vec8i a, const vec8i b) noexcept {
-    return addVec8i(a, b);
+    return addVec8(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec8f  EUCLID_CALL operator+(const vec8f a, const vec8f b) noexcept {
-    return addVec8f(a, b);
+    return addVec8(a, b);
 }
 
 /* Substract Operator Overload for Vector */
 
 EUCLID_FUNC_QUALIFIER vec8i& EUCLID_CALL operator-=(vec8i& a, const vec8i b) noexcept {
-    a = subVec8i(a, b);
+    a = subVec8(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec8f& EUCLID_CALL operator-=(vec8f& a, const vec8f b) noexcept {
-    a = subVec8f(a, b);
+    a = subVec8(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec8i  EUCLID_CALL operator-(const vec8i a, const vec8i b) noexcept {
-    return subVec8i(a, b);
+    return subVec8(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec8f  EUCLID_CALL operator-(const vec8f a, const vec8f b) noexcept {
-    return subVec8f(a, b);
+    return subVec8(a, b);
 }
 
 /* Multiplication Operator Overload for Vector */
 
 EUCLID_FUNC_QUALIFIER vec8i& EUCLID_CALL operator*=(vec8i& a, const vec8i b) noexcept {
-    a = mulVec8i(a, b);
+    a = mulVec8(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec8f& EUCLID_CALL operator*=(vec8f& a, const vec8f b) noexcept {
-    a = mulVec8f(a, b);
+    a = mulVec8(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec8i  EUCLID_CALL operator*(const vec8i a, const vec8i b) noexcept {
-    return mulVec8i(a, b);
+    return mulVec8(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec8f  EUCLID_CALL operator*(const vec8f a, const vec8f b) noexcept {
-    return mulVec8f(a, b);
+    return mulVec8(a, b);
 }
 
 /* Divsion Operator Overload for Vector */
 
 EUCLID_FUNC_QUALIFIER vec8i& EUCLID_CALL operator/=(vec8i& a, const vec8i b) noexcept {
-    a = divVec8i(a, b);
+    a = divVec8(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec8f& EUCLID_CALL operator/=(vec8f& a, const vec8f b) noexcept {
-    a = divVec8f(a, b);
+    a = divVec8(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec8i  EUCLID_CALL operator/(const vec8i a, const vec8i b) noexcept {
-    return divVec8i(a, b);
+    return divVec8(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec8f  EUCLID_CALL operator/(const vec8f a, const vec8f b) noexcept {
-    return divVec8f(a, b);
+    return divVec8(a, b);
+}
+
+/* Scale Operator Overload for Vector */
+
+EUCLID_FUNC_QUALIFIER vec8i& EUCLID_CALL operator*=(vec8i& vec, const int val) noexcept {
+    vec = scaleVec8(vec, val);
+    return vec;
+}
+
+EUCLID_FUNC_QUALIFIER vec8f& EUCLID_CALL operator*=(vec8f& vec, const float val) noexcept {
+    vec = scaleVec8(vec, val);
+    return vec;
+}
+
+EUCLID_FUNC_QUALIFIER vec8i  EUCLID_CALL operator*(const vec8i vec, const int val) noexcept {
+    return scaleVec8(vec, val);
+}
+
+EUCLID_FUNC_QUALIFIER vec8f  EUCLID_CALL operator*(const vec8f vec, const float val) noexcept {
+    return scaleVec8(vec, val);
+}
+
+EUCLID_FUNC_QUALIFIER vec8i  EUCLID_CALL operator*(const int val, const vec8i vec) noexcept {
+    return scaleVec8(vec, val);
+}
+
+EUCLID_FUNC_QUALIFIER vec8f  EUCLID_CALL operator*(const float val, const vec8f vec) noexcept {
+    return scaleVec8(vec, val);
+}
+
+/* ------------------------------------------------------------------------------- */
+
+EUCLID_FUNC_QUALIFIER vec8i& EUCLID_CALL operator/=(vec8i& vec, const int val) noexcept {
+    vec = divVec8(vec, set1Vec8i(val));
+    return vec;
+}
+
+EUCLID_FUNC_QUALIFIER vec8f& EUCLID_CALL operator/=(vec8f& vec, const float val) noexcept {
+    vec = divVec8(vec, set1Vec8f(val));
+    return vec;
+}
+
+EUCLID_FUNC_QUALIFIER vec8i  EUCLID_CALL operator/(const vec8i vec, const int val) noexcept {
+    return divVec8(vec, set1Vec8i(val));
+}
+
+EUCLID_FUNC_QUALIFIER vec8f  EUCLID_CALL operator/(const vec8f vec, const float val) noexcept {
+    return divVec8(vec, set1Vec8f(val));
 }
 
 #endif // Euclid Operator Overload

@@ -9,6 +9,8 @@
 // C4514 : Ignore the compiler's warning about removing unused inline functions
 #endif
 
+#define EUCLID_SHUFFLE_MASK(x, y, z, w) (((w) << 6) | ((z) << 4) | ((y) << 2) | ((x)))
+
 namespace euclid {
 
 /* 
@@ -100,9 +102,52 @@ EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL setZeroVec4d() noexcept {
 
 /* ------------------------------------------------------------------------------- */
 
-/* Type convertion for Vector */
+/* Get Data from Vector */
 
-EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL castVec4fTo4i(const vec4f vec) noexcept {
+EUCLID_FUNC_QUALIFIER int&    EUCLID_CALL getRefDataVec4(vec4i& a, const std::size_t pos) noexcept {
+#ifdef _MSC_VER
+    return a.m128i_i32[pos];
+#else
+    int* p = reinterpret_cast<int*>(&a);
+    return *(p + pos);
+#endif
+}
+
+EUCLID_FUNC_QUALIFIER float&  EUCLID_CALL getRefDataVec4(vec4f& a, const std::size_t pos) noexcept {
+#ifdef _MSC_VER
+    return a.m128_f32[pos];
+#else
+    float* p = reinterpret_cast<float*>(&a);
+    return *(p + pos);
+#endif
+}
+
+EUCLID_FUNC_QUALIFIER double& EUCLID_CALL getRefDataVec4(vec4d& a, const std::size_t pos) noexcept {
+#ifdef _MSC_VER
+    return a.m256d_f64[pos];
+#else
+    double* p = reinterpret_cast<double*>(&a);
+    return *(p + pos);
+#endif
+}
+
+EUCLID_FUNC_QUALIFIER int    EUCLID_CALL getDataVec4(vec4i a, const std::size_t pos) noexcept {
+    return getRefDataVec4(a, pos);
+}
+
+EUCLID_FUNC_QUALIFIER float  EUCLID_CALL getDataVec4(vec4f a, const std::size_t pos) noexcept {
+    return getRefDataVec4(a, pos);
+}
+
+EUCLID_FUNC_QUALIFIER double EUCLID_CALL getDataVec4(vec4d a, const std::size_t pos) noexcept {
+    return getRefDataVec4(a, pos);
+}
+
+/* ------------------------------------------------------------------------------- */
+
+/* Type Convertion for Vector */
+
+EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL castToVec4i(const vec4f vec) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4i result{};
@@ -115,7 +160,7 @@ EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL castVec4fTo4i(const vec4f vec) noexcept 
     return _mm_cvtps_epi32(vec);
 }
 
-EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL castVec4dTo4i(const vec4d vec) noexcept {
+EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL castToVec4i(const vec4d vec) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4i result{};
@@ -128,7 +173,7 @@ EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL castVec4dTo4i(const vec4d vec) noexcept 
     return _mm256_cvtpd_epi32(vec);
 }
 
-EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL castVec4iTo4f(const vec4i vec) noexcept {
+EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL castToVec4f(const vec4i vec) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4f result{};
@@ -141,7 +186,7 @@ EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL castVec4iTo4f(const vec4i vec) noexcept 
     return _mm_cvtepi32_ps(vec);
 }
 
-EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL castVec4dTo4f(const vec4d vec) noexcept {
+EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL castToVec4f(const vec4d vec) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4f result{};
@@ -154,7 +199,7 @@ EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL castVec4dTo4f(const vec4d vec) noexcept 
     return _mm256_cvtpd_ps(vec);
 }
 
-EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL castVec4dTo4f(const vec4i vec) noexcept {
+EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL castToVec4d(const vec4i vec) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4d result{};
@@ -167,7 +212,7 @@ EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL castVec4dTo4f(const vec4i vec) noexcept 
     return _mm256_cvtepi32_pd(vec);
 }
 
-EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL castVec4dTo4f(const vec4f vec) noexcept {
+EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL castToVec4d(const vec4f vec) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4d result{};
@@ -186,7 +231,7 @@ EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL castVec4dTo4f(const vec4f vec) noexcept 
 
 /* Negate Functions for Vector */
 
-EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL negateVec4i(const vec4i a) noexcept {
+EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL negateVec4(const vec4i a) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4i result{};
@@ -199,7 +244,7 @@ EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL negateVec4i(const vec4i a) noexcept {
     return _mm_sub_epi32(_mm_setzero_si128(), a);
 }
 
-EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL negateVec4f(const vec4f a) noexcept {
+EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL negateVec4(const vec4f a) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4f result{};
@@ -212,7 +257,7 @@ EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL negateVec4f(const vec4f a) noexcept {
     return _mm_sub_ps(_mm_setzero_ps(), a);
 }
 
-EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL negateVec4d(const vec4d a) noexcept {
+EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL negateVec4(const vec4d a) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4d result{};
@@ -227,7 +272,7 @@ EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL negateVec4d(const vec4d a) noexcept {
 
 /* Add Functions for Vector */
 
-EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL addVec4i(const vec4i a, const vec4i b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL addVec4(const vec4i a, const vec4i b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4i result{};
@@ -240,7 +285,7 @@ EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL addVec4i(const vec4i a, const vec4i b) n
     return _mm_add_epi32(a, b);
 }
 
-EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL addVec4f(const vec4f a, const vec4f b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL addVec4(const vec4f a, const vec4f b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4f result{};
@@ -253,7 +298,7 @@ EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL addVec4f(const vec4f a, const vec4f b) n
     return _mm_add_ps(a, b);
 }
 
-EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL addVec4d(const vec4d a, const vec4d b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL addVec4(const vec4d a, const vec4d b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4d result{};
@@ -268,7 +313,7 @@ EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL addVec4d(const vec4d a, const vec4d b) n
 
 /* Substract Functions for Vector */
 
-EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL subVec4i(const vec4i a, const vec4i b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL subVec4(const vec4i a, const vec4i b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4i result{};
@@ -281,7 +326,7 @@ EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL subVec4i(const vec4i a, const vec4i b) n
     return _mm_sub_epi32(a, b);
 }
 
-EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL subVec4f(const vec4f a, const vec4f b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL subVec4(const vec4f a, const vec4f b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4f result{};
@@ -294,7 +339,7 @@ EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL subVec4f(const vec4f a, const vec4f b) n
     return _mm_sub_ps(a, b);
 }
 
-EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL subVec4d(const vec4d a, const vec4d b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL subVec4(const vec4d a, const vec4d b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4d result{};
@@ -309,7 +354,7 @@ EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL subVec4d(const vec4d a, const vec4d b) n
 
 /* Multiplication Functions for Vector */
 
-EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL mulVec4i(const vec4i a, const vec4i b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL mulVec4(const vec4i a, const vec4i b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4i result{};
@@ -322,7 +367,7 @@ EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL mulVec4i(const vec4i a, const vec4i b) n
     return _mm_mullo_epi32(a, b);
 }
 
-EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL mulVec4f(const vec4f a, const vec4f b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL mulVec4(const vec4f a, const vec4f b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4f result{};
@@ -335,7 +380,7 @@ EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL mulVec4f(const vec4f a, const vec4f b) n
     return _mm_mul_ps(a, b);
 }
 
-EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL mulVec4d(const vec4d a, const vec4d b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL mulVec4(const vec4d a, const vec4d b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4d result{};
@@ -350,7 +395,7 @@ EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL mulVec4d(const vec4d a, const vec4d b) n
 
 /* Division Functions for Vector */
 
-EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL divVec4i(const vec4i a, const vec4i b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL divVec4(const vec4i a, const vec4i b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4i result{};
@@ -368,7 +413,7 @@ EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL divVec4i(const vec4i a, const vec4i b) n
 #endif
 }
 
-EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL divVec4f(const vec4f a, const vec4f b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL divVec4(const vec4f a, const vec4f b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4f result{};
@@ -381,7 +426,7 @@ EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL divVec4f(const vec4f a, const vec4f b) n
     return _mm_div_ps(a, b);
 }
 
-EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL divVec4d(const vec4d a, const vec4d b) noexcept {
+EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL divVec4(const vec4d a, const vec4d b) noexcept {
 #ifdef _MSC_VER
     if (__builtin_is_constant_evaluated()) {
         vec4d result{};
@@ -396,122 +441,222 @@ EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL divVec4d(const vec4d a, const vec4d b) n
 
 /* ------------------------------------------------------------------------------- */
 
-#ifdef EUCLID_HAS_OPERATOR_OVERLOAD
+/* Scale Functions for Vector */
+
+EUCLID_FUNC_QUALIFIER vec4i EUCLID_CALL scaleVec4(const vec4i vec, const int val) noexcept {
+    return mulVec4(vec, set1Vec4i(val));
+}
+
+EUCLID_FUNC_QUALIFIER vec4f EUCLID_CALL scaleVec4(const vec4f vec, const float val) noexcept {
+    return mulVec4(vec, set1Vec4f(val));
+}
+
+EUCLID_FUNC_QUALIFIER vec4d EUCLID_CALL scaleVec4(const vec4d vec, const double val) noexcept {
+    return mulVec4(vec, set1Vec4d(val));
+}
+
+/* ------------------------------------------------------------------------------- */
+
+#ifdef EUCLID_HAS_GLOBAL_OPERATOR_OVERLOAD
+
+/* Negate Operator Overload for Vector */
+
+EUCLID_FUNC_QUALIFIER vec4i  EUCLID_CALL operator-(const vec4i a) noexcept {
+    return negateVec4(a);
+}
+
+EUCLID_FUNC_QUALIFIER vec4f  EUCLID_CALL operator-(const vec4f a) noexcept {
+    return negateVec4(a);
+}
+
+EUCLID_FUNC_QUALIFIER vec4d  EUCLID_CALL operator-(const vec4d a) noexcept {
+    return negateVec4(a);
+}
 
 /* Add Operator Overload for Vector */
 
 EUCLID_FUNC_QUALIFIER vec4i& EUCLID_CALL operator+=(vec4i& a, const vec4i b) noexcept {
-    a = addVec4i(a, b);
+    a = addVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4f& EUCLID_CALL operator+=(vec4f& a, const vec4f b) noexcept {
-    a = addVec4f(a, b);
+    a = addVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4d& EUCLID_CALL operator+=(vec4d& a, const vec4d b) noexcept {
-    a = addVec4d(a, b);
+    a = addVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4i  EUCLID_CALL operator+(const vec4i a, const vec4i b) noexcept {
-    return addVec4i(a, b);
+    return addVec4(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec4f  EUCLID_CALL operator+(const vec4f a, const vec4f b) noexcept {
-    return addVec4f(a, b);
+    return addVec4(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec4d  EUCLID_CALL operator+(const vec4d a, const vec4d b) noexcept {
-    return addVec4d(a, b);
+    return addVec4(a, b);
 }
 
 /* Substract Operator Overload for Vector */
 
 EUCLID_FUNC_QUALIFIER vec4i& EUCLID_CALL operator-=(vec4i& a, const vec4i b) noexcept {
-    a = subVec4i(a, b);
+    a = subVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4f& EUCLID_CALL operator-=(vec4f& a, const vec4f b) noexcept {
-    a = subVec4f(a, b);
+    a = subVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4d& EUCLID_CALL operator-=(vec4d& a, const vec4d b) noexcept {
-    a = subVec4d(a, b);
+    a = subVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4i  EUCLID_CALL operator-(const vec4i a, const vec4i b) noexcept {
-    return subVec4i(a, b);
+    return subVec4(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec4f  EUCLID_CALL operator-(const vec4f a, const vec4f b) noexcept {
-    return subVec4f(a, b);
+    return subVec4(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec4d  EUCLID_CALL operator-(const vec4d a, const vec4d b) noexcept {
-    return subVec4d(a, b);
+    return subVec4(a, b);
 }
 
 /* Multiplication Operator Overload for Vector */
 
 EUCLID_FUNC_QUALIFIER vec4i& EUCLID_CALL operator*=(vec4i& a, const vec4i b) noexcept {
-    a = mulVec4i(a, b);
+    a = mulVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4f& EUCLID_CALL operator*=(vec4f& a, const vec4f b) noexcept {
-    a = mulVec4f(a, b);
+    a = mulVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4d& EUCLID_CALL operator*=(vec4d& a, const vec4d b) noexcept {
-    a = mulVec4d(a, b);
+    a = mulVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4i  EUCLID_CALL operator*(const vec4i a, const vec4i b) noexcept {
-    return mulVec4i(a, b);
+    return mulVec4(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec4f  EUCLID_CALL operator*(const vec4f a, const vec4f b) noexcept {
-    return mulVec4f(a, b);
+    return mulVec4(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec4d  EUCLID_CALL operator*(const vec4d a, const vec4d b) noexcept {
-    return mulVec4d(a, b);
+    return mulVec4(a, b);
 }
 
 /* Divsion Operator Overload for Vector */
 
 EUCLID_FUNC_QUALIFIER vec4i& EUCLID_CALL operator/=(vec4i& a, const vec4i b) noexcept {
-    a = divVec4i(a, b);
+    a = divVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4f& EUCLID_CALL operator/=(vec4f& a, const vec4f b) noexcept {
-    a = divVec4f(a, b);
+    a = divVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4d& EUCLID_CALL operator/=(vec4d& a, const vec4d b) noexcept {
-    a = divVec4d(a, b);
+    a = divVec4(a, b);
     return a;
 }
 
 EUCLID_FUNC_QUALIFIER vec4i  EUCLID_CALL operator/(const vec4i a, const vec4i b) noexcept {
-    return divVec4i(a, b);
+    return divVec4(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec4f  EUCLID_CALL operator/(const vec4f a, const vec4f b) noexcept {
-    return divVec4f(a, b);
+    return divVec4(a, b);
 }
 
 EUCLID_FUNC_QUALIFIER vec4d  EUCLID_CALL operator/(const vec4d a, const vec4d b) noexcept {
-    return divVec4d(a, b);
+    return divVec4(a, b);
+}
+
+/* Scale Operator Overload for Vector */
+
+EUCLID_FUNC_QUALIFIER vec4i& EUCLID_CALL operator*=(vec4i& vec, const int val) noexcept {
+    vec = scaleVec4(vec, val);
+    return vec;
+}
+
+EUCLID_FUNC_QUALIFIER vec4f& EUCLID_CALL operator*=(vec4f& vec, const float val) noexcept {
+    vec = scaleVec4(vec, val);
+    return vec;
+}
+
+EUCLID_FUNC_QUALIFIER vec4d& EUCLID_CALL operator*=(vec4d& vec, const double val) noexcept {
+    vec = scaleVec4(vec, val);
+    return vec;
+}
+
+EUCLID_FUNC_QUALIFIER vec4i  EUCLID_CALL operator*(const vec4i vec, const int val) noexcept {
+    return scaleVec4(vec, val);
+}
+
+EUCLID_FUNC_QUALIFIER vec4f  EUCLID_CALL operator*(const vec4f vec, const float val) noexcept {
+    return scaleVec4(vec, val);
+}
+
+EUCLID_FUNC_QUALIFIER vec4d  EUCLID_CALL operator*(const vec4d vec, const double val) noexcept {
+    return scaleVec4(vec, val);
+}
+
+EUCLID_FUNC_QUALIFIER vec4i  EUCLID_CALL operator*(const int val, const vec4i vec) noexcept {
+    return scaleVec4(vec, val);
+}
+
+EUCLID_FUNC_QUALIFIER vec4f  EUCLID_CALL operator*(const float val, const vec4f vec) noexcept {
+    return scaleVec4(vec, val);
+}
+
+EUCLID_FUNC_QUALIFIER vec4d  EUCLID_CALL operator*(const double val, const vec4d vec) noexcept {
+    return scaleVec4(vec, val);
+}
+
+/* ------------------------------------------------------------------------------- */
+
+EUCLID_FUNC_QUALIFIER vec4i& EUCLID_CALL operator/=(vec4i& vec, const int val) noexcept {
+    vec = divVec4(vec, set1Vec4i(val));
+    return vec;
+}
+
+EUCLID_FUNC_QUALIFIER vec4f& EUCLID_CALL operator/=(vec4f& vec, const float val) noexcept {
+    vec = divVec4(vec, set1Vec4f(val));
+    return vec;
+}
+
+EUCLID_FUNC_QUALIFIER vec4d& EUCLID_CALL operator/=(vec4d& vec, const double val) noexcept {
+    vec = divVec4(vec, set1Vec4d(val));
+    return vec;
+}
+
+EUCLID_FUNC_QUALIFIER vec4i  EUCLID_CALL operator/(const vec4i vec, const int val) noexcept {
+    return divVec4(vec, set1Vec4i(val));
+}
+
+EUCLID_FUNC_QUALIFIER vec4f  EUCLID_CALL operator/(const vec4f vec, const float val) noexcept {
+    return divVec4(vec, set1Vec4f(val));
+}
+
+EUCLID_FUNC_QUALIFIER vec4d  EUCLID_CALL operator/(const vec4d vec, const double val) noexcept {
+    return divVec4(vec, set1Vec4d(val));
 }
 
 #endif // Euclid Operator Overload
