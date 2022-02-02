@@ -2,7 +2,7 @@
 
 #include "Vec4.hpp"
 
-namespace euclid {
+namespace euclid::util {
 
 void clamp() {}
 
