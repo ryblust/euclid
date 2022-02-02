@@ -1,3 +1,3 @@
 #pragma once
 
-#include "detail/vec4_test.hpp"
+#include "detail/vec_test.hpp"
