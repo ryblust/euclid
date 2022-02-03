@@ -61,47 +61,6 @@ EUCLID_FORCEINLINE constexpr float tan(const float angle) noexcept {
     return std::tan(angle * radian<float>);
 }
 
-EUCLID_FORCEINLINE constexpr double sqrt(const double number) noexcept {
-    if (__builtin_is_constant_evaluated()) {
-        return static_cast<double>(math::sqrt(static_cast<float>(number)));
-    }
-    return std::sqrt(number);
-}
-
-EUCLID_FORCEINLINE constexpr double cos(const double angle) noexcept {
-    if (__builtin_is_constant_evaluated()) {
-        const double first  = angle * radian<double> *angle * radian<double>;
-        const double second = first * first;
-        const double third  = first * second;
-        return 1.0 - 0.5 * first + second * 0.04166666791 - third * 0.001361971023;
-    }
-    return std::cos(angle * radian<double>);
-}
-
-EUCLID_FORCEINLINE constexpr double sin(const double angle) noexcept {
-    if (__builtin_is_constant_evaluated()) {
-        const double first  = angle  * radian<double>;
-        const double square = first  * first;
-        const double second = first  * square;
-        const double third  = second * square;
-        const double forth  = third  * square;
-        return first - second * 0.1666666716 + third * 0.008333333768 - forth * 0.0001984127011;
-    }
-    return std::sin(angle * radian<double>);
-}
-
-EUCLID_FORCEINLINE constexpr double tan(const double angle) noexcept {
-    if (__builtin_is_constant_evaluated()) {
-        const double first  = (90 - angle) * radian<double>;
-        const double square = first  * first;
-        const double second = first  * square;
-        const double third  = second * square;
-        const double forth  = third  * square;
-        return -(-1.0 / first + first / 3.0 + second / 45.0 + third * 2.0 / 945.0 + forth / 4725.0);
-    }
-    return std::tan(angle * radian<double>);
-}
-
 }
 
 #ifdef _MSC_VER
