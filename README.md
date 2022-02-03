@@ -12,7 +12,7 @@
 - Head-only
 
 ## Introduction
-- 编译期的计算支持 (只支持 MSVC)
+- 编译期的计算支持 (暂时只支持 MSVC)
   
   Better with C++23 `(if consteval)`
 
@@ -20,30 +20,24 @@
 
 - 编译期的类型约束
   
-   使用 `concept`来约束某些操作
-    
-    **Euclid** 支持的算术类型类型有 `int, float`
-  ```c++
-
-  ```
-- `euclid::debug::printVec(...args)`
+- `euclid::debug::print(...args)`
   ```c++
   #include <Euclid/Euclid.h>
-  #include <Euclid/Print.hpp>
+  #include <Euclid/Print.hpp> // 需要在 Euclid.h 之后 include
 
   using namespace euclid;
 
   vec4i v1 = setVec4i(1, 2, 3, 4);
   vec4f v2 = setVec4f(1, 2, 3, 4);
-  debug::printVec(v1, v2);
-
+  mat2i m1 = { 1,2,3,4 };
+  debug::print(v1, v2, m1);
   ```
 
 - `constexpr` 数学函数
   ```c++
   using namespace euclid;
   constexpr float res1 = math::cos(45);
-  constexpr float res2 = math::sin(35.f)
+  constexpr float res2 = math::sin(35);
   constexpr float res4 = math::sqrt(2);
   ```
 
@@ -51,15 +45,7 @@
 
   ```c++
   vec4i ivec = setVec4i(1, 2, 3, 4);
-  vec4f fvec = castVec4iTo4f(ivec); // 暂定名称
-  ```
-
-- `operator+=, *=, -=` 的约束
-  ```c++
-  vec2i v1{ 1, 2 };
-  vec2f v2{ 1.1f, 2.2f };
-  v1 *= 2.2f; // concept constraint failed : int *= float unacceptable precision loss
-  v1 += v2; // same reason
+  vec4f fvec = castToVec4f(ivec);
   ```
 
 - `Transformation in Homogeneous Coordinates`
