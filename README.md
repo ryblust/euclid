@@ -12,7 +12,7 @@
 - Head-only
 
 ## Introduction
-- 编译期的计算支持 (暂时只支持 MSVC)
+- 编译期的计算支持 (暂时不支持 Clang)
   
   Better with C++23 `(if consteval)`
 

@@ -6,38 +6,43 @@
 #ifdef _MSC_VER
     #define EUCLID_FORCEINLINE [[msvc::forceinline]]
     #define EUCLID_CALL __vectorcall
-    #define EUCLID_MSVC_CONSTEXPR constexpr
 #else
     #define EUCLID_FORCEINLINE inline __attribute__((always_inline))
     #define EUCLID_CALL
-    #define EUCLID_MSVC_CONSTEXPR
 #endif
 
-// MSVC has better constexpr support for simd intrinsics
-#define EUCLID_FUNC_QUALIFIER EUCLID_FORCEINLINE EUCLID_MSVC_CONSTEXPR
-
-#if defined(_MSC_VER) && !defined(EUCLID_NO_GLOBAL_OPERATOR_OVERLOAD) 
-    #define EUCLID_HAS_GLOBAL_OPERATOR_OVERLOAD
-#endif
+#define EUCLID_QUALIFIER EUCLID_FORCEINLINE constexpr
 
 namespace euclid {
 
-using vec4i = __m128i;
-using vec4f = __m128;
-using vec4d = __m256d;
-using vec8i = __m256i;
-using vec8f = __m256;
+#ifdef _MSC_VER
+    using vec4 = __m128;
+    using vec8 = __m256;
+#else
+    struct alignas(16) vec4 {
+        constexpr vec4() noexcept : v(__m128{ 0, 0, 0, 0 }) {}
+        constexpr vec4(const float a0, const float a1, const float a2, const float a3)
+            noexcept : v(__m128{ a0, a1, a2, a3 }) {}
+        constexpr vec4(const __m128 m) noexcept : v(m) {}
+        constexpr operator __m128() const { return v; }
+        __m128 v;
+    };
+    struct alignas(32) vec8 {
+        constexpr vec8() noexcept : v(__m256{ 0, 0, 0, 0, 0, 0, 0, 0 }) {}
+        constexpr vec8(const float a0, const float a1, const float a2, const float a3,
+                       const float a4, const float a5, const float a6, const float a7)
+            noexcept : v(__m256{ a0, a1, a2, a3, a4, a5, a6, a7 }) {}
+        constexpr vec8(const __m256 m) noexcept : v(m) {}
+        constexpr operator __m256() const { return v; }
+        __m256 v;
+    };
+#endif
 
-struct vec2i;
-struct vec2f;
-struct vec3i;
-struct vec3f;
-struct mat2i;
-struct mat2f;
-struct mat3i;
-struct mat3f;
-struct mat4i;
-struct mat4f;
+struct vec2;
+struct vec3;
+struct mat2;
+struct mat3;
+struct mat4;
 
 template<typename Ty1, typename Ty2>
 concept same_type = std::is_same_v<Ty1, Ty2>;
@@ -59,11 +64,10 @@ namespace trait {
 #endif
 
 template<typename T>
-concept vector_type = is_any_type_of<T, vec2i, vec2f, vec3i, vec3f,                    
-                                        vec4i, vec4f, vec4d, vec8i, vec8f>;
+concept vector_type = is_any_type_of<T, vec4, vec8>;
 
 template<typename T>
-concept matrix_type = is_any_type_of<T, mat2i, mat2f, mat3i, mat3f, mat4i, mat4f>;
+concept matrix_type = is_any_type_of<T, mat2, mat3, mat4>;
 
 template<typename T>
 concept euclid_component = vector_type<T> || matrix_type<T>;
