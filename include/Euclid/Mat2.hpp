@@ -22,7 +22,7 @@ struct alignas(16) mat2 {
         return getVec4RefData(mat, 2 * row + col);
     }
 
-    constexpr float  operator()(const std::size_t row, const std::size_t col) const noexcept {
+    constexpr float operator()(const std::size_t row, const std::size_t col) const noexcept {
         return getVec4Data(mat, 2 * row + col);
     }
 
@@ -60,7 +60,7 @@ EUCLID_QUALIFIER mat2 EUCLID_CALL operator*(const mat2 a, const mat2 b) noexcept
     const vec4 res1 = _mm_mul_ps(a.mat, mul1);
     const vec4 res2 = _mm_mul_ps(a.mat, mul2);
     const vec4 res3 = _mm_hadd_ps(res1, res2);
-    const vec4 res = _mm_shuffle_ps(res3, res3, EUCLID_SHUFFLE_MASK(0, 2, 1, 3));
+    const vec4 res  = _mm_shuffle_ps(res3, res3, EUCLID_SHUFFLE_MASK(0, 2, 1, 3));
     return { res };
 }
 

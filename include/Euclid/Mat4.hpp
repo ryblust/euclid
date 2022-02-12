@@ -82,7 +82,7 @@ EUCLID_QUALIFIER mat4 EUCLID_CALL transpose(mat4 a) noexcept {
         util::swap(a(2, 3), a(3, 2));
         return a;
     }
-    const __m256i mask  = _mm256_set_epi32(7,3,6,2,5,1,4,0);
+    const __m256i mask = _mm256_set_epi32(7,3,6,2,5,1,4,0);
     const vec8 unpack1 = _mm256_unpacklo_ps(a.mat[0], a.mat[1]);
     const vec8 unpack2 = _mm256_unpackhi_ps(a.mat[0], a.mat[1]);
     const vec8 trans1  = _mm256_permutevar8x32_ps(unpack1, mask);
