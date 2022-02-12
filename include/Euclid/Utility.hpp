@@ -41,16 +41,40 @@ EUCLID_QUALIFIER T lerp(const T a, const T b, const T t) noexcept {
     return a + t * (b - a);
 }
 
-void lerp() {}
+EUCLID_QUALIFIER vec4 EUCLID_CALL lerp(const vec4 a, const vec4 b, const vec4 t) noexcept {
+    if (__builtin_is_constant_evaluated()) {
+        return {
+            lerp(getVec4Data(a, 0), getVec4Data(b, 0), getVec4Data(t, 0)),
+            lerp(getVec4Data(a, 1), getVec4Data(b, 1), getVec4Data(t, 1)),
+            lerp(getVec4Data(a, 2), getVec4Data(b, 2), getVec4Data(t, 2)),
+            lerp(getVec4Data(a, 3), getVec4Data(b, 3), getVec4Data(t, 3))
+        };
+    }
+    return _mm_fmadd_ps(t, _mm_sub_ps(b, a), a);
+}
+
+EUCLID_QUALIFIER vec4 EUCLID_CALL lerp(const vec4 a, const vec4 b, const float t) noexcept {
+    return lerp(a, b, set1Vec4(t));
+}
 
 /* Saturate Functions */
 
 template<arithmetic T>
-EUCLID_FORCEINLINE constexpr T saturate(const T val) noexcept {
+EUCLID_QUALIFIER T saturate(const T val) noexcept {
     return val > 1 ? 1 : val < 0 ? 0 : val;
 }
 
-void saturate() {}
+EUCLID_QUALIFIER vec4 EUCLID_CALL saturate(const vec4 a) noexcept {
+    if (__builtin_is_constant_evaluated()) {
+        return {
+            saturate(getVec4Data(a, 0)),
+            saturate(getVec4Data(a, 1)),
+            saturate(getVec4Data(a, 2)),
+            saturate(getVec4Data(a, 3))
+        };
+    }
+    return _mm_max_ps(_mm_min_ps(a, _mm_set1_ps(1)), _mm_setzero_ps());
+}
 
 }
 
