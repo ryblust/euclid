@@ -7,8 +7,7 @@
 **Features**
 
 - 编译期的计算支持
-- 编译期的类型约束
-- `SIMD` Speed up (Requires AVX2 supported)
+- SIMD Speed up (requires AVX2 supported)
 - Head-only
 
 ## Introduction
@@ -17,8 +16,6 @@
   Better with C++23 `(if consteval)`
 
   暂时使用 `__builtin_is_constant_evaluated()` 来判断是否是常量求值上下文
-
-- 编译期的类型约束
   
 - `euclid::debug::print(...args)`
   ```c++
@@ -27,10 +24,10 @@
 
   using namespace euclid;
 
-  vec4i v1 = setVec4i(1, 2, 3, 4);
-  vec4f v2 = setVec4f(1, 2, 3, 4);
-  mat2i m1 = { 1,2,3,4 };
-  debug::print(v1, v2, m1);
+  vec4 v = setVec4i(1, 2, 3, 4);
+  mat2 m = { 1,2,
+             3,4 };
+  debug::print(v, m);
   ```
 
 - `constexpr` 数学函数
@@ -41,14 +38,7 @@
   constexpr float res4 = math::sqrt(2);
   ```
 
-- 类型转换
-
-  ```c++
-  vec4i ivec = setVec4i(1, 2, 3, 4);
-  vec4f fvec = castToVec4f(ivec);
-  ```
-
-- `Transformation in Homogeneous Coordinates`
+- `Transformation` (working on)
 
 ## Tested Compiler
 - MSVC 19.29/19.30
