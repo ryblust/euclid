@@ -22,7 +22,7 @@ constexpr float& getVec4RefData(vec4& vec, const std::size_t pos) noexcept {
 #endif
 }
 
-constexpr float getVec4Data(const vec4 vec, const std::size_t pos) noexcept {
+constexpr float EUCLID_CALL getVec4Data(const vec4 vec, const std::size_t pos) noexcept {
 #ifdef _MSC_VER
     return vec.m128_f32[pos];
 #else

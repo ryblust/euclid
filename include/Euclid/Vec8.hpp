@@ -19,7 +19,7 @@ EUCLID_QUALIFIER float& getVec8RefData(vec8& vec, const std::size_t pos) noexcep
 #endif
 }
 
-EUCLID_QUALIFIER float getVec8Data(const vec8 vec, const std::size_t pos) noexcept {
+EUCLID_QUALIFIER float EUCLID_CALL getVec8Data(const vec8 vec, const std::size_t pos) noexcept {
 #ifdef _MSC_VER
     return vec.m256_f32[pos];
 #else
