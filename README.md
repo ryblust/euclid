@@ -24,9 +24,9 @@
 
   using namespace euclid;
 
-  vec4 v = setVec4i(1, 2, 3, 4);
-  mat2 m = { 1,2,
-             3,4 };
+  vec4 v{ 1,2,3,4 };
+  mat2 m{ 1,2,
+          3,4 };
   debug::print(v, m);
   ```
 
