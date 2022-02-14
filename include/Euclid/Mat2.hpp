@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Vec2.hpp"
 #include "Vec4.hpp"
 
 #ifdef _MSC_VER
@@ -36,7 +37,7 @@ EUCLID_QUALIFIER mat2 EUCLID_CALL transpose(const mat2 m) noexcept {
               m(0, 1), m(1, 1) }
         };
     }
-    return { _mm_shuffle_ps(m.mat, m.mat, 0b11011000) };
+    return { _mm_shuffle_ps(m.mat, m.mat, EUCLID_SHUFFLE_MASK(0, 2, 1, 3)) };
 }
 
 EUCLID_QUALIFIER mat2 EUCLID_CALL operator+(const mat2 a, const mat2 b) noexcept {

@@ -14,25 +14,25 @@ namespace detail {
 // C4514 : Ignore the compiler's warning about removing unused inline functions
 #endif
 
+inline void printImpl(const vec2 m) noexcept {
+    std::printf("[%.3f, %.3f]\n", m.x, m.y);
+}
+
+inline void printImpl(const vec3 m) noexcept {
+    std::printf("[%.3f, %.3f, %.3f]\n", m.x, m.y, m.z);
+}
+
 inline void printImpl(const vec4 m) noexcept {
-#ifdef _MSC_VER
     std::printf("[%.3f, %.3f, %.3f, %.3f]\n",
-        m.m128_f32[0], m.m128_f32[1], m.m128_f32[2], m.m128_f32[3]);
-#else
-    std::printf("[%.3f, %.3f, %.3f, %.3f]\n", m[0], m[1], m[2], m[3]);
-#endif
+        getVec4Data(m, 0), getVec4Data(m, 1), getVec4Data(m, 2), getVec4Data(m, 3)
+    );
 }
 
 inline void printImpl(const vec8 m) noexcept {
-#ifdef _MSC_VER
     std::printf("[%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f]\n",
-        m.m256_f32[0], m.m256_f32[1], m.m256_f32[2], m.m256_f32[3],
-        m.m256_f32[4], m.m256_f32[5], m.m256_f32[6], m.m256_f32[7]);
-#else
-    std::printf("[%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f]\n",
-        m[0], m[1], m[2], m[3],
-        m[4], m[5], m[6], m[7]);
-#endif
+        getVec8Data(m, 0), getVec8Data(m, 1), getVec8Data(m, 2), getVec8Data(m, 3),
+        getVec8Data(m, 4), getVec8Data(m, 5), getVec8Data(m, 6), getVec8Data(m, 7)
+    );
 }
 
 inline void printImpl(const mat2 m) noexcept {
@@ -60,7 +60,7 @@ inline void printImpl(const mat4 m) noexcept {
 #endif
 
 template<trait::euclid_component T, trait::euclid_component... Rest>
-void print(const T first, const Rest... rest) noexcept {
+inline void print(const T first, const Rest... rest) noexcept {
     detail::printImpl(first);
     if constexpr (sizeof...(rest) != 0) {
         print(rest...);

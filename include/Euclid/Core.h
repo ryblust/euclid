@@ -64,7 +64,7 @@ namespace trait {
 #endif
 
 template<typename T>
-concept vector_type = is_any_type_of<T, vec4, vec8>;
+concept vector_type = is_any_type_of<T, vec2, vec3, vec4, vec8>;
 
 template<typename T>
 concept matrix_type = is_any_type_of<T, mat2, mat3, mat4>;
