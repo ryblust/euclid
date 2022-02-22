@@ -1,5 +1,5 @@
 # Eucild - a Graphics Mathematics Library
-> w11knd's Graphics Mathematics Library
+> SIMD Graphics Mathematics Library
 
 ## Overview
 - **Euclid** 是一个基于 C++20 的图形数学库
@@ -7,11 +7,11 @@
 **Features**
 
 - 编译期的计算支持
-- SIMD Speed up (requires AVX2 supported)
+- SIMD Speed up (暂不支持 ARM)
 - Head-only
 
 ## Introduction
-- 编译期的计算支持 (暂时不支持 Clang)
+- 编译期的计算支持 (暂不支持 Clang)
   
   Better with C++23 `(if consteval)`
 
@@ -43,4 +43,4 @@
 ## Tested Compiler
 - MSVC 19.29/19.30
 - GCC 11.2
-- Clang 13.0
+- Clang
