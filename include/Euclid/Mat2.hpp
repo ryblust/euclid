@@ -12,25 +12,29 @@
 
 namespace euclid {
 
-struct alignas(16) mat2 {
+struct alignas(16) Mat2 {
     using value_type = float;
 
-    static constexpr mat2 EUCLID_CALL identity() noexcept {
+    static constexpr Mat2 EUCLID_CALL identity() noexcept {
         return { { 1,0,0,1 } };
     }
 
-    constexpr float& operator()(const std::size_t row, const std::size_t col) noexcept {
-        return getVec4RefData(mat, 2 * row + col);
-    }
-
-    constexpr float operator()(const std::size_t row, const std::size_t col) const noexcept {
+    EUCLID_CONSTEXPR float& operator()(const std::size_t row, const std::size_t col) noexcept {
+#ifdef __clang__
+        return *((float*)this + 2 * row + col);
+#else
         return getVec4Data(mat, 2 * row + col);
+#endif
     }
 
-    vec4 mat;
+    EUCLID_CONSTEXPR float operator()(const std::size_t row, const std::size_t col) const noexcept {
+        return const_cast<Mat2*>(this)->operator()(row, col);
+    }
+
+    Vec4 mat;
 };
 
-EUCLID_QUALIFIER mat2 EUCLID_CALL transpose(const mat2 m) noexcept {
+EUCLID_QUALIFIER Mat2 EUCLID_CALL transpose(const Mat2 m) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return { 
             { m(0, 0), m(1, 0),
@@ -40,15 +44,15 @@ EUCLID_QUALIFIER mat2 EUCLID_CALL transpose(const mat2 m) noexcept {
     return { _mm_shuffle_ps(m.mat, m.mat, EUCLID_SHUFFLE_MASK(0, 2, 1, 3)) };
 }
 
-EUCLID_QUALIFIER mat2 EUCLID_CALL operator+(const mat2 a, const mat2 b) noexcept {
+EUCLID_QUALIFIER Mat2 EUCLID_CALL operator+(const Mat2 a, const Mat2 b) noexcept {
     return { a.mat + b.mat };
 }
 
-EUCLID_QUALIFIER mat2 EUCLID_CALL operator-(const mat2 a, const mat2 b) noexcept {
+EUCLID_QUALIFIER Mat2 EUCLID_CALL operator-(const Mat2 a, const Mat2 b) noexcept {
     return { a.mat - b.mat };
 }
 
-EUCLID_QUALIFIER mat2 EUCLID_CALL operator*(const mat2 a, const mat2 b) noexcept {
+EUCLID_QUALIFIER Mat2 EUCLID_CALL operator*(const Mat2 a, const Mat2 b) noexcept {
     if (__builtin_is_constant_evaluated()) {
         const float v0 = a(0, 0) * b(0, 0) + a(0, 1) * b(1, 0);
         const float v1 = a(0, 0) * b(0, 1) + a(0, 1) * b(1, 1);
@@ -56,41 +60,44 @@ EUCLID_QUALIFIER mat2 EUCLID_CALL operator*(const mat2 a, const mat2 b) noexcept
         const float v3 = a(1, 0) * b(1, 0) + a(1, 1) * b(1, 1);
         return { { v0, v1, v2, v3 } };
     }
-    const vec4 mul1 = _mm_shuffle_ps(b.mat, b.mat, EUCLID_SHUFFLE_MASK(0, 2, 0, 2));
-    const vec4 mul2 = _mm_shuffle_ps(b.mat, b.mat, EUCLID_SHUFFLE_MASK(1, 3, 1, 3));
-    const vec4 res1 = _mm_mul_ps(a.mat, mul1);
-    const vec4 res2 = _mm_mul_ps(a.mat, mul2);
-    const vec4 res3 = _mm_hadd_ps(res1, res2);
-    const vec4 res  = _mm_shuffle_ps(res3, res3, EUCLID_SHUFFLE_MASK(0, 2, 1, 3));
+    const Vec4 mul1 = _mm_shuffle_ps(b.mat, b.mat, EUCLID_SHUFFLE_MASK(0, 2, 0, 2));
+    const Vec4 mul2 = _mm_shuffle_ps(b.mat, b.mat, EUCLID_SHUFFLE_MASK(1, 3, 1, 3));
+    const Vec4 res1 = _mm_mul_ps(a.mat, mul1);
+    const Vec4 res2 = _mm_mul_ps(a.mat, mul2);
+    const Vec4 res3 = _mm_hadd_ps(res1, res2);
+    const Vec4 res  = _mm_shuffle_ps(res3, res3, EUCLID_SHUFFLE_MASK(0, 2, 1, 3));
     return { res };
 }
 
-EUCLID_QUALIFIER mat2 EUCLID_CALL operator*(const mat2 a, const float v) noexcept {
+EUCLID_QUALIFIER Mat2 EUCLID_CALL operator*(const Mat2 a, const float v) noexcept {
     return { a.mat * v };
 }
 
-EUCLID_QUALIFIER mat2 EUCLID_CALL operator*(const float v, const mat2 a) noexcept {
+EUCLID_QUALIFIER Mat2 EUCLID_CALL operator*(const float v, const Mat2 a) noexcept {
     return { a.mat * v };
 }
 
-EUCLID_QUALIFIER mat2& EUCLID_CALL operator+=(mat2& a, const mat2 b) noexcept {
+EUCLID_QUALIFIER Mat2& EUCLID_CALL operator+=(Mat2& a, const Mat2 b) noexcept {
     a.mat += b.mat;
     return a;
 }
 
-EUCLID_QUALIFIER mat2& EUCLID_CALL operator-=(mat2& a, const mat2 b) noexcept {
+EUCLID_QUALIFIER Mat2& EUCLID_CALL operator-=(Mat2& a, const Mat2 b) noexcept {
     a.mat -= b.mat;
     return a;
 }
 
-EUCLID_QUALIFIER mat2& EUCLID_CALL operator*=(mat2& a, const float v) noexcept {
+EUCLID_QUALIFIER Mat2& EUCLID_CALL operator*=(Mat2& a, const float v) noexcept {
     a.mat *= v;
     return a;
 }
 
-EUCLID_QUALIFIER mat2& EUCLID_CALL transposed(mat2& m) noexcept {
-    m = transpose(m);
-    return m;
+EUCLID_QUALIFIER bool EUCLID_CALL operator==(const Mat2 a, const Mat2 b) noexcept {
+    return a.mat == b.mat;
+}
+
+EUCLID_QUALIFIER bool EUCLID_CALL operator!=(const Mat2 a, const Mat2 b) noexcept {
+    return !(a == b);
 }
 
 }

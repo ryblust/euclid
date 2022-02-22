@@ -11,14 +11,22 @@
 
 namespace euclid::util {
 
-/* Clamp Functions */
-
 template<arithmetic T>
 EUCLID_QUALIFIER T clamp(const T val, const T min, const T max) noexcept {
     return val < min ? min : max < val ? max : val;
 }
 
-EUCLID_QUALIFIER vec4 EUCLID_CALL clamp(const vec4 v, const vec4 min, const vec4 max) noexcept {
+template<floating_point T> 
+EUCLID_QUALIFIER T lerp(const T a, const T b, const T t) noexcept {
+    return a + t * (b - a);
+}
+
+template<arithmetic T>
+EUCLID_QUALIFIER T saturate(const T val) noexcept {
+    return val > 1 ? 1 : val < 0 ? 0 : val;
+}
+
+EUCLID_QUALIFIER Vec4 EUCLID_CALL clamp(const Vec4 v, const Vec4 min, const Vec4 max) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return {
             clamp(getVec4Data(v, 0), getVec4Data(min, 0), getVec4Data(max, 0)),
@@ -30,18 +38,11 @@ EUCLID_QUALIFIER vec4 EUCLID_CALL clamp(const vec4 v, const vec4 min, const vec4
     return _mm_max_ps(_mm_min_ps(v, max), min);
 }
 
-EUCLID_QUALIFIER vec4 EUCLID_CALL clamp(const vec4 v, const float min, const float max) noexcept {
+EUCLID_QUALIFIER Vec4 EUCLID_CALL clamp(const Vec4 v, const float min, const float max) noexcept {
     return clamp(v, set1Vec4(min), set1Vec4(max));
 }
 
-/* Lerp Functions */
-
-template<floating_point T> 
-EUCLID_QUALIFIER T lerp(const T a, const T b, const T t) noexcept {
-    return a + t * (b - a);
-}
-
-EUCLID_QUALIFIER vec4 EUCLID_CALL lerp(const vec4 a, const vec4 b, const vec4 t) noexcept {
+EUCLID_QUALIFIER Vec4 EUCLID_CALL lerp(const Vec4 a, const Vec4 b, const Vec4 t) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return {
             lerp(getVec4Data(a, 0), getVec4Data(b, 0), getVec4Data(t, 0)),
@@ -53,18 +54,11 @@ EUCLID_QUALIFIER vec4 EUCLID_CALL lerp(const vec4 a, const vec4 b, const vec4 t)
     return _mm_fmadd_ps(t, _mm_sub_ps(b, a), a);
 }
 
-EUCLID_QUALIFIER vec4 EUCLID_CALL lerp(const vec4 a, const vec4 b, const float t) noexcept {
+EUCLID_QUALIFIER Vec4 EUCLID_CALL lerp(const Vec4 a, const Vec4 b, const float t) noexcept {
     return lerp(a, b, set1Vec4(t));
 }
 
-/* Saturate Functions */
-
-template<arithmetic T>
-EUCLID_QUALIFIER T saturate(const T val) noexcept {
-    return val > 1 ? 1 : val < 0 ? 0 : val;
-}
-
-EUCLID_QUALIFIER vec4 EUCLID_CALL saturate(const vec4 a) noexcept {
+EUCLID_QUALIFIER Vec4 EUCLID_CALL saturate(const Vec4 a) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return {
             saturate(getVec4Data(a, 0)),

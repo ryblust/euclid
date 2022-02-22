@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core.h"
-#include <cstdio>  // waiting for std::print
+#include <cstdio>
 
 namespace euclid::debug {
 
@@ -14,32 +14,32 @@ namespace detail {
 // C4514 : Ignore the compiler's warning about removing unused inline functions
 #endif
 
-inline void printImpl(const vec2 m) noexcept {
+inline void printImpl(const Vec2 m) noexcept {
     std::printf("[%.3f, %.3f]\n", m.x, m.y);
 }
 
-inline void printImpl(const vec3 m) noexcept {
+inline void printImpl(const Vec3 m) noexcept {
     std::printf("[%.3f, %.3f, %.3f]\n", m.x, m.y, m.z);
 }
 
-inline void printImpl(const vec4 m) noexcept {
+inline void printImpl(const Vec4 m) noexcept {
     std::printf("[%.3f, %.3f, %.3f, %.3f]\n",
         getVec4Data(m, 0), getVec4Data(m, 1), getVec4Data(m, 2), getVec4Data(m, 3)
     );
 }
 
-inline void printImpl(const vec8 m) noexcept {
+inline void printImpl(const Vec8 m) noexcept {
     std::printf("[%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f]\n",
         getVec8Data(m, 0), getVec8Data(m, 1), getVec8Data(m, 2), getVec8Data(m, 3),
         getVec8Data(m, 4), getVec8Data(m, 5), getVec8Data(m, 6), getVec8Data(m, 7)
     );
 }
 
-inline void printImpl(const mat2 m) noexcept {
+inline void printImpl(const Mat2 m) noexcept {
     std::printf("%.3f, %.3f\n%.3f, %.3f\n", m(0, 0), m(0, 1), m(1, 0), m(1, 1));
 }
 
-inline void printImpl(const mat4 m) noexcept {
+inline void printImpl(const Mat4 m) noexcept {
     std::printf("%.3f, %.3f, %.3f, %.3f\n%.3f, %.3f, %.3f, %.3f\n%.3f, %.3f, %.3f, %.3f\n%.3f, %.3f, %.3f, %.3f\n",
         m(0, 0), m(0, 1), m(0, 2), m(0, 3),
         m(1, 0), m(1, 1), m(1, 2), m(1, 3),

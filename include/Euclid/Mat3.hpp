@@ -1,13 +1,11 @@
 #pragma once
 
+#include "Vec3.hpp"
+
 namespace euclid {
 
-struct mat3i {
-
-};
-
-struct mat3f {
-
+struct Mat3 {
+    Vec3 m[3];
 };
 
 }

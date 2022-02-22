@@ -11,37 +11,27 @@
 
 namespace euclid {
 
-EUCLID_QUALIFIER float& getVec8RefData(vec8& vec, const std::size_t pos) noexcept {
 #ifdef _MSC_VER
-    return vec.m256_f32[pos];
+    #define getVec8Data(vec, pos) (vec.m256_f32)[(pos)]
 #else
-    return vec.v[pos];
+    #define getVec8Data(vec, pos) (vec).v[(pos)]
 #endif
-}
 
-EUCLID_QUALIFIER float EUCLID_CALL getVec8Data(const vec8 vec, const std::size_t pos) noexcept {
-#ifdef _MSC_VER
-    return vec.m256_f32[pos];
-#else
-    return vec.v[pos];
-#endif
-}
-
-EUCLID_QUALIFIER vec8 EUCLID_CALL set1Vec8(const float v) noexcept {
+EUCLID_QUALIFIER Vec8 EUCLID_CALL set1Vec8(const float v) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return { v,v,v,v,v,v,v,v };
     }
     return _mm256_set1_ps(v);
 }
 
-EUCLID_QUALIFIER vec8 EUCLID_CALL setZeroVec8() noexcept {
+EUCLID_QUALIFIER Vec8 EUCLID_CALL setZeroVec8() noexcept {
     if (__builtin_is_constant_evaluated()) {
         return { 0,0,0,0,0,0,0,0 };
     }
     return _mm256_setzero_ps();
 }
 
-EUCLID_QUALIFIER vec8 EUCLID_CALL combine2Vec4(const vec4 a, const vec4 b) noexcept {
+EUCLID_QUALIFIER Vec8 EUCLID_CALL combine2Vec4(const Vec4 a, const Vec4 b) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return {
             getVec4Data(a, 0), getVec4Data(a, 1),
@@ -53,7 +43,7 @@ EUCLID_QUALIFIER vec8 EUCLID_CALL combine2Vec4(const vec4 a, const vec4 b) noexc
     return _mm256_set_m128(a, b);
 }
 
-EUCLID_QUALIFIER vec8 EUCLID_CALL operator+(const vec8 a, const vec8 b) noexcept {
+EUCLID_QUALIFIER Vec8 EUCLID_CALL operator+(const Vec8 a, const Vec8 b) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return {
             getVec8Data(a, 0) + getVec8Data(b, 0),
@@ -69,7 +59,7 @@ EUCLID_QUALIFIER vec8 EUCLID_CALL operator+(const vec8 a, const vec8 b) noexcept
     return _mm256_add_ps(a, b);
 }
 
-EUCLID_QUALIFIER vec8 EUCLID_CALL operator-(const vec8 a, const vec8 b) noexcept {
+EUCLID_QUALIFIER Vec8 EUCLID_CALL operator-(const Vec8 a, const Vec8 b) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return {
             getVec8Data(a, 0) - getVec8Data(b, 0),
@@ -85,7 +75,7 @@ EUCLID_QUALIFIER vec8 EUCLID_CALL operator-(const vec8 a, const vec8 b) noexcept
     return _mm256_sub_ps(a, b);
 }
 
-EUCLID_QUALIFIER vec8 EUCLID_CALL operator*(const vec8 a, const vec8 b) noexcept {
+EUCLID_QUALIFIER Vec8 EUCLID_CALL operator*(const Vec8 a, const Vec8 b) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return {
             getVec8Data(a, 0) * getVec8Data(b, 0),
@@ -101,15 +91,15 @@ EUCLID_QUALIFIER vec8 EUCLID_CALL operator*(const vec8 a, const vec8 b) noexcept
     return _mm256_mul_ps(a, b);
 }
 
-EUCLID_QUALIFIER vec8 EUCLID_CALL operator*(const vec8 a, const float v) noexcept {
+EUCLID_QUALIFIER Vec8 EUCLID_CALL operator*(const Vec8 a, const float v) noexcept {
     return a * set1Vec8(v);
 }
 
-EUCLID_QUALIFIER vec8 EUCLID_CALL operator*(const float v, const vec8 a) noexcept {
+EUCLID_QUALIFIER Vec8 EUCLID_CALL operator*(const float v, const Vec8 a) noexcept {
     return a * v;
 }
 
-EUCLID_QUALIFIER vec8 EUCLID_CALL operator/(const vec8 a, const vec8 b) noexcept {
+EUCLID_QUALIFIER Vec8 EUCLID_CALL operator/(const Vec8 a, const Vec8 b) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return {
             getVec8Data(a, 0) / getVec8Data(b, 0),
@@ -125,45 +115,45 @@ EUCLID_QUALIFIER vec8 EUCLID_CALL operator/(const vec8 a, const vec8 b) noexcept
     return _mm256_div_ps(a, b);
 }
 
-EUCLID_QUALIFIER vec8 EUCLID_CALL operator/(const vec8 a, const float v) noexcept {
+EUCLID_QUALIFIER Vec8 EUCLID_CALL operator/(const Vec8 a, const float v) noexcept {
     return a / set1Vec8(v);
 }
 
-EUCLID_QUALIFIER vec8& EUCLID_CALL operator+=(vec8& a, const vec8 b) noexcept {
+EUCLID_QUALIFIER Vec8& EUCLID_CALL operator+=(Vec8& a, const Vec8 b) noexcept {
     a = a + b;
     return a;
 }
 
-EUCLID_QUALIFIER vec8& EUCLID_CALL operator-=(vec8& a, const vec8 b) noexcept {
+EUCLID_QUALIFIER Vec8& EUCLID_CALL operator-=(Vec8& a, const Vec8 b) noexcept {
     a = a - b;
     return a;
 }
 
-EUCLID_QUALIFIER vec8& EUCLID_CALL operator*=(vec8& a, const vec8 b) noexcept {
+EUCLID_QUALIFIER Vec8& EUCLID_CALL operator*=(Vec8& a, const Vec8 b) noexcept {
     a = a * b;
     return a;
 }
 
-EUCLID_QUALIFIER vec8& EUCLID_CALL operator*=(vec8& a, const float v) noexcept {
+EUCLID_QUALIFIER Vec8& EUCLID_CALL operator*=(Vec8& a, const float v) noexcept {
     a = a * v;
     return a;
 }
 
-EUCLID_QUALIFIER vec8& EUCLID_CALL operator/=(vec8& a, const vec8 b) noexcept {
+EUCLID_QUALIFIER Vec8& EUCLID_CALL operator/=(Vec8& a, const Vec8 b) noexcept {
     a = a / b;
     return a;
 }
 
-EUCLID_QUALIFIER vec8& EUCLID_CALL operator/=(vec8& a, const float v) noexcept {
+EUCLID_QUALIFIER Vec8& EUCLID_CALL operator/=(Vec8& a, const float v) noexcept {
     a = a / v;
     return a;
 }
 
-EUCLID_QUALIFIER vec8 EUCLID_CALL operator-(const vec8 a) noexcept {
+EUCLID_QUALIFIER Vec8 EUCLID_CALL operator-(const Vec8 a) noexcept {
     return setZeroVec8() - a;
 }
 
-EUCLID_QUALIFIER bool EUCLID_CALL operator==(const vec8 a, const vec8 b) noexcept {
+EUCLID_QUALIFIER bool EUCLID_CALL operator==(const Vec8 a, const Vec8 b) noexcept {
     return (getVec8Data(a, 0) == getVec8Data(b, 0)) && 
            (getVec8Data(a, 1) == getVec8Data(b, 1)) &&
            (getVec8Data(a, 2) == getVec8Data(b, 2)) &&
@@ -174,7 +164,7 @@ EUCLID_QUALIFIER bool EUCLID_CALL operator==(const vec8 a, const vec8 b) noexcep
            (getVec8Data(a, 7) == getVec8Data(b, 7));
 }
 
-EUCLID_QUALIFIER bool EUCLID_CALL operator!=(const vec8 a, const vec8 b) noexcept {
+EUCLID_QUALIFIER bool EUCLID_CALL operator!=(const Vec8 a, const Vec8 b) noexcept {
     return !(a == b);
 }
 
