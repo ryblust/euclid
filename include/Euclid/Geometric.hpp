@@ -44,8 +44,7 @@ EUCLID_QUALIFIER float EUCLID_CALL length(const Vec4 a) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return math::sqrt(dot(a, a));
     }
-    const Vec4 dotVec = _mm_dp_ps(a, a, 0xff);
-    return _mm_cvtss_f32(_mm_sqrt_ps(dotVec));
+    return _mm_cvtss_f32(_mm_sqrt_ps(_mm_dp_ps(a, a, 0xff)));
 }
 
 EUCLID_QUALIFIER float EUCLID_CALL lengthEst(const Vec4 a) noexcept {
@@ -67,16 +66,16 @@ EUCLID_QUALIFIER Vec3 EUCLID_CALL normalize(const Vec3 a) noexcept {
 
 EUCLID_QUALIFIER Vec4 EUCLID_CALL normalize(const Vec4 a) noexcept {
     if (__builtin_is_constant_evaluated()) {
-        return a / math::sqrt(dot(a, a));
+        return a / length(a);
     }
-    return a / _mm_sqrt_ps(_mm_dp_ps(a, a, 0xff));
+    return _mm_div_ps(a, _mm_sqrt_ps(_mm_dp_ps(a, a, 0xff)));
 }
 
 EUCLID_QUALIFIER Vec4 EUCLID_CALL normalizeEst(const Vec4 a) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return a / math::sqrt(dot(a, a));
     }
-    return a * _mm_rsqrt_ps(_mm_dp_ps(a, a, 0xff));
+    return _mm_mul_ps(a, _mm_rsqrt_ps(_mm_dp_ps(a, a, 0xff)));
 }
 
 EUCLID_QUALIFIER Vec3 EUCLID_CALL cross(const Vec3 a, const Vec3 b) noexcept {

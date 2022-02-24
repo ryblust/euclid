@@ -12,7 +12,7 @@
 namespace euclid {
 
 #ifdef _MSC_VER
-    #define getVec8Data(vec, pos) (vec.m256_f32)[(pos)]
+    #define getVec8Data(vec, pos) (vec).m256_f32[(pos)]
 #else
     #define getVec8Data(vec, pos) (vec).v[(pos)]
 #endif
@@ -154,14 +154,14 @@ EUCLID_QUALIFIER Vec8 EUCLID_CALL operator-(const Vec8 a) noexcept {
 }
 
 EUCLID_QUALIFIER bool EUCLID_CALL operator==(const Vec8 a, const Vec8 b) noexcept {
-    return (getVec8Data(a, 0) == getVec8Data(b, 0)) && 
-           (getVec8Data(a, 1) == getVec8Data(b, 1)) &&
-           (getVec8Data(a, 2) == getVec8Data(b, 2)) &&
-           (getVec8Data(a, 3) == getVec8Data(b, 3)) &&
-           (getVec8Data(a, 4) == getVec8Data(b, 4)) &&
-           (getVec8Data(a, 5) == getVec8Data(b, 5)) &&
-           (getVec8Data(a, 6) == getVec8Data(b, 6)) &&
-           (getVec8Data(a, 7) == getVec8Data(b, 7));
+    return getVec8Data(a, 0) == getVec8Data(b, 0) && 
+           getVec8Data(a, 1) == getVec8Data(b, 1) &&
+           getVec8Data(a, 2) == getVec8Data(b, 2) &&
+           getVec8Data(a, 3) == getVec8Data(b, 3) &&
+           getVec8Data(a, 4) == getVec8Data(b, 4) &&
+           getVec8Data(a, 5) == getVec8Data(b, 5) &&
+           getVec8Data(a, 6) == getVec8Data(b, 6) &&
+           getVec8Data(a, 7) == getVec8Data(b, 7);
 }
 
 EUCLID_QUALIFIER bool EUCLID_CALL operator!=(const Vec8 a, const Vec8 b) noexcept {

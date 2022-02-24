@@ -36,10 +36,10 @@ struct alignas(16) Mat2 {
 
 EUCLID_QUALIFIER Mat2 EUCLID_CALL transpose(const Mat2 m) noexcept {
     if (__builtin_is_constant_evaluated()) {
-        return { 
-            { m(0, 0), m(1, 0),
-              m(0, 1), m(1, 1) }
-        };
+        return { {
+            m(0, 0), m(1, 0),
+            m(0, 1), m(1, 1)
+        } };
     }
     return { _mm_shuffle_ps(m.mat, m.mat, EUCLID_SHUFFLE_MASK(0, 2, 1, 3)) };
 }
