@@ -22,14 +22,14 @@ struct alignas(32) Mat4 {
 
     EUCLID_CONSTEXPR float& operator()(const std::size_t row, const std::size_t col) noexcept {
         if (row > 2) {
-            return getVec8RefData(mat[1], 4 * row + col);
+            return getVec8RefData(mat[1], 4 * row + col - 8);
         }
         return getVec8RefData(mat[0], 4 * row + col);
     }
 
     EUCLID_CONSTEXPR float operator()(const std::size_t row, const std::size_t col) const noexcept {
         if (row > 2) {
-            return getVec8Data(mat[1], 4 * row + col);
+            return getVec8Data(mat[1], 4 * row + col - 8);
         }
         return getVec8Data(mat[0], 4 * row + col);
     }
