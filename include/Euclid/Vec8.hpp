@@ -11,11 +11,24 @@
 
 namespace euclid {
 
+EUCLID_QUALIFIER float getVec8Data(const Vec8 a, const std::size_t pos) noexcept {
 #ifdef _MSC_VER
-    #define getVec8Data(vec, pos) (vec).m256_f32[(pos)]
+    return a.m256_f32[pos];
 #else
-    #define getVec8Data(vec, pos) (vec).v[(pos)]
+    return a[pos];
 #endif
+}
+
+EUCLID_QUALIFIER float& getVec8RefData(Vec8& a, const std::size_t pos) noexcept {
+#ifdef _MSC_VER
+    return a.m256_f32[pos];
+#elif __clang__
+    float* p = (float*)&a;
+    return *(p + pos);
+#else
+    return a[pos];
+#endif
+}
 
 EUCLID_QUALIFIER Vec8 EUCLID_CALL set1Vec8(const float v) noexcept {
     if (__builtin_is_constant_evaluated()) {

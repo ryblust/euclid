@@ -13,11 +13,24 @@
 
 namespace euclid {
 
+EUCLID_QUALIFIER float getVec4Data(const Vec4 a, const std::size_t pos) noexcept {
 #ifdef _MSC_VER
-    #define getVec4Data(vec, pos) (vec).m128_f32[(pos)]
+    return a.m128_f32[pos];
 #else
-    #define getVec4Data(vec, pos) (vec).v[(pos)]
+    return a[pos];
 #endif
+}
+
+EUCLID_QUALIFIER float& getVec4RefData(Vec4& a, const std::size_t pos) noexcept {
+#ifdef _MSC_VER
+    return a.m128_f32[pos];
+#elif __clang__
+    float* p = (float*)&a;
+    return *(p + pos);
+#else
+    return a[pos];
+#endif
+}
 
 EUCLID_QUALIFIER Vec4 EUCLID_CALL set1Vec4(const float v) noexcept {
     if (__builtin_is_constant_evaluated()) {

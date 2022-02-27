@@ -21,19 +21,17 @@ struct alignas(32) Mat4 {
     }
 
     EUCLID_CONSTEXPR float& operator()(const std::size_t row, const std::size_t col) noexcept {
-#ifdef __clang__
-        return *((float*)this + 4 * row + col);
-#else
-        const std::size_t pos = 4 * row + col;
-        if (pos > 7) {
-            return getVec8Data(mat[1], pos - 8);
+        if (row > 2) {
+            return getVec8RefData(mat[1], 4 * row + col);
         }
-        return getVec8Data(mat[0], pos);
-#endif
+        return getVec8RefData(mat[0], 4 * row + col);
     }
 
     EUCLID_CONSTEXPR float operator()(const std::size_t row, const std::size_t col) const noexcept {
-        return const_cast<Mat4*>(this)->operator()(row, col);
+        if (row > 2) {
+            return getVec8Data(mat[1], 4 * row + col);
+        }
+        return getVec8Data(mat[0], 4 * row + col);
     }
 
     EUCLID_CONSTEXPR Vec4 operator[](const std::size_t pos) const noexcept {

@@ -20,15 +20,11 @@ struct alignas(16) Mat2 {
     }
 
     EUCLID_CONSTEXPR float& operator()(const std::size_t row, const std::size_t col) noexcept {
-#ifdef __clang__
-        return *((float*)this + 2 * row + col);
-#else
-        return getVec4Data(mat, 2 * row + col);
-#endif
+        return getVec4RefData(mat, 2 * row + col);
     }
 
     EUCLID_CONSTEXPR float operator()(const std::size_t row, const std::size_t col) const noexcept {
-        return const_cast<Mat2*>(this)->operator()(row, col);
+        return getVec4Data(mat, 2 * row + col);
     }
 
     Vec4 mat;
