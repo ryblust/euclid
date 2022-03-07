@@ -1,7 +1,7 @@
 #pragma once
 
+#include "Utility.hpp"
 #include "Vec8.hpp"
-#include "Util.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -21,14 +21,14 @@ struct alignas(32) Mat4 {
     }
 
     EUCLID_CONSTEXPR float& operator()(const std::size_t row, const std::size_t col) noexcept {
-        if (row > 2) {
+        if (row > 1) {
             return getVec8RefData(mat[1], 4 * row + col - 8);
         }
         return getVec8RefData(mat[0], 4 * row + col);
     }
 
     EUCLID_CONSTEXPR float operator()(const std::size_t row, const std::size_t col) const noexcept {
-        if (row > 2) {
+        if (row > 1) {
             return getVec8Data(mat[1], 4 * row + col - 8);
         }
         return getVec8Data(mat[0], 4 * row + col);
@@ -36,56 +36,59 @@ struct alignas(32) Mat4 {
 
     EUCLID_CONSTEXPR Vec4 operator[](const std::size_t pos) const noexcept {
         if (__builtin_is_constant_evaluated()) {
-            const float a0 = getVec8Data(mat[0], pos);
-            const float a1 = getVec8Data(mat[0], pos + 4);
-            const float a2 = getVec8Data(mat[1], pos);
-            const float a3 = getVec8Data(mat[1], pos + 4);
-            return { a0,a1,a2,a3 };
+            const float x = getVec8Data(mat[0], pos);
+            const float y = getVec8Data(mat[0], pos + 4);
+            const float z = getVec8Data(mat[1], pos);
+            const float w = getVec8Data(mat[1], pos + 4);
+            return { x,y,z,w };
         }
         switch (pos) {
             case 0: {
-                const Vec8 data = _mm256_unpacklo_ps(mat[0], mat[1]);
-                const Vec4 extract = _mm256_extractf128_ps(data, 1);
-                return _mm_unpacklo_ps(_mm256_castps256_ps128(data), extract);
+                const Vec8 unpackl = _mm256_unpacklo_ps(mat[0], mat[1]);
+                const Vec4 extract = _mm256_extractf128_ps(unpackl, 1);
+                return _mm_unpacklo_ps(_mm256_castps256_ps128(unpackl), extract);
             }
             case 1: {
-                const Vec8 data = _mm256_unpacklo_ps(mat[0], mat[1]);
-                const Vec4 extract = _mm256_extractf128_ps(data, 1);
-                return _mm_unpackhi_ps(_mm256_castps256_ps128(data), extract);
+                const Vec8 unpackl = _mm256_unpacklo_ps(mat[0], mat[1]);
+                const Vec4 extract = _mm256_extractf128_ps(unpackl, 1);
+                return _mm_unpackhi_ps(_mm256_castps256_ps128(unpackl), extract);
             }
             case 2: {
-                const Vec8 data = _mm256_unpackhi_ps(mat[0], mat[1]);
-                const Vec4 extract = _mm256_extractf128_ps(data, 1);
-                return _mm_unpacklo_ps(_mm256_castps256_ps128(data), extract);
+                const Vec8 unpackh = _mm256_unpackhi_ps(mat[0], mat[1]);
+                const Vec4 extract = _mm256_extractf128_ps(unpackh, 1);
+                return _mm_unpacklo_ps(_mm256_castps256_ps128(unpackh), extract);
             }
             case 3: {
-                const Vec8 data = _mm256_unpackhi_ps(mat[0], mat[1]);
-                const Vec4 extract = _mm256_extractf128_ps(data, 1);
-                return _mm_unpackhi_ps(_mm256_castps256_ps128(data), extract);
+                const Vec8 unpackh = _mm256_unpackhi_ps(mat[0], mat[1]);
+                const Vec4 extract = _mm256_extractf128_ps(unpackh, 1);
+                return _mm_unpackhi_ps(_mm256_castps256_ps128(unpackh), extract);
             }
-            default: return setZeroVec4();
+            default: return _mm_setzero_ps();
         }
     }
 
     Vec8 mat[2];
 };
 
-EUCLID_QUALIFIER Mat4 EUCLID_CALL transpose(Mat4 a) noexcept {
+EUCLID_QUALIFIER Mat4 EUCLID_CALL transpose(const Mat4 a) noexcept {
     if (__builtin_is_constant_evaluated()) {
-        util::swap(a(0, 1), a(1, 0));
-        util::swap(a(0, 2), a(2, 0));
-        util::swap(a(0, 3), a(3, 0));
-        util::swap(a(1, 2), a(2, 1));
-        util::swap(a(1, 3), a(3, 1));
-        util::swap(a(2, 3), a(3, 2));
-        return a;
+        return { {
+            { a(0,0), a(1,0), a(2,0), a(3,0),
+              a(0,1), a(1,1), a(2,1), a(3,1) },
+            { a(0,2), a(1,2), a(2,2), a(3,2),
+              a(0,3), a(1,3), a(2,3), a(3,3) }
+        } };
     }
-    const __m256i mask = _mm256_set_epi32(7,3,6,2,5,1,4,0);
-    const Vec8 unpack1 = _mm256_unpacklo_ps(a.mat[0], a.mat[1]);
-    const Vec8 unpack2 = _mm256_unpackhi_ps(a.mat[0], a.mat[1]);
-    const Vec8 trans1  = _mm256_permutevar8x32_ps(unpack1, mask);
-    const Vec8 trans2  = _mm256_permutevar8x32_ps(unpack2, mask);
-    return { { trans1, trans2 } };
+    const auto codindex = _mm256_set_epi32(7,3,6,2,5,1,4,0);
+    const Vec8 unpacklo = _mm256_unpacklo_ps(a.mat[0], a.mat[1]);
+    const Vec8 unpackhi = _mm256_unpackhi_ps(a.mat[0], a.mat[1]);
+    const Vec8 permutel = _mm256_permutevar8x32_ps(unpacklo, codindex);
+    const Vec8 permuteh = _mm256_permutevar8x32_ps(unpackhi, codindex);
+    return { { permutel, permuteh } };
+}
+
+EUCLID_QUALIFIER Mat4 EUCLID_CALL operator-(const Mat4 a) noexcept {
+    return { { -a.mat[0], -a.mat[1] } };
 }
 
 EUCLID_QUALIFIER Mat4 EUCLID_CALL operator+(const Mat4 a, const Mat4 b) noexcept {
@@ -105,9 +108,9 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL operator*(const Mat4 m, const Vec4 v) noexcept
             a[2] += getVec8Data(m.mat[1], i)     * getVec4Data(v, i);
             a[3] += getVec8Data(m.mat[1], i + 4) * getVec4Data(v, i);
         }
-        return { a[0], a[1], a[2], a[3] };
+        return { a[0],a[1],a[2],a[3] };
     }
-    const __m256i mask = _mm256_set_epi32(0,0,0,0,5,1,4,0);
+    const auto mask = _mm256_set_epi32(0,0,0,0,5,1,4,0);
     const Vec8 data = _mm256_set_m128(v, v);
     const Vec8 mul1 = _mm256_mul_ps(m.mat[0], data);
     const Vec8 mul2 = _mm256_mul_ps(m.mat[1], data);
@@ -119,12 +122,8 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL operator*(const Mat4 m, const Vec4 v) noexcept
 
 EUCLID_QUALIFIER Mat4 EUCLID_CALL operator*(const Mat4 a, const Mat4 b) noexcept {
     if (__builtin_is_constant_evaluated()) {
-        const Vec4 data1 = a * b[0];
-        const Vec4 data2 = a * b[1];
-        const Vec4 data3 = a * b[2];
-        const Vec4 data4 = a * b[3];
-        const Mat4 temp = { { combine2Vec4(data1, data2), combine2Vec4(data3, data4) } };
-        return transpose(temp);
+        const Vec4 row[4]{ a * b[0], a * b[1], a * b[2], a * b[3] };
+        return transpose({{ combine2Vec4(row[0], row[1]), combine2Vec4(row[2], row[3]) }});
     }
     Vec8 a0 = _mm256_shuffle_ps(a.mat[0], a.mat[0], EUCLID_SHUFFLE_MASK(0, 0, 0, 0));
     Vec8 a1 = _mm256_shuffle_ps(a.mat[1], a.mat[1], EUCLID_SHUFFLE_MASK(0, 0, 0, 0));
@@ -150,11 +149,11 @@ EUCLID_QUALIFIER Mat4 EUCLID_CALL operator*(const Mat4 a, const Mat4 b) noexcept
 }
 
 EUCLID_QUALIFIER Mat4 EUCLID_CALL operator*(const Mat4 a, const float v) noexcept {
-    return { { a.mat[0] * v, a.mat[1] * v} };
+    return { { a.mat[0] * v, a.mat[1] * v } };
 }
 
 EUCLID_QUALIFIER Mat4 EUCLID_CALL operator*(const float v, const Mat4 a) noexcept {
-    return { { a.mat[0] * v, a.mat[1] * v} };
+    return { { a.mat[0] * v, a.mat[1] * v } };
 }
 
 EUCLID_QUALIFIER Mat4& EUCLID_CALL operator+=(Mat4& a, const Mat4 b) noexcept {
@@ -173,7 +172,7 @@ EUCLID_QUALIFIER Mat4& EUCLID_CALL operator*=(Mat4& a, const float v) noexcept {
 }
 
 EUCLID_QUALIFIER bool EUCLID_CALL operator==(const Mat4 a, const Mat4 b) noexcept {
-    return a[0] == b[0] && a[1] == b[1];
+    return a.mat[0] == b.mat[0] && a.mat[1] == b.mat[1];
 }
 
 EUCLID_QUALIFIER bool EUCLID_CALL operator!=(const Mat4 a, const Mat4 b) noexcept {

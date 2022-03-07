@@ -12,89 +12,79 @@
 namespace euclid {
 
 struct Vec3 {
-    using value_type = float;
-
-    constexpr Vec3& EUCLID_CALL operator+=(const Vec3 v) noexcept {
-        x += v.x;
-        y += v.y;
-        z += v.z;
-        return *this;
-    }
-
-    constexpr Vec3& EUCLID_CALL operator-=(const Vec3 v) noexcept {
-        x -= v.x;
-        y -= v.y;
-        z -= v.z;
-        return *this;
-    }
-
-    constexpr Vec3& EUCLID_CALL operator*=(const Vec3 v) noexcept {
-        x *= v.x;
-        y *= v.y;
-        z *= v.z;
-        return *this;
-    }
-
-    constexpr Vec3& EUCLID_CALL operator*=(const float scale) noexcept {
-        x *= scale;
-        y *= scale;
-        z *= scale;
-        return *this;
-    }
-
-    constexpr Vec3& EUCLID_CALL operator/=(const Vec3 v) noexcept {
-        x /= v.x;
-        y /= v.y;
-        z /= v.z;
-        return *this;
-    }
-
-    constexpr Vec3& EUCLID_CALL operator/=(const float scale) noexcept {
-        x /= scale;
-        y /= scale;
-        z /= scale;
-        return *this;
-    }
-
-    constexpr Vec3 EUCLID_CALL operator+(const Vec3 v) const noexcept {
-        return { x + v.x, y + v.y, z + v.z };
-    }
-
-    constexpr Vec3 EUCLID_CALL operator-(const Vec3 v) const noexcept {
-        return { x - v.x, y - v.y, z - v.z };
-    }
-
-    constexpr Vec3 EUCLID_CALL operator*(const Vec3 v) const noexcept {
-        return { x * v.x, y * v.y, z * v.z };
-    }
-
-    constexpr Vec3 EUCLID_CALL operator*(const float scale) const noexcept {
-        return { x * scale, y * scale, z * scale };
-    }
-
-    constexpr Vec3 EUCLID_CALL operator/(const Vec3 v) const noexcept {
-        return { x / v.x, y / v.y, z / v.z };
-    }
-
-    constexpr Vec3 EUCLID_CALL operator/(const float scale) const noexcept {
-        return { x / scale, y / scale, z / scale };
-    }
-
-    constexpr Vec3 EUCLID_CALL operator-() const noexcept {
-        return { -x, -y, -z };
-    }
-
-    constexpr bool EUCLID_CALL operator==(const Vec3 v) const noexcept {
-        return x == v.x && y == v.y && z == v.z;
-    }
-
-    constexpr bool EUCLID_CALL operator!=(const Vec3 v) const noexcept {
-        return !(this->operator==(v));
-    }
-
     float x, y, z;
 };
-  
+
+constexpr Vec3 EUCLID_CALL operator+(const Vec3 a, const Vec3 b) noexcept {
+    return { a.x + b.x, a.y + b.y, a.z + b.z };
+}
+
+constexpr Vec3 EUCLID_CALL operator-(const Vec3 a, const Vec3 b) noexcept {
+    return { a.x - b.x, a.y - b.y, a.z - b.z };
+}
+
+constexpr Vec3 EUCLID_CALL operator*(const Vec3 a, const Vec3 b) noexcept {
+    return { a.x * b.x, a.y * b.y, a.z * b.z };
+}
+
+constexpr Vec3 EUCLID_CALL operator*(const Vec3 a, const float scale) noexcept {
+    return { a.x * scale, a.y * scale, a.z * scale };
+}
+
+constexpr Vec3 EUCLID_CALL operator*(const float scale, const Vec3 a) noexcept {
+    return a * scale;
+}
+
+constexpr Vec3 EUCLID_CALL operator/(const Vec3 a, const Vec3 b) noexcept {
+    return { a.x / b.x, a.y / b.y, a.z / b.z };
+}
+
+constexpr Vec3 EUCLID_CALL operator/(const Vec3 a, const float scale) noexcept {
+    return { a.x / scale, a.y / scale, a.z / scale };
+}
+
+constexpr Vec3 EUCLID_CALL operator-(const Vec3 a) noexcept {
+    return { -a.x, -a.y, -a.z };
+}
+
+constexpr Vec3& EUCLID_CALL operator+=(Vec3& a, const Vec3 b) noexcept {
+    a = a + b;
+    return a;
+}
+
+constexpr Vec3& EUCLID_CALL operator-=(Vec3& a, const Vec3 b) noexcept {
+    a = a - b;
+    return a;
+}
+
+constexpr Vec3& EUCLID_CALL operator*=(Vec3& a, const Vec3 b) noexcept {
+    a = a * b;
+    return a;
+}
+
+constexpr Vec3& EUCLID_CALL operator*=(Vec3& a, const float scale) noexcept {
+    a = a * scale;
+    return a;
+}
+
+constexpr Vec3& EUCLID_CALL operator/=(Vec3& a, const Vec3 b) noexcept {
+    a = a / b;
+    return a;
+}
+
+constexpr Vec3& EUCLID_CALL operator/=(Vec3& a, const float scale) noexcept {
+    a = a / scale;
+    return a;
+}
+
+constexpr bool EUCLID_CALL operator==(const Vec3 a, const Vec3 b) noexcept {
+    return a.x == b.x && a.y == b.y && a.z == b.z;
+}
+
+constexpr bool EUCLID_CALL operator!=(const Vec3 a, const Vec3 b) noexcept {
+    return !(a == b);
+}
+
 }
 
 #ifdef _MSC_VER

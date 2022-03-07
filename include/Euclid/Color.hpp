@@ -5,7 +5,7 @@
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4201)
-// C4201 : Use the non-standard extension : unnamed union
+// C4201 : Use the non-standard extension : anonymous union
 #endif
 
 namespace euclid {

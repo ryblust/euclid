@@ -12,82 +12,78 @@
 namespace euclid {
 
 struct Vec2 {
-    using value_type = float;
-
-    constexpr Vec2& EUCLID_CALL operator+=(const Vec2 v) noexcept {
-        x += v.x;
-        y += v.y;
-        return *this;
-    }
-
-    constexpr Vec2& EUCLID_CALL operator-=(const Vec2 v) noexcept {
-        x -= v.x;
-        y -= v.y;
-        return *this;
-    }
-
-    constexpr Vec2& EUCLID_CALL operator*=(const Vec2 v) noexcept {
-        x *= v.x;
-        y *= v.y;
-        return *this;
-    }
-
-    constexpr Vec2& EUCLID_CALL operator*=(const float scale) noexcept {
-        x *= scale;
-        y *= scale;
-        return *this;
-    }
-
-    constexpr Vec2& EUCLID_CALL operator/=(const Vec2 v) noexcept {
-        x /= v.x;
-        y /= v.y;
-        return *this;
-    }
-
-    constexpr Vec2& EUCLID_CALL operator/=(const float scale) noexcept {
-        x /= scale;
-        y /= scale;
-        return *this;
-    }
-
-    constexpr Vec2 EUCLID_CALL operator+(const Vec2 v) const noexcept {
-        return { x + v.x, y + v.y };
-    }
-
-    constexpr Vec2 EUCLID_CALL operator-(const Vec2 v) const noexcept {
-        return { x - v.x, y - v.y };
-    }
-
-    constexpr Vec2 EUCLID_CALL operator*(const Vec2 v) const noexcept {
-        return { x * v.x, y * v.y };
-    }
-
-    constexpr Vec2 EUCLID_CALL operator*(const float scale) const noexcept {
-        return { x * scale, y * scale };
-    }
-
-    constexpr Vec2 EUCLID_CALL operator/(const Vec2 v) const noexcept {
-        return { x / v.x, y / v.y };
-    }
-
-    constexpr Vec2 EUCLID_CALL operator/(const float scale) const noexcept {
-        return { x / scale, y / scale };
-    }
-
-    constexpr Vec2 EUCLID_CALL operator-() const noexcept {
-        return { -x, -y };
-    }
-
-    constexpr bool EUCLID_CALL operator==(const Vec2 v) const noexcept {
-        return x == v.x && y == v.y;
-    }
-
-    constexpr bool EUCLID_CALL operator!=(const Vec2 v) const noexcept {
-        return !(this->operator==(v));
-    }
-
     float x, y;
 };
+
+constexpr Vec2 EUCLID_CALL operator+(const Vec2 a, const Vec2 b) noexcept {
+    return { a.x + b.x, a.y + b.y };
+}
+
+constexpr Vec2 EUCLID_CALL operator-(const Vec2 a, const Vec2 b) noexcept {
+    return { a.x - b.x, a.y - b.y };
+}
+
+constexpr Vec2 EUCLID_CALL operator*(const Vec2 a, const Vec2 b) noexcept {
+    return { a.x * b.x, a.y * b.y };
+}
+
+constexpr Vec2 EUCLID_CALL operator*(const Vec2 a, const float scale) noexcept {
+    return { a.x * scale, a.y * scale };
+}
+
+constexpr Vec2 EUCLID_CALL operator*(const float scale, const Vec2 a) noexcept {
+    return a * scale;
+}
+
+constexpr Vec2 EUCLID_CALL operator/(const Vec2 a, const Vec2 b) noexcept {
+    return { a.x / b.x, a.y / b.y };
+}
+
+constexpr Vec2 EUCLID_CALL operator/(const Vec2 a, const float scale) noexcept {
+    return { a.x / scale, a.y / scale };
+}
+
+constexpr Vec2 EUCLID_CALL operator-(const Vec2 a) noexcept {
+    return { -a.x, -a.y };
+}
+
+constexpr Vec2& EUCLID_CALL operator+=(Vec2& a, const Vec2 b) noexcept {
+    a = a + b;
+    return a;
+}
+
+constexpr Vec2& EUCLID_CALL operator-=(Vec2& a, const Vec2 b) noexcept {
+    a = a - b;
+    return a;
+}
+
+constexpr Vec2& EUCLID_CALL operator*=(Vec2& a, const Vec2 b) noexcept {
+    a = a * b;
+    return a;
+}
+
+constexpr Vec2& EUCLID_CALL operator*=(Vec2& a, const float scale) noexcept {
+    a = a * scale;
+    return a;
+}
+
+constexpr Vec2& EUCLID_CALL operator/=(Vec2& a, const Vec2 b) noexcept {
+    a = a / b;
+    return a;
+}
+
+constexpr Vec2& EUCLID_CALL operator/=(Vec2& a, const float scale) noexcept {
+    a = a / scale;
+    return a;
+}
+
+constexpr bool EUCLID_CALL operator==(const Vec2 a, const Vec2 b) noexcept {
+    return a.x == b.x && a.y == b.y;
+}
+
+constexpr bool EUCLID_CALL operator!=(const Vec2 a, const Vec2 b) noexcept {
+    return !(a == b);
+}
 
 }
 

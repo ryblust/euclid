@@ -51,9 +51,9 @@ EUCLID_QUALIFIER float EUCLID_CALL lengthEst(const Vec4 a) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return math::sqrt(dot(a, a));
     }
-    const Vec4 dotVec = _mm_dp_ps(a, a, 0xff);
-    const Vec4 rsqrt  = _mm_rsqrt_ps(dotVec);
-    return _mm_cvtss_f32(_mm_mul_ps(rsqrt, dotVec));
+    const Vec4 dpvec = _mm_dp_ps(a, a, 0xff);
+    const Vec4 rsqrt = _mm_rsqrt_ps(dpvec);
+    return _mm_cvtss_f32(_mm_mul_ps(rsqrt, dpvec));
 }
 
 EUCLID_QUALIFIER Vec2 EUCLID_CALL normalize(const Vec2 a) noexcept {
@@ -95,12 +95,11 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL cross(const Vec4 a, const Vec4 b) noexcept {
             0
         };
     }
-    const Vec4 temp1 = _mm_shuffle_ps(a, a, EUCLID_SHUFFLE_MASK(1, 2, 0, 3));
-    const Vec4 temp2 = _mm_shuffle_ps(b, b, EUCLID_SHUFFLE_MASK(1, 2, 0, 3));
-    const Vec4 temp3 = _mm_mul_ps(temp1, b);
-    const Vec4 temp4 = _mm_mul_ps(a, temp2);
-    const Vec4 temp5 = _mm_sub_ps(temp4, temp3);
-    return _mm_shuffle_ps(temp5, temp5, EUCLID_SHUFFLE_MASK(1, 2, 0, 3));
+    const Vec4 v1 = EUCLID_PERMUTE_VEC4(a, 1, 2, 0, 3);
+    const Vec4 v2 = EUCLID_PERMUTE_VEC4(b, 1, 2, 0, 3);
+    const Vec4 v3 = _mm_mul_ps(v1, b);
+    const Vec4 v4 = _mm_fmsub_ps(v2, a, v3);
+    return EUCLID_PERMUTE_VEC4(v4, 1, 2, 0, 3);
 }
 
 }

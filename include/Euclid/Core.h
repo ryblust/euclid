@@ -18,6 +18,8 @@
 #endif
 
 #define EUCLID_QUALIFIER EUCLID_FORCEINLINE EUCLID_CONSTEXPR
+#define EUCLID_SHUFFLE_MASK(x, y, z, w) (((w) << 6) | ((z) << 4) | ((y) << 2) | ((x)))
+#define EUCLID_PERMUTE_VEC4(vec, x, y, z, w) _mm_shuffle_ps((vec), (vec), EUCLID_SHUFFLE_MASK((x), (y), (z), (w)))
 
 namespace euclid {
 
@@ -27,7 +29,7 @@ using Vec8 = __m256;
 #else
 struct alignas(16) Vec4 final {
     constexpr Vec4() noexcept : v(__m128{ 0, 0, 0, 0 }) {}
-    constexpr Vec4(const float a0, const float a1, const float a2, const float a3) noexcept : v(__m128{ a0,a1,a2,a3 }) {}
+    constexpr Vec4(const float x, const float y, const float z, const float w) noexcept : v(__m128{ x,y,z,w }) {}
     constexpr Vec4(const __m128 m) noexcept : v(m) {}
     constexpr operator __m128() const { return v; }
     __m128 v;

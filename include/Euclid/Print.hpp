@@ -62,7 +62,7 @@ inline void printImpl(const Mat4 m) noexcept {
 template<trait::euclid_component T, trait::euclid_component... Rest>
 inline void print(const T first, const Rest... rest) noexcept {
     detail::printImpl(first);
-    if constexpr (sizeof...(rest) != 0) {
+    if constexpr (sizeof...(rest) > 0) {
         print(rest...);
     }
 }

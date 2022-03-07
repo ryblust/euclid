@@ -37,7 +37,11 @@ EUCLID_QUALIFIER Mat2 EUCLID_CALL transpose(const Mat2 m) noexcept {
             m(0, 1), m(1, 1)
         } };
     }
-    return { _mm_shuffle_ps(m.mat, m.mat, EUCLID_SHUFFLE_MASK(0, 2, 1, 3)) };
+    return { EUCLID_PERMUTE_VEC4(m.mat, 0, 2, 1, 3) };
+}
+
+EUCLID_QUALIFIER Mat2 EUCLID_CALL operator-(const Mat2 a) noexcept {
+    return { -a.mat };
 }
 
 EUCLID_QUALIFIER Mat2 EUCLID_CALL operator+(const Mat2 a, const Mat2 b) noexcept {
@@ -56,12 +60,12 @@ EUCLID_QUALIFIER Mat2 EUCLID_CALL operator*(const Mat2 a, const Mat2 b) noexcept
         const float v3 = a(1, 0) * b(1, 0) + a(1, 1) * b(1, 1);
         return { { v0, v1, v2, v3 } };
     }
-    const Vec4 mul1 = _mm_shuffle_ps(b.mat, b.mat, EUCLID_SHUFFLE_MASK(0, 2, 0, 2));
-    const Vec4 mul2 = _mm_shuffle_ps(b.mat, b.mat, EUCLID_SHUFFLE_MASK(1, 3, 1, 3));
+    const Vec4 mul1 = EUCLID_PERMUTE_VEC4(b.mat, 0, 2, 0, 2);
+    const Vec4 mul2 = EUCLID_PERMUTE_VEC4(b.mat, 1, 3, 1, 3);
     const Vec4 res1 = _mm_mul_ps(a.mat, mul1);
     const Vec4 res2 = _mm_mul_ps(a.mat, mul2);
     const Vec4 res3 = _mm_hadd_ps(res1, res2);
-    const Vec4 res  = _mm_shuffle_ps(res3, res3, EUCLID_SHUFFLE_MASK(0, 2, 1, 3));
+    const Vec4 res  = EUCLID_PERMUTE_VEC4(res3, 0, 2, 1, 3);
     return { res };
 }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+// constexpr <cmath>
+
 #include "Core.h"
 #include <cmath>
 

@@ -12,17 +12,17 @@
 namespace euclid::util {
 
 template<arithmetic T>
-EUCLID_QUALIFIER T clamp(const T val, const T min, const T max) noexcept {
+EUCLID_FORCEINLINE constexpr T clamp(const T val, const T min, const T max) noexcept {
     return val < min ? min : max < val ? max : val;
 }
 
 template<floating_point T> 
-EUCLID_QUALIFIER T lerp(const T a, const T b, const T t) noexcept {
+EUCLID_FORCEINLINE constexpr T lerp(const T a, const T b, const T t) noexcept {
     return a + t * (b - a);
 }
 
 template<arithmetic T>
-EUCLID_QUALIFIER T saturate(const T val) noexcept {
+EUCLID_FORCEINLINE constexpr T saturate(const T val) noexcept {
     return val > 1 ? 1 : val < 0 ? 0 : val;
 }
 

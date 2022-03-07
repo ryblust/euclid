@@ -23,8 +23,7 @@ EUCLID_QUALIFIER float& getVec8RefData(Vec8& a, const std::size_t pos) noexcept 
 #ifdef _MSC_VER
     return a.m256_f32[pos];
 #elif __clang__
-    float* p = (float*)&a;
-    return *(p + pos);
+    return *(reinterpret_cast<float*>(&a) + pos);
 #else
     return a[pos];
 #endif
@@ -132,6 +131,10 @@ EUCLID_QUALIFIER Vec8 EUCLID_CALL operator/(const Vec8 a, const float v) noexcep
     return a / set1Vec8(v);
 }
 
+EUCLID_QUALIFIER Vec8 EUCLID_CALL operator-(const Vec8 a) noexcept {
+    return setZeroVec8() - a;
+}
+
 EUCLID_QUALIFIER Vec8& EUCLID_CALL operator+=(Vec8& a, const Vec8 b) noexcept {
     a = a + b;
     return a;
@@ -162,19 +165,18 @@ EUCLID_QUALIFIER Vec8& EUCLID_CALL operator/=(Vec8& a, const float v) noexcept {
     return a;
 }
 
-EUCLID_QUALIFIER Vec8 EUCLID_CALL operator-(const Vec8 a) noexcept {
-    return setZeroVec8() - a;
-}
-
 EUCLID_QUALIFIER bool EUCLID_CALL operator==(const Vec8 a, const Vec8 b) noexcept {
-    return getVec8Data(a, 0) == getVec8Data(b, 0) && 
-           getVec8Data(a, 1) == getVec8Data(b, 1) &&
-           getVec8Data(a, 2) == getVec8Data(b, 2) &&
-           getVec8Data(a, 3) == getVec8Data(b, 3) &&
-           getVec8Data(a, 4) == getVec8Data(b, 4) &&
-           getVec8Data(a, 5) == getVec8Data(b, 5) &&
-           getVec8Data(a, 6) == getVec8Data(b, 6) &&
-           getVec8Data(a, 7) == getVec8Data(b, 7);
+    if (__builtin_is_constant_evaluated()) {
+        return getVec8Data(a, 0) == getVec8Data(b, 0) && 
+               getVec8Data(a, 1) == getVec8Data(b, 1) &&
+               getVec8Data(a, 2) == getVec8Data(b, 2) &&
+               getVec8Data(a, 3) == getVec8Data(b, 3) &&
+               getVec8Data(a, 4) == getVec8Data(b, 4) &&
+               getVec8Data(a, 5) == getVec8Data(b, 5) &&
+               getVec8Data(a, 6) == getVec8Data(b, 6) &&
+               getVec8Data(a, 7) == getVec8Data(b, 7);
+    }
+    return _mm256_movemask_ps(_mm256_cmp_ps(a, b, 0)) == 0xff ? true : false;
 }
 
 EUCLID_QUALIFIER bool EUCLID_CALL operator!=(const Vec8 a, const Vec8 b) noexcept {
