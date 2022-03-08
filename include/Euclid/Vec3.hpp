@@ -15,6 +15,14 @@ struct Vec3 {
     float x, y, z;
 };
 
+constexpr Vec3 EUCLID_CALL set1Vec3(const float val) noexcept {
+    return { val,val,val };
+}
+
+constexpr Vec3 EUCLID_CALL setZeroVec3() noexcept {
+    return { 0,0,0 };
+}
+
 constexpr Vec3 EUCLID_CALL operator+(const Vec3 a, const Vec3 b) noexcept {
     return { a.x + b.x, a.y + b.y, a.z + b.z };
 }
@@ -40,7 +48,8 @@ constexpr Vec3 EUCLID_CALL operator/(const Vec3 a, const Vec3 b) noexcept {
 }
 
 constexpr Vec3 EUCLID_CALL operator/(const Vec3 a, const float scale) noexcept {
-    return { a.x / scale, a.y / scale, a.z / scale };
+    const float rscale = 1.f / scale;
+    return a * rscale;
 }
 
 constexpr Vec3 EUCLID_CALL operator-(const Vec3 a) noexcept {

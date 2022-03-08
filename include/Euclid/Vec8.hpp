@@ -176,7 +176,7 @@ EUCLID_QUALIFIER bool EUCLID_CALL operator==(const Vec8 a, const Vec8 b) noexcep
                getVec8Data(a, 6) == getVec8Data(b, 6) &&
                getVec8Data(a, 7) == getVec8Data(b, 7);
     }
-    return _mm256_movemask_ps(_mm256_cmp_ps(a, b, 0)) == 0xff ? true : false;
+    return _mm256_movemask_ps(_mm256_cmp_ps(a, b, 0)) == 0xff;
 }
 
 EUCLID_QUALIFIER bool EUCLID_CALL operator!=(const Vec8 a, const Vec8 b) noexcept {

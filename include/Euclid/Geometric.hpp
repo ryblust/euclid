@@ -95,11 +95,11 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL cross(const Vec4 a, const Vec4 b) noexcept {
             0
         };
     }
-    const Vec4 v1 = EUCLID_PERMUTE_VEC4(a, 1, 2, 0, 3);
-    const Vec4 v2 = EUCLID_PERMUTE_VEC4(b, 1, 2, 0, 3);
+    const Vec4 v1 = _mm_permute_ps(a, _MM_SHUFFLE(3, 0, 2, 1));
+    const Vec4 v2 = _mm_permute_ps(b, _MM_SHUFFLE(3, 0, 2, 1));
     const Vec4 v3 = _mm_mul_ps(v1, b);
     const Vec4 v4 = _mm_fmsub_ps(v2, a, v3);
-    return EUCLID_PERMUTE_VEC4(v4, 1, 2, 0, 3);
+    return _mm_permute_ps(v4, _MM_SHUFFLE(3, 0, 2, 1));
 }
 
 }

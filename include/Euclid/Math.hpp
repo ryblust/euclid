@@ -20,7 +20,7 @@ inline constexpr Ty pi = static_cast<Ty>(3.1415926535897932384626433832795028841
 template<floating_point Ty>
 inline constexpr Ty radian = pi<Ty> / 180;
 
-EUCLID_FORCEINLINE constexpr float sqrt(const float number) noexcept {
+constexpr float sqrt(const float number) noexcept {
     if (__builtin_is_constant_evaluated()) {
         auto value = __builtin_bit_cast(unsigned, number) >> 1;
         auto magic = __builtin_bit_cast(float, 0x5f1ffff9 - value);
@@ -29,7 +29,7 @@ EUCLID_FORCEINLINE constexpr float sqrt(const float number) noexcept {
     return std::sqrt(number);
 }
 
-EUCLID_FORCEINLINE constexpr float cos(const float angle) noexcept {
+constexpr float cos(const float angle) noexcept {
     if (__builtin_is_constant_evaluated()) {
         const float first  = angle * radian<float> * angle * radian<float>;
         const float second = first * first;
@@ -39,7 +39,7 @@ EUCLID_FORCEINLINE constexpr float cos(const float angle) noexcept {
     return std::cos(angle * radian<float>);
 }
 
-EUCLID_FORCEINLINE constexpr float sin(const float angle) noexcept {
+constexpr float sin(const float angle) noexcept {
     if (__builtin_is_constant_evaluated()) {
         const float first  = angle  * radian<float>;
         const float square = first  * first;
@@ -51,7 +51,7 @@ EUCLID_FORCEINLINE constexpr float sin(const float angle) noexcept {
     return std::sin(angle * radian<float>);
 }
 
-EUCLID_FORCEINLINE constexpr float tan(const float angle) noexcept {
+constexpr float tan(const float angle) noexcept {
     if (__builtin_is_constant_evaluated()) {
         const float first  = (90 - angle) * radian<float>;
         const float square = first  * first;

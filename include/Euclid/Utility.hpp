@@ -9,21 +9,61 @@
 // C4514 : Ignore the compiler's warning about removing unused inline functions
 #endif
 
-namespace euclid::util {
+namespace euclid {
 
 template<arithmetic T>
-EUCLID_FORCEINLINE constexpr T clamp(const T val, const T min, const T max) noexcept {
+constexpr T clamp(const T val, const T min, const T max) noexcept {
     return val < min ? min : max < val ? max : val;
 }
 
 template<floating_point T> 
-EUCLID_FORCEINLINE constexpr T lerp(const T a, const T b, const T t) noexcept {
+constexpr T lerp(const T a, const T b, const T t) noexcept {
     return a + t * (b - a);
 }
 
 template<arithmetic T>
-EUCLID_FORCEINLINE constexpr T saturate(const T val) noexcept {
+constexpr T saturate(const T val) noexcept {
     return val > 1 ? 1 : val < 0 ? 0 : val;
+}
+
+constexpr Vec2 EUCLID_CALL clamp(const Vec2 v, const Vec2 min, const Vec2 max) noexcept {
+    return { clamp(v.x, min.x, max.x), clamp(v.y, min.y, max.y) };
+}
+
+constexpr Vec2 EUCLID_CALL clamp(const Vec2 v, const float min, const float max) noexcept {
+    return clamp(v, set1Vec2(min), set1Vec2(max));
+}
+
+constexpr Vec3 EUCLID_CALL clamp(const Vec3 v, const Vec3 min, const Vec3 max) noexcept {
+    return { clamp(v.x, min.x, max.x), clamp(v.y, min.y, max.y), clamp(v.z, min.z, max.z) };
+}
+
+constexpr Vec3 EUCLID_CALL clamp(const Vec3 v, const float min, const float max) noexcept {
+    return clamp(v, set1Vec3(min), set1Vec3(max));
+}
+
+constexpr Vec2 EUCLID_CALL lerp(const Vec2 a, const Vec2 b, const Vec2 t) noexcept {
+    return { lerp(a.x, b.x, t.x), lerp(a.y, b.y, t.y) };
+}
+
+constexpr Vec2 EUCLID_CALL lerp(const Vec2 a, const Vec2 b, const float t) noexcept {
+    return lerp(a, b, set1Vec2(t));
+}
+
+constexpr Vec3 EUCLID_CALL lerp(const Vec3 a, const Vec3 b, const Vec3 t) noexcept {
+    return { lerp(a.x, b.x, t.x), lerp(a.y, b.y, t.y), lerp(a.z, b.z, t.z) };
+}
+
+constexpr Vec3 EUCLID_CALL lerp(const Vec3 a, const Vec3 b, const float t) noexcept {
+    return lerp(a, b, set1Vec3(t));
+}
+
+constexpr Vec2 EUCLID_CALL saturate(const Vec2 a) noexcept {
+    return { saturate(a.x), saturate(a.y) };
+}
+
+constexpr Vec3 EUCLID_CALL saturate(const Vec3 a) noexcept {
+    return { saturate(a.x), saturate(a.y), saturate(a.z) };
 }
 
 EUCLID_QUALIFIER Vec4 EUCLID_CALL clamp(const Vec4 v, const Vec4 min, const Vec4 max) noexcept {

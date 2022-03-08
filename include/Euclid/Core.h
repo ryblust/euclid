@@ -18,8 +18,6 @@
 #endif
 
 #define EUCLID_QUALIFIER EUCLID_FORCEINLINE EUCLID_CONSTEXPR
-#define EUCLID_SHUFFLE_MASK(x, y, z, w) (((w) << 6) | ((z) << 4) | ((y) << 2) | ((x)))
-#define EUCLID_PERMUTE_VEC4(vec, x, y, z, w) _mm_shuffle_ps((vec), (vec), EUCLID_SHUFFLE_MASK((x), (y), (z), (w)))
 
 namespace euclid {
 

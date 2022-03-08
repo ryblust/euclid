@@ -144,7 +144,7 @@ EUCLID_QUALIFIER bool EUCLID_CALL operator==(const Vec4 a, const Vec4 b) noexcep
                getVec4Data(a, 2) == getVec4Data(b, 2) &&
                getVec4Data(a, 3) == getVec4Data(b, 3);
     }
-    return _mm_movemask_ps(_mm_cmpeq_ps(a, b)) == 0xf ? true : false;
+    return _mm_movemask_ps(_mm_cmpeq_ps(a, b)) == 0xf;
 }
 
 EUCLID_QUALIFIER bool EUCLID_CALL operator!=(const Vec4 a, const Vec4 b) noexcept {
