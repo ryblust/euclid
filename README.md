@@ -4,7 +4,7 @@
 ## Overview
 
 **Features**
-- Cross-platform
+- Cross-compiler
 - Compile-time calculation
 - SIMD Speed up (not support ARM)
 - Head-only

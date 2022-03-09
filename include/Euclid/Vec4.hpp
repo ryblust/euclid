@@ -15,7 +15,7 @@ EUCLID_QUALIFIER float getVec4Data(const Vec4 a, const std::size_t pos) noexcept
 #ifdef _MSC_VER
     return a.m128_f32[pos];
 #else
-    return a[pos];
+    return a.v[pos];
 #endif
 }
 
@@ -25,7 +25,7 @@ EUCLID_QUALIFIER float& getVec4RefData(Vec4& a, const std::size_t pos) noexcept 
 #elif __clang__
     return *(reinterpret_cast<float*>(&a) + pos);
 #else
-    return a[pos];
+    return a.v[pos];
 #endif
 }
 

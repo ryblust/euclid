@@ -76,6 +76,10 @@ EUCLID_QUALIFIER Mat2 EUCLID_CALL operator*(const float v, const Mat2 a) noexcep
     return { a.mat * v };
 }
 
+EUCLID_QUALIFIER Mat2 EUCLID_CALL operator/(const Mat2 a, const float v) noexcept {
+    return { a.mat / v };
+}
+
 EUCLID_QUALIFIER Mat2& EUCLID_CALL operator+=(Mat2& a, const Mat2 b) noexcept {
     a.mat += b.mat;
     return a;

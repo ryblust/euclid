@@ -48,8 +48,7 @@ constexpr Vec3 EUCLID_CALL operator/(const Vec3 a, const Vec3 b) noexcept {
 }
 
 constexpr Vec3 EUCLID_CALL operator/(const Vec3 a, const float scale) noexcept {
-    const float rscale = 1.f / scale;
-    return a * rscale;
+    return { a.x / scale, a.y / scale, a.z / scale };
 }
 
 constexpr Vec3 EUCLID_CALL operator-(const Vec3 a) noexcept {
