@@ -24,19 +24,22 @@ inline void printImpl(const Vec3 m) noexcept {
 
 inline void printImpl(const Vec4 m) noexcept {
     std::printf("[%.3f, %.3f, %.3f, %.3f]\n",
-        getVec4Data(m, 0), getVec4Data(m, 1), getVec4Data(m, 2), getVec4Data(m, 3)
-    );
+        getVec4Data(m, 0), getVec4Data(m, 1),
+        getVec4Data(m, 2), getVec4Data(m, 3));
 }
 
 inline void printImpl(const Vec8 m) noexcept {
     std::printf("[%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f]\n",
-        getVec8Data(m, 0), getVec8Data(m, 1), getVec8Data(m, 2), getVec8Data(m, 3),
-        getVec8Data(m, 4), getVec8Data(m, 5), getVec8Data(m, 6), getVec8Data(m, 7)
-    );
+        getVec8Data(m, 0), getVec8Data(m, 1),
+        getVec8Data(m, 2), getVec8Data(m, 3),
+        getVec8Data(m, 4), getVec8Data(m, 5),
+        getVec8Data(m, 6), getVec8Data(m, 7));
 }
 
 inline void printImpl(const Mat2 m) noexcept {
-    std::printf("%.3f, %.3f\n%.3f, %.3f\n", m(0, 0), m(0, 1), m(1, 0), m(1, 1));
+    std::printf("%.3f, %.3f\n%.3f, %.3f\n",
+        m(0, 0), m(0, 1),
+        m(1, 0), m(1, 1));
 }
 
 inline void printImpl(const Mat4 m) noexcept {
@@ -44,8 +47,7 @@ inline void printImpl(const Mat4 m) noexcept {
         m(0, 0), m(0, 1), m(0, 2), m(0, 3),
         m(1, 0), m(1, 1), m(1, 2), m(1, 3),
         m(2, 0), m(2, 1), m(2, 2), m(2, 3),
-        m(3, 0), m(3, 1), m(3, 2), m(3, 3)
-    );
+        m(3, 0), m(3, 1), m(3, 2), m(3, 3));
 }
 
 #ifdef _MSC_VER
