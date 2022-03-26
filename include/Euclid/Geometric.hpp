@@ -49,9 +49,9 @@ constexpr Vec3 EUCLID_CALL cross(const Vec3 a, const Vec3 b) noexcept {
 EUCLID_QUALIFIER float EUCLID_CALL dot(const Vec4 a, const Vec4 b) noexcept {
     if (__builtin_is_constant_evaluated()) {
         return getVec4Data(a, 0) * getVec4Data(b, 0) +
-            getVec4Data(a, 1) * getVec4Data(b, 1) +
-            getVec4Data(a, 2) * getVec4Data(b, 2) +
-            getVec4Data(a, 3) * getVec4Data(b, 3);
+               getVec4Data(a, 1) * getVec4Data(b, 1) +
+               getVec4Data(a, 2) * getVec4Data(b, 2) +
+               getVec4Data(a, 3) * getVec4Data(b, 3);
     }
     return _mm_cvtss_f32(_mm_dp_ps(a, b, 0xff));
 }
