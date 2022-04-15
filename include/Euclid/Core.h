@@ -3,19 +3,22 @@
 #include <immintrin.h>
 #include <type_traits>
 
-#ifdef _MSC_VER
-    #define EUCLID_FORCEINLINE [[msvc::forceinline]]
-    #define EUCLID_CALL __vectorcall
+#if defined(_MSC_VER) && !defined(__clang__)
+#define EUCLID_FORCEINLINE [[msvc::forceinline]]
 #else
-    #define EUCLID_FORCEINLINE inline __attribute__((always_inline))
-    #define EUCLID_CALL
-    #define EUCLID_MSVC_SAFEBUFFERS
+#define EUCLID_FORCEINLINE inline __attribute__((always_inline))
 #endif
 
 #ifndef __clang__
-    #define EUCLID_CONSTEXPR constexpr
+#define EUCLID_CONSTEXPR constexpr
 #else
-    #define EUCLID_CONSTEXPR
+#define EUCLID_CONSTEXPR
+#endif
+
+#ifdef _MSC_VER
+#define EUCLID_CALL __vectorcall
+#else
+#define EUCLID_CALL
 #endif
 
 #define EUCLID_QUALIFIER EUCLID_FORCEINLINE EUCLID_CONSTEXPR
