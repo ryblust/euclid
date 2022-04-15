@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Core.h"
+#include "Mat2.hpp"
+#include "Mat4.hpp"
 #include <cstdio>
 
 namespace euclid::debug {

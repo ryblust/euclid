@@ -23,7 +23,7 @@
 - `euclid::debug::print(...args)`
   ```c++
   #include <Euclid/Euclid.h>
-  #include <Euclid/Print.hpp> // please include this file after <Euclid.h>
+  #include <Euclid/Print.hpp>
 
   using namespace euclid;
 

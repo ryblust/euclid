@@ -30,10 +30,16 @@ using Vec4 = __m128;
 using Vec8 = __m256;
 #else
 struct alignas(16) Vec4 final {
+    constexpr Vec4(const float x, const float y, const float z, const float w) noexcept : v(__m128{ x,y,z,w }) {}
+    constexpr Vec4(const __m128 m) noexcept : v(m) {}
     constexpr operator __m128() const noexcept { return v; }
     __m128 v;
 };
 struct alignas(32) Vec8 final {
+    constexpr Vec8(const float x, const float y, const float z, const float w,
+                   const float a, const float b, const float c, const float d)
+        noexcept : v(__m256{ x,y,z,w,a,b,c,d }) {}
+    constexpr Vec8(const __m256 m) noexcept : v(m) {}
     constexpr operator __m256() const noexcept { return v; }
     __m256 v;
 };

@@ -13,7 +13,7 @@
 namespace euclid {
 
 EUCLID_QUALIFIER float getVec8Data(const Vec8 a, const std::size_t pos) noexcept {
-#ifdef _MSC_VER
+#if defined (_MSC_VER) && !defined(__clang__)
     return a.m256_f32[pos];
 #else
     return a.v[pos];
@@ -21,7 +21,7 @@ EUCLID_QUALIFIER float getVec8Data(const Vec8 a, const std::size_t pos) noexcept
 }
 
 EUCLID_QUALIFIER float& getVec8RefData(Vec8& a, const std::size_t pos) noexcept {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
     return a.m256_f32[pos];
 #elif __clang__
     return *(reinterpret_cast<float*>(&a) + pos);
