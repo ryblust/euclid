@@ -11,7 +11,7 @@ namespace detail {
 #pragma warning(push)
 #pragma warning(disable : 4514)
 // enable /Wall
-// C4514 : Ignore the compiler's warning about removing unused inline functions
+// C4514: remove unused inline functions
 #endif
 
 inline void printImpl(const Vec2 m) noexcept {
@@ -61,7 +61,7 @@ inline void printImpl(const Mat4 m) noexcept {
 #pragma GCC diagnostic ignored "-Wignored-attributes"
 #endif
 
-template<trait::euclid_component T, trait::euclid_component... Rest>
+template<euclid_component T, euclid_component... Rest>
 inline void print(const T first, const Rest... rest) noexcept {
     detail::printImpl(first);
     if constexpr (sizeof...(rest) > 0) {

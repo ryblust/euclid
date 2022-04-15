@@ -6,7 +6,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4514)
 // enable /Wall
-// C4514 : Ignore the compiler's warning about removing unused inline functions
+// C4514: removing unused inline functions
 #endif
 
 namespace euclid {

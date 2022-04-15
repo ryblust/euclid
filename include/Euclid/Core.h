@@ -9,6 +9,7 @@
 #else
     #define EUCLID_FORCEINLINE inline __attribute__((always_inline))
     #define EUCLID_CALL
+    #define EUCLID_MSVC_SAFEBUFFERS
 #endif
 
 #ifndef __clang__
@@ -21,25 +22,16 @@
 
 namespace euclid {
 
-#ifdef _MSC_VER
+#if defined (_MSC_VER) && !defined(__clang__) 
 using Vec4 = __m128;
 using Vec8 = __m256;
 #else
 struct alignas(16) Vec4 final {
-    constexpr Vec4() noexcept : v(__m128{ 0, 0, 0, 0 }) {}
-    constexpr Vec4(const float x, const float y, const float z, const float w)
-        noexcept : v(__m128{ x,y,z,w }) {}
-    constexpr Vec4(const __m128 m) noexcept : v(m) {}
-    constexpr operator __m128() const { return v; }
+    constexpr operator __m128() const noexcept { return v; }
     __m128 v;
 };
 struct alignas(32) Vec8 final {
-    constexpr Vec8() noexcept : v(__m256{ 0, 0, 0, 0, 0, 0, 0, 0 }) {}
-    constexpr Vec8(const float a0, const float a1, const float a2, const float a3,
-        const float a4, const float a5, const float a6, const float a7)
-        noexcept : v(__m256{ a0,a1,a2,a3,a4,a5,a6,a7 }) {}
-    constexpr Vec8(const __m256 m) noexcept : v(m) {}
-    constexpr operator __m256() const { return v; }
+    constexpr operator __m256() const noexcept { return v; }
     __m256 v;
 };
 #endif
@@ -62,8 +54,6 @@ concept floating_point = std::is_floating_point_v<Ty>;
 template<typename First, typename... Rest>
 concept is_any_type_of = std::disjunction_v<std::is_same<First, Rest>...>;
 
-namespace trait {
-
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wignored-attributes"
@@ -81,7 +71,5 @@ concept euclid_component = vector_type<T> || matrix_type<T>;
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
-
-}
 
 }

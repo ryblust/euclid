@@ -4,15 +4,16 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4514)
+#pragma warning(disable : 4514 5246)
 // enable /Wall
-// C4514 : Ignore the compiler's warning about removing unused inline functions
+// C4514: removing unused inline functions
+// C5246: the initialization of a subobject should be wrapped in braces
 #endif
 
 namespace euclid {
 
 EUCLID_QUALIFIER float getVec4Data(const Vec4 a, const std::size_t pos) noexcept {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
     return a.m128_f32[pos];
 #else
     return a.v[pos];
@@ -20,7 +21,7 @@ EUCLID_QUALIFIER float getVec4Data(const Vec4 a, const std::size_t pos) noexcept
 }
 
 EUCLID_QUALIFIER float& getVec4RefData(Vec4& a, const std::size_t pos) noexcept {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
     return a.m128_f32[pos];
 #elif __clang__
     return *(reinterpret_cast<float*>(&a) + pos);

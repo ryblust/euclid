@@ -6,3 +6,16 @@
 #include "Geometric.hpp"
 #include "Color.hpp"
 #include "Utility.hpp"
+
+using euclid::operator+;
+using euclid::operator-;
+using euclid::operator*;
+using euclid::operator/;
+
+using euclid::operator+=;
+using euclid::operator-=;
+using euclid::operator*=;
+using euclid::operator/=;
+
+using euclid::operator==;
+using euclid::operator!=;

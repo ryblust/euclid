@@ -5,12 +5,12 @@
 
 **Features**
 - Cross-compiler
-- Compile-time calculation
+- Compile-time calculation (not support Clang)
 - SIMD Speed up (not support ARM)
 - Head-only
 
 ## Introduction
-- Compile-time calculation (not support Clang)
+- Compile-time calculation
   ```c++
   using namespace euclid;
   constexpr Vec4 a { 1,2,3,0 };

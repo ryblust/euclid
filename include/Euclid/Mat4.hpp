@@ -5,10 +5,11 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4514 5045)
+#pragma warning(disable : 4514 5045 5246)
 // enable /Wall
-// C4514 : Ignore the compiler's warning about removing unused inline functions
-// C5045 : Spectre mitigation
+// C4514: remove unused inline functions
+// C5045: spectre mitigation
+// C5246: the initialization of a subobject should be wrapped in braces
 #endif
 
 namespace euclid {
