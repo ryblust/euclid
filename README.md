@@ -6,7 +6,7 @@
 **Features**
 - Cross-compiler
 - Compile-time calculation (not support Clang)
-- SIMD Speed up (not support ARM)
+- SIMD Speed up
 - Head-only
 
 ## Introduction
