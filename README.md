@@ -20,13 +20,11 @@
   
 - Print euclid components
   ```c++
-  #include <euclid/Print.hpp>
-
   using namespace euclid;
 
   Vec4 v{ 1,2,3,4 };
   constexpr auto m = Mat4::identity();
-  debug::print(v, m);
+  print(v, m);
   ```
 
 - Transformation (WIP)
