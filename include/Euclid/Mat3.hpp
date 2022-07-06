@@ -5,7 +5,7 @@
 namespace euclid {
 
 struct Mat3 {
-    Vec3 m[3];
+  Vec3 m[3];
 };
 
 }

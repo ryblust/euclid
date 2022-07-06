@@ -4,49 +4,49 @@
 #include <type_traits>
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#define EUCLID_FORCEINLINE [[msvc::forceinline]]
+  #define EUCLID_FORCEINLINE [[msvc::forceinline]]
 #else
-#define EUCLID_FORCEINLINE inline __attribute__((always_inline))
+  #define EUCLID_FORCEINLINE inline __attribute__((always_inline))
 #endif
 
 #ifndef __clang__
-#define EUCLID_CONSTEXPR constexpr
+  #define EUCLID_CONSTEXPR constexpr
 #else
-#define EUCLID_CONSTEXPR
+  #define EUCLID_CONSTEXPR
 #endif
 
 #ifdef _MSC_VER
-#define EUCLID_CALL __vectorcall
+  #define EUCLID_CALL __vectorcall
 #else
-#define EUCLID_CALL
+  #define EUCLID_CALL
 #endif
 
 #define EUCLID_QUALIFIER EUCLID_FORCEINLINE EUCLID_CONSTEXPR
 
 namespace euclid {
 
-#if defined(_MSC_VER) && !defined (__clang__)
+#if defined(_MSC_VER) && !defined(__clang__)
 using Vec4  = __m128;
 using Vec8  = __m256;
 using Vec4d = __m256d;
 #else
 struct alignas(16) Vec4 final {
-    constexpr EUCLID_CALL operator __m128() const noexcept {
-        return v;
-    }
-    __m128 v;
+  constexpr EUCLID_CALL operator __m128() const noexcept {
+    return v;
+  }
+  __m128 v;
 };
 struct alignas(32) Vec8 final {
-    constexpr EUCLID_CALL operator __m256() const noexcept {
-        return v;
-    }
-    __m256 v;
+  constexpr EUCLID_CALL operator __m256() const noexcept {
+    return v;
+  }
+  __m256 v;
 };
 struct alignas(32) Vec4d final {
-    constexpr EUCLID_CALL operator __m256d() const noexcept {
-        return v;
-    }
-    __m256d v;
+  constexpr EUCLID_CALL operator __m256d() const noexcept {
+    return v;
+  }
+  __m256d v;
 };
 #endif
 
@@ -77,4 +77,4 @@ concept matrix_type = is_any_type_of<std::remove_cv_t<T>, Mat2, Mat3, Mat4>;
 template<typename T>
 concept euclid_component = vector_type<T> || matrix_type<T>;
 
-}
+} // namespace euclid

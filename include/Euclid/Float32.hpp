@@ -11,17 +11,16 @@
 
 namespace euclid {
 
-class Float32 {
-public:
+struct Float32 {
 	union {
-		struct {
-			std::uint32_t mantissa : 23;
-			std::uint32_t exponent :  8;
-			std::uint32_t sign     :  1;
-		} bits; // default little-endian
-		float value;
+	  struct {
+		  std::uint32_t mantissa : 23;
+		  std::uint32_t exponent :  8;
+		  std::uint32_t sign     :  1;
+	  } bits; // default little-endian
+	  float value;
 	};
-    constexpr Float32(const float val) noexcept : value(val) {}
+  constexpr Float32(const float val) noexcept : value(val) {}
 };
 
 }
