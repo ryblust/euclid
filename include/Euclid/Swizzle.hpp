@@ -139,4 +139,4 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL shuffle(Vec4 a, Vec4 b) noexcept {
 //     return { _mm_shuffle_ps(a, b, _MM_SHUFFLE(w, z, y, x)) };
 // }
 
-}
+} // namespace euclid

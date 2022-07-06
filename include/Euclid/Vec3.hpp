@@ -149,7 +149,7 @@ constexpr Vec3 EUCLID_CALL saturate(const Vec3 a) noexcept {
   };
 }
 
-}
+} // namespace euclid
 
 #ifdef _MSC_VER
 #pragma warning(pop)

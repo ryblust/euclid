@@ -104,7 +104,7 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL cross(Vec4 a, Vec4 b) noexcept {
   return { _mm_permute_ps(v4, _MM_SHUFFLE(3, 0, 2, 1)) };
 }
 
-}
+} // namespace euclid
 
 #ifdef _MSC_VER
 #pragma warning(pop)

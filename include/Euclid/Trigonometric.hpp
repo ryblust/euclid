@@ -79,7 +79,7 @@ constexpr float tan(const float angle) noexcept {
 #endif
 }
 
-}
+} // namespace euclid::math
 
 #ifdef _MSC_VER
 #pragma warning(pop)

@@ -23,7 +23,7 @@ struct Color {
   std::uint8_t r, g, b, a;
 };
 
-}
+} // namespace euclid
 
 #ifdef _MSC_VER
 #pragma warning(pop)

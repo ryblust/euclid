@@ -115,7 +115,7 @@ EUCLID_QUALIFIER bool EUCLID_CALL equals(Mat2 a, Mat2 b) noexcept {
   return equals(a.mat, b.mat);
 }
 
-}
+} // namespace euclid
 
 #ifdef _MSC_VER
 #pragma warning(pop)

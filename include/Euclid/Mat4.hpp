@@ -253,7 +253,7 @@ EUCLID_QUALIFIER bool EUCLID_CALL equals(Mat4 a, Mat4 b) noexcept {
   return equals(a.mat[0], b.mat[0]) && equals(a.mat[1], b.mat[1]);
 }
 
-}
+} // namespace euclid
 
 #ifdef _MSC_VER
 #pragma warning(pop)

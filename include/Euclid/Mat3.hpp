@@ -8,4 +8,4 @@ struct Mat3 {
   Vec3 m[3];
 };
 
-}
+} // namespace euclid

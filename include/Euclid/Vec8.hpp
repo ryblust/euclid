@@ -232,7 +232,7 @@ EUCLID_QUALIFIER bool EUCLID_CALL equals(Vec8 a, Vec8 b) noexcept {
   return a == b;
 }
 
-}
+} // namespace euclid
 
 #ifdef _MSC_VER
 #pragma warning(pop)

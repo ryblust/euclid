@@ -250,7 +250,7 @@ constexpr Vec2 saturate(detail::Vec2ArgType a) noexcept {
   return res;
 }
 
-}
+} // namespace euclid
 
 #ifdef _MSC_VER
 #pragma warning(pop)

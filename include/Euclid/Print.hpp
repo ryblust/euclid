@@ -90,4 +90,4 @@ inline std::ostream& operator<<(std::ostream& output, euclid_component auto a) n
 #pragma GCC diagnostic pop
 #endif
 
-}
+} // namespace euclid

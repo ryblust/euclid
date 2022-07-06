@@ -275,7 +275,7 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL saturate(Vec4 a) noexcept {
   return { _mm_max_ps(_mm_min_ps(a, _mm_set1_ps(1)), _mm_setzero_ps()) };
 }
 
-}
+} // namespace euclid
 
 #ifdef _MSC_VER
 #pragma warning(pop)

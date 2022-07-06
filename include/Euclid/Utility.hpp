@@ -31,4 +31,4 @@ constexpr bool floating_point_equals(T a, T b) noexcept {
   return absolute(a - b) < std::numeric_limits<T>::epsilon();
 }
 
-}
+} // namespace euclid::detail

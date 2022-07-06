@@ -23,7 +23,7 @@ struct Float32 {
   constexpr Float32(const float val) noexcept : value(val) {}
 };
 
-}
+} // namespace euclid
 
 #ifdef _MSC_VER
 #pragma warning(pop)

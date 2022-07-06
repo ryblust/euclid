@@ -4,4 +4,4 @@
 
 namespace euclid {
     
-}
+} // namespace euclid
