@@ -69,16 +69,16 @@ struct alignas(32) Mat4 {
   }
 
   EUCLID_CONSTEXPR Vec4 EUCLID_CALL getColumnVec4(std::size_t pos) const noexcept {
-    #ifndef __clang__
-      if (__builtin_is_constant_evaluated()) {
-        return {
-          getVec8Data(mat[0], pos),
-          getVec8Data(mat[0], pos + 4),
-          getVec8Data(mat[1], pos),
-          getVec8Data(mat[1], pos + 4)
-        };
-      }
-    #endif
+#ifndef __clang__
+    if (__builtin_is_constant_evaluated()) {
+      return {
+        getVec8Data(mat[0], pos),
+        getVec8Data(mat[0], pos + 4),
+        getVec8Data(mat[1], pos),
+        getVec8Data(mat[1], pos + 4)
+      };
+    }
+#endif
     // Todo: do not mix sse and avx
     // comment_assert(pos < 4);
     switch (pos) {

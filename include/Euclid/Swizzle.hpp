@@ -9,27 +9,27 @@ namespace detail {
 
 template<std::size_t X, std::size_t Y, std::size_t Z, std::size_t W>
 struct PermuteHelper {
-  
+
   static EUCLID_CONSTEXPR Vec4 EUCLID_CALL default_permute(Vec4 v) noexcept {
-    #ifndef __clang__
-      if (__builtin_is_constant_evaluated()) {
-        return {
-          getVec4Data(v, X),
-          getVec4Data(v, Y),
-          getVec4Data(v, Z),
-          getVec4Data(v, W)
-        };
-      }
-    #endif
+#ifndef __clang__
+    if (__builtin_is_constant_evaluated()) {
+      return {
+        getVec4Data(v, X),
+        getVec4Data(v, Y),
+        getVec4Data(v, Z),
+        getVec4Data(v, W)
+      };
+    }
+#endif
     return { _mm_permute_ps(v, _MM_SHUFFLE(W, Z, Y, X)) };
   }
 
   static EUCLID_CONSTEXPR Vec4 EUCLID_CALL permute(Vec4 v) noexcept {
-    #ifndef __clang__
-      if (__builtin_is_constant_evaluated()) {
-        return default_permute(v);
-      }
-    #endif
+#ifndef __clang__
+    if (__builtin_is_constant_evaluated()) {
+      return default_permute(v);
+    }
+#endif
     if constexpr (is_permute_match<0, 1, 2, 3>) {
       return v;
     } else if constexpr (is_permute_match<0, 1, 0, 1>) {
@@ -56,7 +56,7 @@ struct PermuteHelper {
 
 template<std::size_t X, std::size_t Y, std::size_t Z, std::size_t W>
 struct ShuffleHelper {
-    
+
   template<std::uint8_t Shuffle, bool WhichX, bool WhichY, bool WhichZ, bool WhichW>
   static Vec4 EUCLID_CALL shuffle_helper(Vec4 a, Vec4 b) noexcept {
     static constexpr __m128 mask {
@@ -73,22 +73,22 @@ struct ShuffleHelper {
   }
 
   static EUCLID_CONSTEXPR Vec4 EUCLID_CALL default_shuffle(const Vec4 a, const Vec4 b) noexcept {
-    #ifndef __clang__
-      if (__builtin_is_constant_evaluated()) {
-        auto select = []<std::size_t I>(Vec4 v1, Vec4 v2) {
-          if constexpr (I < 4) {
-            return getVec4Data(v1, I);
-          }
-          return getVec4Data(v2, I - 4);
-        };
-        return {
-          select.template operator()<X>(a, b),
-          select.template operator()<Y>(a, b),
-          select.template operator()<Z>(a, b),
-          select.template operator()<W>(a, b)
-        };
-      }
-    #endif
+#ifndef __clang__
+    if (__builtin_is_constant_evaluated()) {
+      auto select = []<std::size_t I>(Vec4 v1, Vec4 v2) {
+        if constexpr (I < 4) {
+          return getVec4Data(v1, I);
+        }
+        return getVec4Data(v2, I - 4);
+      };
+      return {
+        select.template operator()<X>(a, b),
+        select.template operator()<Y>(a, b),
+        select.template operator()<Z>(a, b),
+        select.template operator()<W>(a, b)
+      };
+    }
+#endif
     constexpr bool x = X > 3;
     constexpr bool y = Y > 3;
     constexpr bool z = Z > 3;
@@ -97,7 +97,7 @@ struct ShuffleHelper {
   }
 
   // static EUCLID_CONSTEXPR Vec4 EUCLID_CALL shuffle(const Vec4 a, const Vec4 b) noexcept {
-  //  
+  //
   // }
 };
 

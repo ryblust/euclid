@@ -245,16 +245,16 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL clamp(Vec4 v, float min, float max) noexcept {
 
 constexpr Vec4 EUCLID_CALL lerp(Vec4 a, Vec4 b, Vec4 t) noexcept {
   if (__builtin_is_constant_evaluated()) {
-    #if defined (_MSC_VER) && !defined(__clang__)
-      return {
-        detail::lerp(getVec4Data(a, 0), getVec4Data(b, 0), getVec4Data(t, 0)),
-        detail::lerp(getVec4Data(a, 1), getVec4Data(b, 1), getVec4Data(t, 1)),
-        detail::lerp(getVec4Data(a, 2), getVec4Data(b, 2), getVec4Data(t, 2)),
-        detail::lerp(getVec4Data(a, 3), getVec4Data(b, 3), getVec4Data(t, 3))
-      };
-    #else
-      return { (b.v - a.v) * t.v + a.v };
-    #endif
+#if defined (_MSC_VER) && !defined(__clang__)
+    return {
+      detail::lerp(getVec4Data(a, 0), getVec4Data(b, 0), getVec4Data(t, 0)),
+      detail::lerp(getVec4Data(a, 1), getVec4Data(b, 1), getVec4Data(t, 1)),
+      detail::lerp(getVec4Data(a, 2), getVec4Data(b, 2), getVec4Data(t, 2)),
+      detail::lerp(getVec4Data(a, 3), getVec4Data(b, 3), getVec4Data(t, 3))
+    };
+#else
+    return { (b.v - a.v) * t.v + a.v };
+#endif
   }
   return { _mm_fmadd_ps(t, _mm_sub_ps(b, a), a) };
 }

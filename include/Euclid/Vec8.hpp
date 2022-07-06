@@ -214,7 +214,7 @@ EUCLID_QUALIFIER bool EUCLID_CALL operator==(Vec8 a, Vec8 b) noexcept {
 }
 
 EUCLID_QUALIFIER bool EUCLID_CALL operator!=(Vec8 a, Vec8 b) noexcept {
-    return !(a == b);
+  return !(a == b);
 }
 
 EUCLID_QUALIFIER bool EUCLID_CALL equals(Vec8 a, Vec8 b) noexcept {
