@@ -6,7 +6,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4514)
 // enable /Wall
-// C4514: removing unused inline functions
+// C4514: remove unused inline functions
 #endif
 
 namespace euclid {
@@ -16,9 +16,9 @@ public:
 	union {
 		struct {
 			std::uint32_t mantissa : 23;
-			std::uint32_t exponent : 8;
-			std::uint32_t sign     : 1;
-		} bits; // Default Little-endian
+			std::uint32_t exponent :  8;
+			std::uint32_t sign     :  1;
+		} bits; // default little-endian
 		float value;
 	};
     constexpr Float32(const float val) noexcept : value(val) {}

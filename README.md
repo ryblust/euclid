@@ -1,16 +1,14 @@
 # Eucild - a Graphics Mathematics Library
-> **Euclid** is a SIMD Graphics Mathematics Library based on C++20
-
-## Overview
 
 **Features**
-- Cross-compiler
-- Compile-time calculation (not support Clang)
-- SIMD Speed up
-- Head-only
+- Compile-time calculation (part in clang)
+- C++20 Module support (WIP)
 
 ## Introduction
-- Compile-time calculation
+- Euclid uses **row-major** order
+- Euclid requires AVX2 support
+
+- Compile-time Calculation
   ```c++
   using namespace euclid;
   constexpr Vec4 a { 1,2,3,0 };
@@ -20,7 +18,7 @@
   constexpr Vec4 res3 = cross(a, b);
   ```
   
-- `euclid::debug::print(...args)`
+- Print Euclid Components
   ```c++
   #include <Euclid/Euclid.h>
   #include <Euclid/Print.hpp>
@@ -36,6 +34,6 @@
 - `Transformation` (WIP)
 
 ## Tested Compiler
-- MSVC 19.29/19.30
-- GCC 11.2
-- Clang 13
+- MSVC 19.29
+- GCC 11.3
+- Clang 13.0

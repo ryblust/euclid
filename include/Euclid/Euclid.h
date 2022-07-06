@@ -5,7 +5,8 @@
 #include "Mat4.hpp"
 #include "Geometric.hpp"
 #include "Color.hpp"
-#include "Utility.hpp"
+#include "Swizzle.hpp"
+#include "Print.hpp"
 
 using euclid::operator+;
 using euclid::operator-;

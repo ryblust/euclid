@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Core.h"
+#include <cstdint>
 
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4201)
-// C4201: use the non-standard extension anonymous union
+// enable: /Wall
+// C4201:  use the non-standard extension anonymous union
 #endif
 
 namespace euclid {
@@ -13,16 +14,11 @@ namespace euclid {
 enum class GammaSpace : std::uint8_t { Linear, sRGB };
 
 struct LinearColor {
-    float r,g,b,a;
+    float r, g, b, a;
 };
 
 struct Color {
-    union {
-        struct {
-            std::uint8_t r,g,b,a;
-        };
-        std::uint32_t alignment;
-    };
+    std::uint8_t r, g, b, a;
 };
 
 }

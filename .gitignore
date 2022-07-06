@@ -1,9 +1,4 @@
-*.vscode
-*.sln
-*.vcxproj
-*.filters
-*.user
-*.vs
-Euclid.cpp
-x64
-Main.cpp
+.vscode
+.xmake
+build
+tests/Main.cpp
