@@ -1,8 +1,9 @@
 # Eucild - a Graphics Mathematics Library
 
 **Features**
-- Compile-time calculation (part in clang)
+- Compile-time calculation (not support clang)
 - C++20 Module support (WIP)
+- SIMD speed up
 
 ## Introduction
 - Euclid uses **row-major** order
