@@ -31,12 +31,14 @@ struct alignas(16) Mat2 {
 };
 
 EUCLID_QUALIFIER Mat2 EUCLID_CALL transpose(Mat2 m) noexcept {
-  if (__builtin_is_constant_evaluated()) {
+#ifndef __clang__  
+  if consteval {
     return {
       m(0, 0), m(1, 0),
       m(0, 1), m(1, 1)
     };
   }
+#endif
   return { _mm_shuffle_ps(m.mat, m.mat, _MM_SHUFFLE(3, 1, 2, 0)) };
 }
 

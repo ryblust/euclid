@@ -48,6 +48,7 @@ constexpr Vec3 EUCLID_CALL cross(Vec3 a, Vec3 b) noexcept {
 }
 
 EUCLID_QUALIFIER float EUCLID_CALL dot(Vec4 a, Vec4 b) noexcept {
+#ifndef __clang__
   if (__builtin_is_constant_evaluated()) {
     return
       getVec4Data(a, 0) * getVec4Data(b, 0) +
@@ -55,40 +56,50 @@ EUCLID_QUALIFIER float EUCLID_CALL dot(Vec4 a, Vec4 b) noexcept {
       getVec4Data(a, 2) * getVec4Data(b, 2) +
       getVec4Data(a, 3) * getVec4Data(b, 3);
   }
+#endif // __clang__
   return _mm_cvtss_f32(_mm_dp_ps(a, b, 0xff));
 }
 
 EUCLID_QUALIFIER float EUCLID_CALL length(Vec4 a) noexcept {
+#ifndef __clang__
   if (__builtin_is_constant_evaluated()) {
     return math::sqrt(dot(a, a));
   }
+#endif // __clang__
   return _mm_cvtss_f32(_mm_sqrt_ps(_mm_dp_ps(a, a, 0xff)));
 }
 
 EUCLID_QUALIFIER float EUCLID_CALL lengthFast(Vec4 a) noexcept {
+#ifndef __clang__
   if (__builtin_is_constant_evaluated()) {
     return math::sqrt(dot(a, a));
   }
+#endif // __clang__
   const __m128 dpvec = _mm_dp_ps(a, a, 0xff);
   const __m128 rsqrt = _mm_rsqrt_ps(dpvec);
   return _mm_cvtss_f32(_mm_mul_ps(rsqrt, dpvec));
 }
 
 EUCLID_QUALIFIER Vec4 EUCLID_CALL normalize(Vec4 a) noexcept {
+#ifndef __clang__
   if (__builtin_is_constant_evaluated()) {
     return a / length(a);
   }
+#endif // __clang__
   return { _mm_div_ps(a, _mm_sqrt_ps(_mm_dp_ps(a, a, 0xff))) };
 }
 
 EUCLID_QUALIFIER Vec4 EUCLID_CALL normalizeFast(Vec4 a) noexcept {
+#ifndef __clang__
   if (__builtin_is_constant_evaluated()) {
     return a / math::sqrt(dot(a, a));
   }
+#endif // __clang__
   return { _mm_mul_ps(a, _mm_rsqrt_ps(_mm_dp_ps(a, a, 0xff))) };
 }
 
 EUCLID_QUALIFIER Vec4 EUCLID_CALL cross(Vec4 a, Vec4 b) noexcept {
+#ifndef __clang__
   if (__builtin_is_constant_evaluated()) {
     return {
       getVec4Data(a, 1) * getVec4Data(b, 2) - getVec4Data(a, 2) * getVec4Data(b, 1),
@@ -97,6 +108,7 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL cross(Vec4 a, Vec4 b) noexcept {
       0
     };
   }
+#endif // __clang__
   const __m128 v1 = _mm_permute_ps(a, _MM_SHUFFLE(3, 0, 2, 1));
   const __m128 v2 = _mm_permute_ps(b, _MM_SHUFFLE(3, 0, 2, 1));
   const __m128 v3 = _mm_mul_ps(v1, b);

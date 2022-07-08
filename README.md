@@ -22,14 +22,11 @@
 - Print Euclid Components
   ```c++
   #include <Euclid/Euclid.h>
-  #include <Euclid/Print.hpp>
-
-  using namespace euclid;
-
-  Vec4 v{ 1,2,3,4 };
-  Mat2 m{ 1,2,
-          3,4 };
-  debug::print(v, m);
+  
+  euclid::Vec4 v{ 1,2,3,4 };
+  euclid::Mat2 m{ 1,2,
+                  3,4 };
+  euclid::print(v, m);
   ```
 
 - `Transformation` (WIP)

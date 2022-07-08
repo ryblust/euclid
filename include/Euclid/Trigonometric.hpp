@@ -19,7 +19,7 @@ template<floating_point Ty>
 inline constexpr Ty radian = pi<Ty> / 180;
 
 // https://en.wikipedia.org/wiki/Fast_inverse_square_root
-constexpr float sqrt(const float number) noexcept {
+constexpr float sqrt(float number) noexcept {
 #if defined(__GLIBCXX__) && !defined(__clang__)
   // libstdc++ provides constexpr math function
   return std::sqrt(number);
@@ -33,7 +33,7 @@ constexpr float sqrt(const float number) noexcept {
 #endif
 }
 
-constexpr float cos(const float angle) noexcept {
+constexpr float cos(float angle) noexcept {
 #if defined(__GLIBCXX__) && !defined(__clang__)
   return std::cos(angle);
 #else
@@ -47,7 +47,7 @@ constexpr float cos(const float angle) noexcept {
 #endif
 }
 
-constexpr float sin(const float angle) noexcept {
+constexpr float sin(float angle) noexcept {
 #if defined(__GLIBCXX__) && !defined(__clang__)
   return std::sin(angle);
 #else
@@ -63,7 +63,7 @@ constexpr float sin(const float angle) noexcept {
 #endif
 }
 
-constexpr float tan(const float angle) noexcept {
+constexpr float tan(float angle) noexcept {
 #if defined(__GLIBCXX__) && !defined(__clang__)
   return std::tan(angle);
 #else

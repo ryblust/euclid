@@ -20,7 +20,7 @@ struct Float32 {
     } bits; // default little-endian
     float value;
   };
-  constexpr Float32(const float val) noexcept : value(val) {}
+  constexpr Float32(float val) noexcept : value(val) {}
 };
 
 } // namespace euclid
