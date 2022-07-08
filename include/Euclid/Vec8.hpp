@@ -30,8 +30,10 @@ EUCLID_QUALIFIER float& getVec8Data(Vec8& a, std::size_t pos) noexcept {
 #endif
 }
 
-// it's recommended to use this function to create Vec8 rather than using the list-initialization
-constexpr Vec8 EUCLID_CALL setVec8(float x, float y, float z,float w, float a, float b, float c, float d) noexcept {
+// it's recommended to use this function to create
+// Vec8 rather than using the list-initialization
+constexpr Vec8 EUCLID_CALL setVec8(float x, float y, float z, float w,
+                                   float a, float b, float c, float d) noexcept {
   if (__builtin_is_constant_evaluated()) {
     return { x,y,z,w,a,b,c,d };
   }

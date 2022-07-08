@@ -26,9 +26,9 @@ inline void EUCLID_CALL storeVec2(Vec2& dst, __m128 src) noexcept {
   _mm_store_sd(reinterpret_cast<double*>(&dst), _mm_castps_pd(src));
 }
 
-}
+} // namespace euclid::detail
 
-constexpr Vec2 EUCLID_CALL set1Vec2(const float val) noexcept {
+constexpr Vec2 EUCLID_CALL set1Vec2(float val) noexcept {
   return { val,val };
 }
 

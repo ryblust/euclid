@@ -101,7 +101,7 @@ struct ShuffleHelper {
   // }
 };
 
-}
+} // namespace euclid::detail
 
 template<std::size_t X, std::size_t Y, std::size_t Z, std::size_t W>
   requires(X < 4 && Y < 4 && Z < 4 && W < 4)

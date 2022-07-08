@@ -30,7 +30,7 @@ inline void EUCLID_CALL storeVec3(Vec3& dst, const __m128 src) noexcept {
   *reinterpret_cast<int*>(&dst.z) = _mm_extract_ps(src, 2);
 }
 
-}
+} // namespace euclid::detail
 
 constexpr Vec3 EUCLID_CALL set1Vec3(float val) noexcept {
   return { val,val,val };
