@@ -5,7 +5,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4514)
+#pragma warning(disable: 4514)
 // enable /Wall
 // C4514: remove unused inline functions
 #endif
@@ -20,7 +20,7 @@ namespace detail {
     
 inline __m128 EUCLID_CALL loadVec3(const Vec3& a) noexcept {
   const __m128 xy = _mm_castpd_ps(_mm_load_sd(reinterpret_cast<const double*>(&a)));
-  const __m128 z  = _mm_load_ss(&a.z);
+  const __m128  z = _mm_load_ss(&a.z);
   return _mm_insert_ps(xy, z, 0x20);
 }
 

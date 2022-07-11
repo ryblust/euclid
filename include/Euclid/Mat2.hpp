@@ -5,7 +5,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4514 5246)
+#pragma warning(disable: 4514 5246)
 // enable /Wall
 // C4514: remove unused inline functions
 // C5246: the initialization of a subobject should be wrapped in braces
@@ -32,7 +32,7 @@ struct alignas(16) Mat2 {
 
 EUCLID_QUALIFIER Mat2 EUCLID_CALL transpose(Mat2 m) noexcept {
 #ifndef __clang__  
-  if consteval {
+  if (__builtin_is_constant_evaluated()) {
     return {
       m(0, 0), m(1, 0),
       m(0, 1), m(1, 1)

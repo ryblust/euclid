@@ -4,7 +4,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4201)
+#pragma warning(disable: 4201)
 // enable: /Wall
 // C4201:  use the non-standard extension anonymous union
 #endif

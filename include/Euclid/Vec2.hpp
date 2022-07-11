@@ -5,7 +5,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4514)
+#pragma warning(disable: 4514)
 // enable /Wall
 // C4514: remove unused inline functions
 #endif
