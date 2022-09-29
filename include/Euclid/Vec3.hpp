@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Core.h"
-#include "Utility.hpp"
+#include "Core.hpp"
+#include "Math.hpp"
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)
 #pragma warning(disable: 4514)
-// enable /Wall
-// C4514: remove unused inline functions
-#endif
+#endif // _MSC_VER && !__clang__
 
 namespace euclid {
 
@@ -16,21 +14,24 @@ struct Vec3 {
   float x, y, z;
 };
 
-namespace detail {
-    
+namespace experimental {
+
 inline __m128 EUCLID_CALL loadVec3(const Vec3& a) noexcept {
   const __m128 xy = _mm_castpd_ps(_mm_load_sd(reinterpret_cast<const double*>(&a)));
   const __m128  z = _mm_load_ss(&a.z);
   return _mm_insert_ps(xy, z, 0x20);
 }
 
-inline void EUCLID_CALL storeVec3(Vec3& dst, const __m128 src) noexcept {
+inline void EUCLID_CALL storeVec3(Vec3& dst, __m128 src) noexcept {
+  // *std::launder(reinterpret_cast<int*>(&dst.x)) = _mm_extract_ps(src, 0);
+  // *std::launder(reinterpret_cast<int*>(&dst.y)) = _mm_extract_ps(src, 1);
+  // *std::launder(reinterpret_cast<int*>(&dst.z)) = _mm_extract_ps(src, 2);
   *reinterpret_cast<int*>(&dst.x) = _mm_extract_ps(src, 0);
   *reinterpret_cast<int*>(&dst.y) = _mm_extract_ps(src, 1);
   *reinterpret_cast<int*>(&dst.z) = _mm_extract_ps(src, 2);
 }
 
-} // namespace euclid::detail
+} // namespace euclid::experimental
 
 constexpr Vec3 EUCLID_CALL set1Vec3(float val) noexcept {
   return { val,val,val };
@@ -112,16 +113,16 @@ constexpr bool EUCLID_CALL operator!=(Vec3 a, Vec3 b) noexcept {
 
 constexpr bool EUCLID_CALL equals(Vec3 a, Vec3 b) noexcept {
   return
-    detail::floating_point_equals(a.x, b.x) &&
-    detail::floating_point_equals(a.y, b.y) &&
-    detail::floating_point_equals(a.z, b.z);
+    math::nearly_equal(a.x, b.x) &&
+    math::nearly_equal(a.y, b.y) &&
+    math::nearly_equal(a.z, b.z);
 }
 
 constexpr Vec3 EUCLID_CALL clamp(Vec3 v, Vec3 min, Vec3 max) noexcept {
   return {
-    detail::clamp(v.x, min.x, max.x),
-    detail::clamp(v.y, min.y, max.y),
-    detail::clamp(v.z, min.z, max.z)
+    math::clamp(v.x, min.x, max.x),
+    math::clamp(v.y, min.y, max.y),
+    math::clamp(v.z, min.z, max.z)
   };
 }
 
@@ -131,9 +132,9 @@ constexpr Vec3 EUCLID_CALL clamp(Vec3 v, float min, float max) noexcept {
 
 constexpr Vec3 EUCLID_CALL lerp(Vec3 a, Vec3 b, Vec3 t) noexcept {
   return { 
-    detail::lerp(a.x, b.x, t.x),
-    detail::lerp(a.y, b.y, t.y),
-    detail::lerp(a.z, b.z, t.z)
+    math::lerp(a.x, b.x, t.x),
+    math::lerp(a.y, b.y, t.y),
+    math::lerp(a.z, b.z, t.z)
   };
 }
 
@@ -143,14 +144,14 @@ constexpr Vec3 EUCLID_CALL lerp(Vec3 a, Vec3 b, float t) noexcept {
 
 constexpr Vec3 EUCLID_CALL saturate(Vec3 a) noexcept {
   return {
-    detail::saturate(a.x),
-    detail::saturate(a.y),
-    detail::saturate(a.z)
+    math::saturate(a.x),
+    math::saturate(a.y),
+    math::saturate(a.z)
   };
 }
 
 } // namespace euclid
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(pop)
-#endif
+#endif // _MSC_VER && !__clang__

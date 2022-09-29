@@ -1,4 +1,4 @@
-# Eucild - a Graphics Mathematics Library
+# Eucild - constexpr SIMD Graphics Mathematics Library
 
 **Features**
 - Compile-time calculation (not support clang)
@@ -6,30 +6,32 @@
 - SIMD speed up
 
 ## Introduction
-- Euclid uses **row-major** order
+- **Notice:** \
+  Euclid uses **row-major-order** only to store matrix \
+  Euclid uses **col-major-order** to do matrix transform
+- Euclid requires C++20
 - Euclid requires AVX2 support
 
-- Compile-time Calculation
+- Compile-time computation
   ```c++
-  using namespace euclid;
-  constexpr Vec4 a { 1,2,3,0 };
-  constexpr Vec4 b { 4,5,6,0 };
-  constexpr Vec4 res1 = a + b;
-  constexpr Vec4 res2 = dot(a, b);
-  constexpr Vec4 res3 = cross(a, b);
+  constexpr euclid::Vec4 a{ 1,2,3,0 };
+  constexpr euclid::Vec4 b{ 4,5,6,0 };
+  constexpr auto res1 = a + b;
+  constexpr auto res2 = euclid::dot(a, b);
+  constexpr auto res3 = euclid::cross(a, b);
   ```
   
-- Print Euclid Components
+- Swizzle
   ```c++
-  #include <Euclid/Euclid.h>
-  
-  euclid::Vec4 v{ 1,2,3,4 };
-  euclid::Mat2 m{ 1,2,
-                  3,4 };
-  euclid::print(v, m);
+  constexpr euclid::Vec4 a{ 1,2,3,0 };
+  constexpr euclid::Vec4 b{ 4,5,6,0 };
+  constexpr auto res1 = euclid::permute<0,2,1,3>(a);
+  // the first two template paramters
+  // are used for a and rest is for b
+  constexpr auto res2 = euclid::shuffle<0,2,1,3>(a, b);
   ```
 
-- `Transformation` (WIP)
+- Transformation (WIP)
 
 ## Tested Compiler
 - MSVC 19.29

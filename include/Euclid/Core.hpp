@@ -12,6 +12,7 @@
 #ifndef __clang__
   #define EUCLID_CONSTEXPR constexpr
 #else
+  // clang does not support get __m128's field at compile-time
   #define EUCLID_CONSTEXPR
 #endif
 
@@ -23,6 +24,12 @@
 
 #define EUCLID_QUALIFIER EUCLID_FORCEINLINE EUCLID_CONSTEXPR
 
+#if defined(_MSC_VER) && !defined(__clang__)
+  #define EUCLID_UNREACHABLE() __assume(false)
+#else
+  #define EUCLID_UNREACHABLE() __builtin_unreachable()
+#endif
+
 namespace euclid {
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -30,12 +37,6 @@ using Vec4  = __m128;
 using Vec8  = __m256;
 using Vec4d = __m256d;
 #else
-struct alignas(16) Vec4 final {
-  constexpr EUCLID_CALL operator __m128() const noexcept {
-    return v;
-  }
-  __m128 v;
-};
 struct alignas(32) Vec8 final {
   constexpr EUCLID_CALL operator __m256() const noexcept {
     return v;
@@ -52,6 +53,7 @@ struct alignas(32) Vec4d final {
 
 struct Vec2;
 struct Vec3;
+struct Vec4;
 struct Mat2;
 struct Mat3;
 struct Mat4;

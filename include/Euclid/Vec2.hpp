@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Core.h"
-#include "Utility.hpp"
+#include "Core.hpp"
+#include "Math.hpp"
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)
 #pragma warning(disable: 4514)
-// enable /Wall
-// C4514: remove unused inline functions
-#endif
+#endif // _MSC_VER && !__clang__
 
 namespace euclid {
 
@@ -28,11 +26,11 @@ inline void EUCLID_CALL storeVec2(Vec2& dst, __m128 src) noexcept {
 
 } // namespace euclid::detail
 
-constexpr Vec2 EUCLID_CALL set1Vec2(float val) noexcept {
+constexpr Vec2 set1Vec2(float val) noexcept {
   return { val,val };
 }
 
-constexpr Vec2 EUCLID_CALL setZeroVec2() noexcept {
+constexpr Vec2 setZeroVec2() noexcept {
   return { 0,0 };
 }
 
@@ -108,14 +106,14 @@ constexpr bool operator!=(Vec2 a, Vec2 b) noexcept {
 
 constexpr bool equals(Vec2 a, Vec2 b) noexcept {
   return
-    detail::floating_point_equals(a.x, b.x) &&
-    detail::floating_point_equals(a.y, b.y);
+    math::nearly_equal(a.x, b.x) &&
+    math::nearly_equal(a.y, b.y);
 }
 
 constexpr Vec2 clamp(Vec2 v, Vec2 min, Vec2 max) noexcept {
   return {
-    detail::clamp(v.x, min.x, max.x),
-    detail::clamp(v.y, min.y, max.y)
+    math::clamp(v.x, min.x, max.x),
+    math::clamp(v.y, min.y, max.y)
   };
 }
 
@@ -125,8 +123,8 @@ constexpr Vec2 clamp(Vec2 v, float min, float max) noexcept {
 
 constexpr Vec2 lerp(Vec2 a, Vec2 b, Vec2 t) noexcept {
   return {
-    detail::lerp(a.x, b.x, t.x),
-    detail::lerp(a.y, b.y, t.y)
+    math::lerp(a.x, b.x, t.x),
+    math::lerp(a.y, b.y, t.y)
   };
 }
 
@@ -136,13 +134,13 @@ constexpr Vec2 lerp(Vec2 a, Vec2 b, float t) noexcept {
 
 constexpr Vec2 saturate(Vec2 a) noexcept {
   return {
-    detail::saturate(a.x),
-    detail::saturate(a.y)
+    math::saturate(a.x),
+    math::saturate(a.y)
   };
 }
 
 } // namespace euclid
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(pop)
-#endif
+#endif // _MSC_VER && !__clang__

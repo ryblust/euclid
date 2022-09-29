@@ -1,13 +1,12 @@
 #pragma once
 
+#include "Core.hpp"
 #include <cstdint>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)
 #pragma warning(disable: 4201)
-// enable: /Wall
-// C4201:  use the non-standard extension anonymous union
-#endif
+#endif // _MSC_VER && !__clang__
 
 namespace euclid {
 
@@ -25,6 +24,6 @@ struct Color {
 
 } // namespace euclid
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(pop)
-#endif
+#endif // _MSC_VER && !__clang__

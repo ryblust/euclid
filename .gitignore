@@ -1,5 +1,5 @@
 .vscode
 .xmake
 build
-tests/Main.cpp
-roadmap.md
+Main.cpp
+xmake.lua

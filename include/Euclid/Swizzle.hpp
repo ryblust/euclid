@@ -3,6 +3,11 @@
 #include "Vec4.hpp"
 #include <cstdint>
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable: 4514)
+#endif // _MSC_VER && !__clang__
+
 namespace euclid {
 
 namespace detail {
@@ -12,7 +17,7 @@ struct PermuteHelper {
 
   static EUCLID_CONSTEXPR Vec4 EUCLID_CALL default_permute(Vec4 v) noexcept {
 #ifndef __clang__
-    if (__builtin_is_constant_evaluated()) {
+    if (std::is_constant_evaluated()) {
       return {
         getVec4Data(v, X),
         getVec4Data(v, Y),
@@ -26,32 +31,33 @@ struct PermuteHelper {
 
   static EUCLID_CONSTEXPR Vec4 EUCLID_CALL permute(Vec4 v) noexcept {
 #ifndef __clang__
-    if (__builtin_is_constant_evaluated()) {
+    if (std::is_constant_evaluated()) {
       return default_permute(v);
     }
 #endif
-    if constexpr (is_permute_match<0, 1, 2, 3>) {
+    if constexpr (is_index_match<0, 1, 2, 3>) {
       return v;
-    } else if constexpr (is_permute_match<0, 1, 0, 1>) {
+    } else if constexpr (is_index_match<0, 1, 0, 1>) {
       return { _mm_movelh_ps(v, v) };
-    } else if constexpr (is_permute_match<2, 3, 2, 3>) {
+    } else if constexpr (is_index_match<2, 3, 2, 3>) {
       return { _mm_movehl_ps(v, v) };
-    } else if constexpr (is_permute_match<0, 0, 1, 1>) {
+    } else if constexpr (is_index_match<0, 0, 1, 1>) {
       return { _mm_unpacklo_ps(v, v) };
-    } else if constexpr (is_permute_match<2, 2, 3, 3>) {
+    } else if constexpr (is_index_match<2, 2, 3, 3>) {
       return { _mm_unpackhi_ps(v, v) };
-    } else if constexpr (is_permute_match<0, 0, 2, 2>) {
+    } else if constexpr (is_index_match<0, 0, 2, 2>) {
       return { _mm_moveldup_ps(v) }; // sse3
-    } else if constexpr (is_permute_match<1, 1, 3, 3>) {
+    } else if constexpr (is_index_match<1, 1, 3, 3>) {
       return { _mm_movehdup_ps(v) }; // sse3
-    } else if constexpr (is_permute_match<0, 0, 0, 0>) {
+    } else if constexpr (is_index_match<0, 0, 0, 0>) {
       return { _mm_broadcastss_ps(v) }; // avx2
     }
     return default_permute(v);
   }
 
   template<std::size_t x, std::size_t y, std::size_t z, std::size_t w>
-  static constexpr bool is_permute_match = std::is_same_v<PermuteHelper, PermuteHelper<x, y, z, w>>;
+  static constexpr bool is_index_match = 
+    std::is_same_v<PermuteHelper, PermuteHelper<x, y, z, w>>;
 };
 
 template<std::size_t X, std::size_t Y, std::size_t Z, std::size_t W>
@@ -72,9 +78,9 @@ struct ShuffleHelper {
     return { _mm_or_ps(m128mask1, m128mask2) };
   }
 
-  static EUCLID_CONSTEXPR Vec4 EUCLID_CALL default_shuffle(const Vec4 a, const Vec4 b) noexcept {
+  static EUCLID_CONSTEXPR Vec4 EUCLID_CALL default_shuffle(Vec4 a, Vec4 b) noexcept {
 #ifndef __clang__
-    if (__builtin_is_constant_evaluated()) {
+    if (std::is_constant_evaluated()) {
       auto select = []<std::size_t I>(Vec4 v1, Vec4 v2) {
         if constexpr (I < 4) {
           return getVec4Data(v1, I);
@@ -96,7 +102,7 @@ struct ShuffleHelper {
     return shuffle_helper<_MM_SHUFFLE(W, Z, Y, X), x, y, z, w>(a, b);
   }
 
-  // static EUCLID_CONSTEXPR Vec4 EUCLID_CALL shuffle(const Vec4 a, const Vec4 b) noexcept {
+  // static EUCLID_CONSTEXPR Vec4 EUCLID_CALL shuffle(Vec4 a, Vec4 b) noexcept {
   //
   // }
 };
@@ -117,9 +123,9 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL shuffle(Vec4 a, Vec4 b) noexcept {
 
 // template<std::size_t X, std::size_t Y, std::size_t Z, std::size_t W>
 //     requires(X < 8 && Y < 8 && Z < 8 && W < 8)
-// EUCLID_QUALIFIER Vec4 EUCLID_CALL shuffle(const Vec4 a, const Vec4 b) noexcept {
-//     if (__builtin_is_constant_evaluated()) {
-//         auto select = []<std::size_t I>(const Vec4 v1, const Vec4 v2) {
+// EUCLID_QUALIFIER Vec4 EUCLID_CALL shuffle(Vec4 a,Vec4 b) noexcept {
+//     if (std::is_constant_evaluated()) {
+//         auto select = []<std::size_t I>(Vec4 v1, Vec4 v2) {
 //             if constexpr (I < 4) {
 //                 return getVec4Data(v1, I);
 //             }
@@ -140,3 +146,7 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL shuffle(Vec4 a, Vec4 b) noexcept {
 // }
 
 } // namespace euclid
+
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(pop)
+#endif // _MSC_VER && !__clang__

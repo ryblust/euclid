@@ -1,30 +1,51 @@
 #pragma once
 
-#include "Core.h"
+#include "Core.hpp"
+#include <bit>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)
 #pragma warning(disable: 4514)
-// enable /Wall
-// C4514: remove unused inline functions
-#endif
+#endif // _MSC_VER && !__clang__
 
 namespace euclid {
 
+namespace detail {
+
+template<std::endian>
+struct float_bits {};
+
+template<>
+struct float_bits<std::endian::little> {
+  std::uint32_t mantissa : 23;
+  std::uint32_t exponent :  8;
+  std::uint32_t sign     :  1;
+};
+
+template<>
+struct float_bits<std::endian::big> {
+  std::uint32_t sign     :  1;
+  std::uint32_t exponent :  8;
+  std::uint32_t mantissa : 23;
+};
+
+} // namespace euclid::detail
+
 struct Float32 {
+  constexpr Float32() noexcept = default;
+
+  constexpr Float32(float val) noexcept : value(val) {}
+
+  using float_bits = detail::float_bits<std::endian::native>;
+  
   union {
-    struct {
-      std::uint32_t mantissa : 23;
-      std::uint32_t exponent :  8;
-      std::uint32_t sign     :  1;
-    } bits; // default little-endian
+    float_bits bits;
     float value;
   };
-  constexpr Float32(float val) noexcept : value(val) {}
 };
 
 } // namespace euclid
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(pop)
-#endif
+#endif // _MSC_VER && !__clang__
