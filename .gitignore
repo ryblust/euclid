@@ -1,5 +1,7 @@
 .vscode
 .xmake
 build
+include/Euclid/Vec2.hpp
+include/Euclid/Mat2.hpp
 Main.cpp
 xmake.lua

@@ -1,7 +1,7 @@
 # Eucild - constexpr SIMD Graphics Mathematics Library
 
 **Features**
-- Compile-time calculation (not support clang)
+- Compile-time calculation
 - C++20 Module support (WIP)
 - SIMD speed up
 
@@ -12,7 +12,8 @@
 - Euclid requires C++20
 - Euclid requires AVX2 support
 
-- Compile-time computation
+- Compile-time calculation \
+  **notice: clang only support for a few of functions**
   ```c++
   constexpr euclid::Vec4 a{ 1,2,3,0 };
   constexpr euclid::Vec4 b{ 4,5,6,0 };

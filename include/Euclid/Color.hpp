@@ -10,17 +10,11 @@
 
 namespace euclid {
 
-enum class GammaSpace : std::uint8_t {
-  Linear, sRGB
-};
+enum class GammaSpace : std::uint8_t { Linear, sRGB };
 
-struct LinearColor {
-  float r, g, b, a;
-};
+struct LinearColor { float r, g, b, a; };
 
-struct Color {
-  std::uint8_t r, g, b, a;
-};
+struct Color { std::uint8_t r, g, b, a; };
 
 } // namespace euclid
 

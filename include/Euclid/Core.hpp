@@ -32,34 +32,13 @@
 
 namespace euclid {
 
-#if defined(_MSC_VER) && !defined(__clang__)
-using Vec4  = __m128;
-using Vec8  = __m256;
-using Vec4d = __m256d;
-#else
-struct alignas(32) Vec8 final {
-  constexpr EUCLID_CALL operator __m256() const noexcept {
-    return v;
-  }
-  __m256 v;
-};
-struct alignas(32) Vec4d final {
-  constexpr EUCLID_CALL operator __m256d() const noexcept {
-    return v;
-  }
-  __m256d v;
-};
-#endif
-
 struct Vec2;
 struct Vec3;
 struct Vec4;
-struct Mat2;
+struct Vec8;
 struct Mat3;
 struct Mat4;
-
-template<typename T1, typename T2>
-concept same_type = std::is_same_v<T1, T2>;
+struct Vec4d;
 
 template<typename T>
 concept arithmetic = std::is_arithmetic_v<T>;
@@ -74,7 +53,7 @@ template<typename T>
 concept vector_type = is_any_type_of<std::remove_cv_t<T>, Vec2, Vec3, Vec4, Vec4d, Vec8>;
 
 template<typename T>
-concept matrix_type = is_any_type_of<std::remove_cv_t<T>, Mat2, Mat3, Mat4>;
+concept matrix_type = is_any_type_of<std::remove_cv_t<T>, Mat3, Mat4>;
 
 template<typename T>
 concept euclid_component = vector_type<T> || matrix_type<T>;

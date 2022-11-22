@@ -11,24 +11,9 @@
 namespace euclid {
 
 struct alignas(32) Mat4 {
-
   constexpr Mat4() noexcept : mat{} {}
-
-  constexpr Mat4(
-    float a0, float a1, float a2, float a3,
-    float b0, float b1, float b2, float b3,
-    float c0, float c1, float c2, float c3,
-    float d0, float d1, float d2, float d3)
-      noexcept : mat {
-        { a0,a1,a2,a3,b0,b1,b2,b3 },
-        { c0,c1,c2,c3,d0,d1,d2,d3 }
-      } {
-  }
-
-  constexpr Mat4(Vec4 a, Vec4 b, Vec4 c, Vec4 d)
-    noexcept : mat{ toVec8(a, b), toVec8(c, d) } {
-  }
-
+  constexpr Mat4(float a0, float a1, float a2, float a3, float b0, float b1, float b2, float b3, float c0, float c1, float c2, float c3, float d0, float d1, float d2, float d3) noexcept : mat {{ a0,a1,a2,a3,b0,b1,b2,b3 }, { c0,c1,c2,c3,d0,d1,d2,d3 }} {}
+  constexpr Mat4(Vec4 a, Vec4 b, Vec4 c, Vec4 d) noexcept : mat{ toVec8(a, b), toVec8(c, d) } {}
   constexpr Mat4(Vec8 a, Vec8 b) noexcept : mat{ a,b } {}
 
   static constexpr Mat4 EUCLID_CALL identity() noexcept {
@@ -71,7 +56,7 @@ struct alignas(32) Mat4 {
   EUCLID_CONSTEXPR Vec4 EUCLID_CALL getColVec4(std::size_t pos) const noexcept {
 #ifndef __clang__
     if (std::is_constant_evaluated()) {
-      return {
+      return Vec4 {
         getVec8Data(mat[0], pos),
         getVec8Data(mat[0], pos + 4),
         getVec8Data(mat[1], pos),
@@ -141,7 +126,7 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL getColVec4(Mat4 m) noexcept {
   if constexpr (Index == 0) {
 #ifndef __clang__
     if (std::is_constant_evaluated()) {
-      return {
+      return Vec4 {
         getVec8Data(m.mat[0], 0),
         getVec8Data(m.mat[0], 4),
         getVec8Data(m.mat[1], 0),
@@ -156,7 +141,7 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL getColVec4(Mat4 m) noexcept {
   } else if constexpr (Index == 1) {
 #ifndef __clang__
     if (std::is_constant_evaluated()) {
-      return {
+      return Vec4 {
         getVec8Data(m.mat[0], 1),
         getVec8Data(m.mat[0], 5),
         getVec8Data(m.mat[1], 1),
@@ -167,7 +152,7 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL getColVec4(Mat4 m) noexcept {
   } else if constexpr (Index == 2) {
 #ifndef __clang__
     if (std::is_constant_evaluated()) {
-      return {
+      return Vec4 {
         getVec8Data(m.mat[0], 2),
         getVec8Data(m.mat[0], 6),
         getVec8Data(m.mat[1], 2),
@@ -178,7 +163,7 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL getColVec4(Mat4 m) noexcept {
   } else {
 #ifndef __clang__
     if (std::is_constant_evaluated()) {
-      return {
+      return Vec4 {
         getVec8Data(m.mat[0], 3),
         getVec8Data(m.mat[0], 7),
         getVec8Data(m.mat[1], 3),
@@ -191,11 +176,7 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL getColVec4(Mat4 m) noexcept {
 
 // it's recommended to use this function to create
 // `Mat4` rather than using the list-initialization
-constexpr Mat4 EUCLID_CALL setMat4(
-  float a0, float a1, float a2, float a3,
-  float b0, float b1, float b2, float b3,
-  float c0, float c1, float c2, float c3,
-  float d0, float d1, float d2, float d3) noexcept {
+constexpr Mat4 EUCLID_CALL setMat4(float a0, float a1, float a2, float a3, float b0, float b1, float b2, float b3, float c0, float c1, float c2, float c3, float d0, float d1, float d2, float d3) noexcept {
   if (std::is_constant_evaluated()) {
     return Mat4 {
       a0, a1, a2, a3,
@@ -251,7 +232,7 @@ EUCLID_QUALIFIER Vec4 EUCLID_CALL operator*(Mat4 m, Vec4 v) noexcept {
       a[2] += getVec8Data(m.mat[1], i)     * getVec4Data(v, i);
       a[3] += getVec8Data(m.mat[1], i + 4) * getVec4Data(v, i);
     }
-    return { a[0],a[1],a[2],a[3] };
+    return Vec4{ a[0],a[1],a[2],a[3] };
   }
 #endif // __clang__
   const __m256i mask = _mm256_set_epi32(0, 0, 0, 0, 5, 1, 4, 0);

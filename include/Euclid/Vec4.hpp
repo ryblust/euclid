@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core.hpp"
 #include "Math.hpp"
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -14,11 +13,10 @@ namespace euclid {
 using Vec4 = __m128;
 #else
 struct alignas(16) Vec4 final {
-  constexpr Vec4() noexcept : v() {}
-  constexpr Vec4(float x, float y, float z, float w) noexcept : v(__m128{ x,y,z,w }) {}
-  constexpr Vec4(__m128 a) noexcept : v(a) {}
-  constexpr EUCLID_CALL operator __m128() const noexcept { return v; }
-  __m128 v;
+  constexpr EUCLID_CALL operator __m128() const noexcept {
+    return data;
+  }
+  __m128 data;
 };
 #endif // _MSC_VER && !__clang__
 
@@ -26,17 +24,17 @@ EUCLID_QUALIFIER float EUCLID_CALL getVec4Data(const Vec4& a, std::size_t i) noe
 #if defined(_MSC_VER) && !defined(__clang__)
   return a.m128_f32[i];
 #else // __clang__ || __GNUC__
-  return a.v[i];
+  return a.data[i];
 #endif
 }
 
 EUCLID_QUALIFIER float& EUCLID_CALL getVec4Data(Vec4& a, std::size_t i) noexcept {
-#if defined(_MSC_VER) && !defined(__clang__)  
+#if defined(_MSC_VER) && !defined(__clang__)
   return a.m128_f32[i];
 #elif __clang__
   return *(reinterpret_cast<float*>(&a) + i);
 #else // __GNUC__
-  return a.v[i];
+  return a.data[i];
 #endif
 }
 
@@ -55,7 +53,7 @@ EUCLID_QUALIFIER float EUCLID_CALL getVec4Y(Vec4 a) noexcept {
     return getVec4Data(a, 1);
   }
 #endif
-  return _mm_cvtss_f32(_mm_permute_ps(a, _MM_SHUFFLE(1, 1, 1, 1)));
+  return _mm_cvtss_f32(_mm_shuffle_ps(a, a, _MM_SHUFFLE(1, 1, 1, 1)));
 }
 
 EUCLID_QUALIFIER float EUCLID_CALL getVec4Z(Vec4 a) noexcept {
@@ -64,7 +62,7 @@ EUCLID_QUALIFIER float EUCLID_CALL getVec4Z(Vec4 a) noexcept {
     return getVec4Data(a, 2);
   }
 #endif
-  return _mm_cvtss_f32(_mm_permute_ps(a, _MM_SHUFFLE(2, 2, 2, 2)));
+  return _mm_cvtss_f32(_mm_shuffle_ps(a, a, _MM_SHUFFLE(2, 2, 2, 2)));
 }
 
 EUCLID_QUALIFIER float EUCLID_CALL getVec4W(Vec4 a) noexcept {
@@ -73,77 +71,77 @@ EUCLID_QUALIFIER float EUCLID_CALL getVec4W(Vec4 a) noexcept {
     return getVec4Data(a, 3);
   }
 #endif
-  return _mm_cvtss_f32(_mm_permute_ps(a, _MM_SHUFFLE(3, 3, 3, 3)));
+  return _mm_cvtss_f32(_mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 3, 3, 3)));
 }
 
-// it's recommended to use this function to create
+// it's recommended to use `setVec4` to create
 // `Vec4` rather than using the list-initialization
 constexpr Vec4 EUCLID_CALL setVec4(float x, float y, float z, float w) noexcept {
   if (std::is_constant_evaluated()) {
-    return { x,y,z,w };
+    return Vec4{ x,y,z,w };
   }
-  return _mm_set_ps(w, z, y, x);
+  return { _mm_set_ps(w, z, y, x) };
 }
 
 constexpr Vec4 EUCLID_CALL set1Vec4(float v) noexcept {
   if (std::is_constant_evaluated()) {
-    return { v,v,v,v };
+    return Vec4{ v,v,v,v };
   }
-  return _mm_set1_ps(v);
+  return { _mm_set1_ps(v) };
 }
 
 constexpr Vec4 EUCLID_CALL setZeroVec4() noexcept {
   if (std::is_constant_evaluated()) {
-    return { 0,0,0,0 };
+    return Vec4{ 0,0,0,0 };
   }
-  return _mm_setzero_ps();
+  return { _mm_setzero_ps() };
 }
 
 constexpr Vec4 EUCLID_CALL operator+(Vec4 a, Vec4 b) noexcept {
 #if defined(__clang__) || defined(__GNUC__)
-  return a.v + b.v;
+  return { a.data + b.data };
 #else
   if (std::is_constant_evaluated()) {
-    return {
+    return Vec4 {
       getVec4Data(a, 0) + getVec4Data(b, 0),
       getVec4Data(a, 1) + getVec4Data(b, 1),
       getVec4Data(a, 2) + getVec4Data(b, 2),
       getVec4Data(a, 3) + getVec4Data(b, 3)
     };
   }
-  return _mm_add_ps(a, b);
+  return { _mm_add_ps(a, b) };
 #endif
 }
 
 constexpr Vec4 EUCLID_CALL operator-(Vec4 a, Vec4 b) noexcept {
 #if defined(__clang__) || defined(__GNUC__)
-  return a.v - b.v;
+  return { a.data - b.data };
 #else
   if (std::is_constant_evaluated()) {
-    return {
+    return Vec4 {
       getVec4Data(a, 0) - getVec4Data(b, 0),
       getVec4Data(a, 1) - getVec4Data(b, 1),
       getVec4Data(a, 2) - getVec4Data(b, 2),
       getVec4Data(a, 3) - getVec4Data(b, 3)
     };
   }
-  return _mm_sub_ps(a, b);
+  return { _mm_sub_ps(a, b) };
 #endif
 }
 
 constexpr Vec4 EUCLID_CALL operator*(Vec4 a, Vec4 b) noexcept {
 #if defined(__clang__) || defined(__GNUC__)
-  return a.v * b.v;
+  return { a.data * b.data };
 #else
   if (std::is_constant_evaluated()) {
-    return {
+    return Vec4 {
       getVec4Data(a, 0) * getVec4Data(b, 0),
       getVec4Data(a, 1) * getVec4Data(b, 1),
       getVec4Data(a, 2) * getVec4Data(b, 2),
       getVec4Data(a, 3) * getVec4Data(b, 3)
     };
   }
-  return _mm_mul_ps(a, b);
+  return { _mm_mul_ps(a, b) };
 #endif
 }
 
@@ -157,17 +155,17 @@ constexpr Vec4 EUCLID_CALL operator*(float v, Vec4 a) noexcept {
 
 constexpr Vec4 EUCLID_CALL operator/(Vec4 a, Vec4 b) noexcept {
 #if defined(__clang__) || defined(__GNUC__)
-  return a.v / b.v;
+  return { a.data / b.data };
 #else
   if (std::is_constant_evaluated()) {
-    return {
+    return Vec4 {
       getVec4Data(a, 0) / getVec4Data(b, 0),
       getVec4Data(a, 1) / getVec4Data(b, 1),
       getVec4Data(a, 2) / getVec4Data(b, 2),
       getVec4Data(a, 3) / getVec4Data(b, 3)
     };
   }
-  return _mm_div_ps(a, b);
+  return { _mm_div_ps(a, b) };
 #endif
 }
 

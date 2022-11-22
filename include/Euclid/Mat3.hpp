@@ -9,9 +9,7 @@
 
 namespace euclid {
 
-struct Mat3 {
-  Vec3 m[3];
-};
+struct Mat3 {};
 
 } // namespace euclid
 

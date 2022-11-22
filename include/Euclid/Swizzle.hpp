@@ -18,7 +18,7 @@ struct PermuteHelper {
   static EUCLID_CONSTEXPR Vec4 EUCLID_CALL default_permute(Vec4 v) noexcept {
 #ifndef __clang__
     if (std::is_constant_evaluated()) {
-      return {
+      return Vec4 {
         getVec4Data(v, X),
         getVec4Data(v, Y),
         getVec4Data(v, Z),

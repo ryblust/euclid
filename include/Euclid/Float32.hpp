@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core.hpp"
 #include <bit>
+#include <cstdint>
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)
@@ -32,11 +32,10 @@ struct float_bits<std::endian::big> {
 } // namespace euclid::detail
 
 struct Float32 {
-  constexpr Float32() noexcept = default;
-
-  constexpr Float32(float val) noexcept : value(val) {}
-
   using float_bits = detail::float_bits<std::endian::native>;
+
+  constexpr Float32() noexcept = default;
+  constexpr Float32(float val) noexcept : value(val) {}
   
   union {
     float_bits bits;
