@@ -10,7 +10,7 @@
 namespace euclid {
 
 #if defined(_MSC_VER) && !defined(__clang__)
-using __m256 = Vec8;
+using Vec8 = __m256;
 #else
 struct alignas(32) Vec8 final {
   constexpr EUCLID_CALL operator __m256() const noexcept {
