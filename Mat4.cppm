@@ -23,8 +23,8 @@ export namespace Euclid
         {
             if (std::is_constant_evaluated())
             {
-
             }
+
             return *(reinterpret_cast<float*>(this) + 4 * row + col);
         }
 
@@ -34,35 +34,19 @@ export namespace Euclid
         }
 
 #ifdef __clang__
-        union { float forconstexpr[16]; __m256 data[2]; };
-#else // _MSC_VER || __GNUC__
+        union {
+            float forconstexpr[16];
+            __m256 data[2];
+        };
+#else
         __m256 data[2];
-#endif // __clang__
+#endif
     };
-
-} // namespace Euclid
+}
 
 using namespace Euclid;
 
 export
 {
-    // constexpr Mat4 EUCLID_CALL operator+(Mat4 a, Mat4 b) noexcept
-    // {
-    //     if (std::is_constant_evaluated())
-    //     {
-    //         Mat4 ret;
-            
-    //         for (std::size_t i = 0; i < 4; ++i)
-    //             for (std::size_t j = 0; j < 4; ++i)
-    //                 ret(i, j) = a(i, j) + b(i, j);
 
-    //         return ret;
-    //     }
-
-    //     return Mat4
-    //     {
-    //         .data[0] = _mm256_add_ps(a.data[0], b.data[0]),
-    //         .data[1] = _mm256_add_ps(a.data[1], b.data[1])
-    //     }
-    // }
 }

@@ -8,89 +8,88 @@ module;
 
 export module Euclid.Math;
 
-export namespace Euclid::Math {
-
-template<typename T>
-concept arithmetic = std::is_arithmetic_v<T>;
-
-template<typename T>
-concept floating_point = std::is_floating_point_v<T>;
-
-template<floating_point FloatT>
-inline constexpr auto Radian = std::numbers::pi_v<FloatT> / 180;
-
-// https://en.wikipedia.org/wiki/Fast_inverse_square_root
-constexpr float RSqrt(float num) noexcept
+export namespace Euclid::Math
 {
-    const auto x = std::bit_cast<unsigned int>(num);
-    const auto y = std::bit_cast<float>(0x5f1ffff9 -  (x >> 1));
-    return 0.703952253f * (2.38924456f - num * y * y) * y;
-}
+    template<typename T>
+    concept arithmetic = std::is_arithmetic_v<T>;
 
-constexpr float Sqrt(float num) noexcept
-{
-    if (std::is_constant_evaluated())
-        return RSqrt(num) * num;
+    template<typename T>
+    concept floating_point = std::is_floating_point_v<T>;
 
-    return std::sqrt(num);
-}
+    template<floating_point FloatT>
+    inline constexpr auto Radian = std::numbers::pi_v<FloatT> / 180;
 
-constexpr float Cos(float angle) noexcept
-{
-    if (std::is_constant_evaluated())
+    // https://en.wikipedia.org/wiki/Fast_inverse_square_root
+    constexpr float RSqrt(float num) noexcept
     {
-        return 0;
+        const auto x = std::bit_cast<unsigned int>(num);
+        const auto y = std::bit_cast<float>(0x5f1ffff9 -  (x >> 1));
+        return 0.703952253f * (2.38924456f - num * y * y) * y;
     }
 
-    return std::cos(angle * Radian<float>);
-}
-
-constexpr float Sin(float angle) noexcept
-{
-    if (std::is_constant_evaluated())
+    constexpr float Sqrt(float num) noexcept
     {
-        return 0;
+        if (std::is_constant_evaluated())
+            return RSqrt(num) * num;
+
+        return std::sqrt(num);
     }
 
-    return std::sin(angle * Radian<float>);
-}
-
-constexpr float Tan(float angle) noexcept
-{
-    if (std::is_constant_evaluated())
+    constexpr float Cos(float angle) noexcept
     {
-        return 0;
+        if (std::is_constant_evaluated())
+        {
+            return 0;
+        }
+
+        return std::cos(angle * Radian<float>);
     }
 
-    return std::tan(angle * Radian<float>);
-}
+    constexpr float Sin(float angle) noexcept
+    {
+        if (std::is_constant_evaluated())
+        {
+            return 0;
+        }
 
-template<arithmetic Ty>
-constexpr Ty Clamp(Ty num, Ty min, Ty max) noexcept
-{
-    return num < min ? min : max < num ? max : num;
-}
+        return std::sin(angle * Radian<float>);
+    }
 
-template<floating_point FloatT>
-constexpr FloatT Lerp(FloatT a, FloatT b, FloatT t) noexcept
-{
-    return a + t * (b - a);
-}
+    constexpr float Tan(float angle) noexcept
+    {
+        if (std::is_constant_evaluated())
+        {
+            return 0;
+        }
 
-constexpr auto Saturate(arithmetic auto num) noexcept
-{
-    return num > 1 ? 1 : num < 0 ? 0 : num;
-}
+        return std::tan(angle * Radian<float>);
+    }
 
-constexpr auto Absolute(arithmetic auto num) noexcept
-{
-    return num < 0 ? -num : num;
-}
+    template<arithmetic Ty>
+    constexpr Ty Clamp(Ty num, Ty min, Ty max) noexcept
+    {
+        return num < min ? min : max < num ? max : num;
+    }
 
-template<floating_point FloatT>
-constexpr bool NearlyEqual(FloatT a, FloatT b) noexcept
-{
-    return Absolute(a - b) < std::numeric_limits<FloatT>::epsilon();
-}
+    template<floating_point FloatT>
+    constexpr FloatT Lerp(FloatT a, FloatT b, FloatT t) noexcept
+    {
+        return a + t * (b - a);
+    }
 
-} // namespace Euclid::Math
+    constexpr auto Saturate(arithmetic auto num) noexcept
+    {
+        return num > 1 ? 1 : num < 0 ? 0 : num;
+    }
+
+    constexpr auto Absolute(arithmetic auto num) noexcept
+    {
+        return num < 0 ? -num : num;
+    }
+
+    template<floating_point FloatT>
+    constexpr bool NearlyEqual(FloatT a, FloatT b) noexcept
+    {
+        return Absolute(a - b) < std::numeric_limits<FloatT>::epsilon();
+    }
+}
